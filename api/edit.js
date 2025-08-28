@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, embedConfigs, logUsage } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage } from "./_shared.js";
 
 export const config = {
   api: {
@@ -18,7 +18,7 @@ export default async function handler(req, res){
 
     const embedId = (fields.embedId?.toString() || '').trim();
     if (!embedId) return res.status(400).json({ error: 'Missing embedId' });
-    const embedConfig = embedConfigs[embedId];
+    const embedConfig = await getEmbedConfig(embedId);
     if (!embedConfig) return res.status(404).json({ error: 'Unknown embedId' });
 
     const promptField = (fields.prompt?.toString() || '').trim();
@@ -49,7 +49,7 @@ export default async function handler(req, res){
 
     const { data } = result || {};
     if (!data){
-      logUsage('edit_error', embedId, { reason: 'no_data', prompt: effectivePrompt });
+      await logUsage('edit_error', embedId, { reason: 'no_data', prompt: effectivePrompt });
       return res.status(502).json({ error: 'No data from model' });
     }
 
@@ -64,13 +64,13 @@ export default async function handler(req, res){
       outputUrl = data.url;
     }
 
-    logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
+    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
 
     res.status(200).json({ outputUrl, prompt: effectivePrompt });
   }catch(err){
     console.error('/api/edit error', err);
     const embedId = (req.query?.embedId || req.body?.embedId || '').toString();
-    if (embedId) logUsage('edit_error', embedId, { reason: 'exception', message: err?.message || '' });
+    if (embedId) await logUsage('edit_error', embedId, { reason: 'exception', message: err?.message || '' });
     res.status(500).json({ error: 'Edit failed' });
   }
 }
