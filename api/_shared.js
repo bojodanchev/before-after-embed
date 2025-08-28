@@ -1,4 +1,5 @@
 import { fal } from "@fal-ai/client";
+import { kv as vercelKv } from "@vercel/kv";
 
 fal.config({ credentials: process.env.FAL_KEY || "" });
 
@@ -9,13 +10,7 @@ export const verticalPromptPresets = {
 };
 
 // ----- Storage layer: Vercel KV if available, otherwise in-memory fallback -----
-let kvClient = null;
-try {
-  const mod = await import("@vercel/kv");
-  kvClient = mod.kv;
-} catch (_err) {
-  kvClient = null;
-}
+const kvClient = vercelKv || null;
 
 const memoryEmbeds = {
   "demo-barber": { id: "demo-barber", name: "Barber Demo", vertical: "barber", theme: "light", width: "100%", height: "520px" },
@@ -25,24 +20,23 @@ const memoryEmbeds = {
 const memoryUsage = [];
 
 function isKvEnabled(){
-  return Boolean(kvClient && (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL));
+  return Boolean((process.env.KV_REST_API_URL || process.env.KV_URL || process.env.UPSTASH_REDIS_REST_URL));
 }
 
 export async function setEmbedConfig(config){
   const cfg = { ...config, id: config.id };
   if (!cfg.id) throw new Error("Embed id is required");
-  if (isKvEnabled()){
+  if (isKvEnabled() && kvClient){
     await kvClient.set(`embeds:${cfg.id}`, cfg);
     await kvClient.sadd("embeds:index", cfg.id);
   }
-  // Always reflect in memory as well for fallback rendering
   memoryEmbeds[cfg.id] = cfg;
   return cfg;
 }
 
 export async function getEmbedConfig(id){
   if (!id) return null;
-  if (isKvEnabled()){
+  if (isKvEnabled() && kvClient){
     const cfg = await kvClient.get(`embeds:${id}`);
     if (cfg) return cfg;
   }
@@ -50,7 +44,7 @@ export async function getEmbedConfig(id){
 }
 
 export async function listEmbeds(){
-  if (isKvEnabled()){
+  if (isKvEnabled() && kvClient){
     const ids = await kvClient.smembers("embeds:index");
     const results = [];
     if (ids && ids.length){
@@ -60,7 +54,6 @@ export async function listEmbeds(){
       }
       return results;
     }
-    // Seed KV with memory demos when empty
     for (const cfg of Object.values(memoryEmbeds)){
       await kvClient.set(`embeds:${cfg.id}`, cfg);
       await kvClient.sadd("embeds:index", cfg.id);
@@ -72,7 +65,7 @@ export async function listEmbeds(){
 
 export async function logUsage(event, embedId, meta){
   const record = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, ts: Date.now(), event, embedId, meta: meta || {} };
-  if (isKvEnabled()){
+  if (isKvEnabled() && kvClient){
     await kvClient.lpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
     await kvClient.lpush(`usage:all`, JSON.stringify(record));
     await kvClient.ltrim(`usage:${embedId || 'all'}`, 0, 999);
@@ -85,7 +78,7 @@ export async function logUsage(event, embedId, meta){
 }
 
 export async function listUsage(embedId, limit = 50){
-  if (isKvEnabled()){
+  if (isKvEnabled() && kvClient){
     const key = embedId ? `usage:${embedId}` : `usage:all`;
     const items = await kvClient.lrange(key, 0, limit - 1);
     return (items || []).map((s) => {
