@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Before/After</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h2>Create Embed</h2>
+        <div class="row"><input id="adm-token" type="password" placeholder="Admin token" /></div>
+        <div class="row"><input id="id" placeholder="id (e.g., acme-barber)" /></div>
+        <div class="row"><input id="name" placeholder="name" /></div>
+        <div class="row">
+          <select id="vertical">
+            <option value="barber">barber</option>
+            <option value="dental">dental</option>
+            <option value="detailing">detailing</option>
+          </select>
+          <select id="theme">
+            <option value="light">light</option>
+            <option value="dark">dark</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="width" placeholder="width" value="100%" />
+          <input id="height" placeholder="height" value="520px" />
+        </div>
+        <div class="row"><button id="create">Create</button></div>
+        <div id="create-status" class="status"></div>
+      </section>
+
+      <section class="card">
+        <h2>Embeds</h2>
+        <div class="row"><button id="refresh">Refresh list</button></div>
+        <pre id="embeds" style="white-space:pre-wrap"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Usage</h2>
+        <div class="row">
+          <input id="usage-embed" placeholder="embedId (optional)" />
+          <button id="usage-btn">Fetch</button>
+        </div>
+        <pre id="usage" style="white-space:pre-wrap"></pre>
+      </section>
+    </main>
+
+    <script src="/admin.js"></script>
+  </body>
+</html>
