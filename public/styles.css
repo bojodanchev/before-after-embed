@@ -1,0 +1,37 @@
+:root{
+  --bg: #0b0d10;
+  --fg: #e6eaf2;
+  --muted: #9aa4b2;
+  --card: #141820;
+  --accent: #6aa5ff;
+  --border: #222734;
+}
+[data-theme="light"]:root, html[data-theme="light"]{
+  --bg: #ffffff;
+  --fg: #0f172a;
+  --muted: #475569;
+  --card: #f8fafc;
+  --accent: #2563eb;
+  --border: #e2e8f0;
+}
+html, body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"}
+.container{max-width:960px;margin:0 auto;padding:24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.row{display:flex;gap:12px;align-items:center;margin:8px 0}
+.label{min-width:120px;color:var(--muted)}
+input[type="file"], input[type="text"], select{flex:1;background:transparent;border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--fg)}
+button{background:var(--accent);color:white;border:0;border-radius:8px;padding:10px 14px;cursor:pointer}
+.status{margin-top:8px;color:var(--muted)}
+.status.small{font-size:12px}
+
+.compare{position:relative;aspect-ratio:4/3;background:#000;border-radius:12px;overflow:hidden;user-select:none}
+.compare.compact{aspect-ratio:auto;height:320px}
+.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.compare .after-wrapper{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
+.slider{position:absolute;left:0;right:0;bottom:12px;margin:0 12px}
+
+.widget-body{padding:0;margin:0}
+.widget-root{padding:12px}
+.w-form{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+
+

@@ -1,0 +1,5 @@
+{
+  "watch": true,
+  "ext": "js,html,css",
+  "exec": "node src/server.js"
+}

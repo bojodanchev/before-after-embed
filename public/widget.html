@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Before/After Widget</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="widget-body">
+    <div class="widget-root">
+      <form id="w-form" class="w-form">
+        <input type="file" id="w-image" name="image" accept="image/*" required />
+        <select id="w-vertical" name="vertical">
+          <option value="">Preset</option>
+          <option value="barber">Barber</option>
+          <option value="dental">Dental</option>
+          <option value="detailing">Detailing</option>
+        </select>
+        <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" />
+        <button type="submit">Visualize</button>
+      </form>
+      <div class="compare compact">
+        <img id="w-before" alt="Before" />
+        <div class="after-wrapper">
+          <img id="w-after" alt="After" />
+        </div>
+        <input id="w-slider" class="slider" type="range" min="0" max="100" value="50" />
+      </div>
+      <div id="w-status" class="status small"></div>
+    </div>
+    <script src="/widget.js"></script>
+  </body>
+  </html>
+
+

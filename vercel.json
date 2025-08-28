@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    { "src": "/", "dest": "/public/index.html" },
+    { "src": "/widget.html", "dest": "/public/widget.html" },
+    { "src": "/widget.js", "dest": "/public/widget.js" },
+    { "src": "/embed.js", "dest": "/public/embed.js" },
+    { "src": "/styles.css", "dest": "/public/styles.css" }
+  ]
+}

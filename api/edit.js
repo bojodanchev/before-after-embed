@@ -1,0 +1,81 @@
+import formidable from "formidable";
+import { fal, verticalPromptPresets, embedConfigs, logUsage } from "./_shared.js";
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res){
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  try{
+    const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 10 * 1024 * 1024 });
+    const { fields, files } = await new Promise((resolve, reject) => {
+      form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
+    });
+
+    const embedId = (fields.embedId?.toString() || '').trim();
+    if (!embedId) return res.status(400).json({ error: 'Missing embedId' });
+    const embedConfig = embedConfigs[embedId];
+    if (!embedConfig) return res.status(404).json({ error: 'Unknown embedId' });
+
+    const promptField = (fields.prompt?.toString() || '').trim();
+    const verticalField = (fields.vertical?.toString() || '').trim().toLowerCase();
+
+    const fileObj = files.image;
+    const file = Array.isArray(fileObj) ? fileObj[0] : fileObj;
+    if (!file) return res.status(400).json({ error: "Missing image file under field 'image'" });
+
+    const buffer = await fsReadFile(file.filepath);
+    const mime = file.mimetype || 'image/png';
+    const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
+
+    const effectivePrompt = [verticalPromptPresets[verticalField || embedConfig.vertical] || null, promptField || null]
+      .filter(Boolean)
+      .join(' ');
+
+    if (!effectivePrompt) return res.status(400).json({ error: "Missing prompt. Provide 'prompt' or choose a 'vertical'." });
+
+    const result = await fal.subscribe("fal-ai/nano-banana/edit", {
+      input: {
+        prompt: effectivePrompt,
+        image_urls: [base64Image],
+      },
+      logs: false,
+      timeout: 120000,
+    });
+
+    const { data } = result || {};
+    if (!data){
+      logUsage('edit_error', embedId, { reason: 'no_data', prompt: effectivePrompt });
+      return res.status(502).json({ error: 'No data from model' });
+    }
+
+    let outputUrl = null;
+    if (typeof data === 'string') {
+      outputUrl = data;
+    } else if (Array.isArray(data?.images) && data.images[0]?.url) {
+      outputUrl = data.images[0].url;
+    } else if (data?.image?.url) {
+      outputUrl = data.image.url;
+    } else if (data?.url) {
+      outputUrl = data.url;
+    }
+
+    logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
+
+    res.status(200).json({ outputUrl, prompt: effectivePrompt });
+  }catch(err){
+    console.error('/api/edit error', err);
+    const embedId = (req.query?.embedId || req.body?.embedId || '').toString();
+    if (embedId) logUsage('edit_error', embedId, { reason: 'exception', message: err?.message || '' });
+    res.status(500).json({ error: 'Edit failed' });
+  }
+}
+
+async function fsReadFile(path){
+  const { readFile } = await import('fs/promises');
+  return readFile(path);
+}

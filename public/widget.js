@@ -1,0 +1,60 @@
+(() => {
+  const params = new URLSearchParams(location.search);
+  const preset = params.get('vertical') || '';
+  const theme = params.get('theme') || 'light';
+  const embedId = params.get('embedId') || '';
+
+  document.documentElement.dataset.theme = theme;
+
+  const form = document.getElementById('w-form');
+  const beforeImg = document.getElementById('w-before');
+  const afterImg = document.getElementById('w-after');
+  const slider = document.getElementById('w-slider');
+  const statusEl = document.getElementById('w-status');
+  const afterWrapper = document.querySelector('.after-wrapper');
+  const verticalSel = document.getElementById('w-vertical');
+  if (preset) verticalSel.value = preset;
+
+  slider.addEventListener('input', () => {
+    const percent = Number(slider.value);
+    afterWrapper.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    statusEl.textContent = 'Uploading...';
+    const file = document.getElementById('w-image').files[0];
+    if (!file) {
+      statusEl.textContent = 'Please choose an image.';
+      return;
+    }
+    beforeImg.src = URL.createObjectURL(file);
+    afterImg.removeAttribute('src');
+    afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
+
+    const formData = new FormData();
+    formData.append('image', file);
+    const vertical = verticalSel.value;
+    const prompt = document.getElementById('w-prompt').value;
+    if (vertical) formData.append('vertical', vertical);
+    if (prompt) formData.append('prompt', prompt);
+    if (embedId) formData.append('embedId', embedId);
+
+    try {
+      const resp = await fetch('/api/edit', { method: 'POST', body: formData });
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || 'Failed');
+      statusEl.textContent = 'Rendering complete';
+      if (json.outputUrl) {
+        afterImg.src = json.outputUrl;
+      } else {
+        statusEl.textContent = 'No image returned';
+      }
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'Error: ' + err.message;
+    }
+  });
+})();
+
+
