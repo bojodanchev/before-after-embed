@@ -77,4 +77,24 @@
       pre.textContent = 'Error: ' + err.message;
     }
   });
+
+  document.getElementById('stats-btn').addEventListener('click', async () => {
+    const box = document.getElementById('stats');
+    box.textContent = 'Loading stats...';
+    try{
+      const resp = await authedFetch('/api/admin/stats');
+      const json = await resp.json();
+      if (!resp.ok) throw new Error(json.error || 'Failed');
+      const lines = [];
+      lines.push('Total renders: ' + json.totals.overall);
+      lines.push('Renders by embed:');
+      for (const [id, count] of Object.entries(json.totals.byEmbed || {})){
+        lines.push(`  - ${id}: ${count}`);
+      }
+      lines.push('Last 24h: ' + json.last24h.overall);
+      box.textContent = lines.join('\n');
+    }catch(err){
+      box.textContent = 'Error: ' + err.message;
+    }
+  });
 })();

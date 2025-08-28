@@ -10,15 +10,15 @@
 [data-theme="light"]:root, html[data-theme="light"]{
   --bg: #ffffff;
   --fg: #0f172a;
-  --muted: #475569;
-  --card: #f8fafc;
+  --muted: #334155;
+  --card: #ffffff;
   --accent: #2563eb;
-  --border: #e2e8f0;
+  --border: #d6dee9;
   --ring: 0 0 0 3px rgba(37,99,235,0.25);
 }
 html, body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"}
 .container{max-width:960px;margin:0 auto;padding:24px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 .row{display:flex;gap:12px;align-items:center;margin:10px 0}
 .label{min-width:120px;color:var(--muted);font-size:14px}
 input[type="file"], input[type="text"], select{flex:1;background:transparent;border:1px solid var(--border);border-radius:10px;padding:12px 12px;color:var(--fg);transition:border .15s ease, box-shadow .15s ease}
@@ -34,8 +34,8 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .compare.compact{aspect-ratio:auto;height:360px}
 .compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .compare .after-wrapper{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
-.slider{position:absolute;left:12px;right:12px;bottom:14px;margin:0;-webkit-appearance:none;height:6px;background:rgba(255,255,255,.15);border-radius:999px}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.25)}
+.slider{position:absolute;left:12px;right:12px;bottom:14px;margin:0;-webkit-appearance:none;height:6px;background:rgba(255,255,255,.25);border-radius:999px}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.15)}
 
 .widget-body{padding:0;margin:0}
 .widget-root{padding:12px}
