@@ -1,4 +1,4 @@
-import { listUsage } from "../_shared.js";
+import { listUsage, getStorageMode } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -23,14 +23,13 @@ function requireAdmin(req, res){
 
 export default async function handler(req, res){
   if (!requireAdmin(req, res)) return;
-  // Fetch recent usage (last 1000 events max from storage helper)
   const now = Date.now();
   const events = await listUsage(undefined, 1000);
   const totals = { overall: 0, byEmbed: {} };
   const last24h = { overall: 0, byEmbed: {} };
 
   for (const evt of events){
-    if (evt.event === 'edit_success'){
+    if (evt.event === 'edit_success' || evt.event === 'client_render'){
       totals.overall += 1;
       totals.byEmbed[evt.embedId] = (totals.byEmbed[evt.embedId] || 0) + 1;
       if (evt.ts && (now - evt.ts) <= 24*60*60*1000){
@@ -40,5 +39,5 @@ export default async function handler(req, res){
     }
   }
 
-  res.status(200).json({ totals, last24h, sampleSize: events.length });
+  res.status(200).json({ totals, last24h, sampleSize: events.length, storage: getStorageMode() });
 }

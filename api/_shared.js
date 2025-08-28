@@ -9,7 +9,6 @@ export const verticalPromptPresets = {
   detailing: "Make the car paint glossy like just detailed, remove minor scratches and swirl marks; realistic reflections; do not change car model or color drastically.",
 };
 
-// ----- Storage layer: Vercel KV if available, otherwise in-memory fallback -----
 const kvClient = vercelKv || null;
 
 const memoryEmbeds = {
@@ -21,6 +20,10 @@ const memoryUsage = [];
 
 function isKvEnabled(){
   return Boolean((process.env.KV_REST_API_URL || process.env.KV_URL || process.env.UPSTASH_REDIS_REST_URL));
+}
+
+export function getStorageMode(){
+  return (isKvEnabled() && kvClient) ? 'kv' : 'memory';
 }
 
 export async function setEmbedConfig(config){
