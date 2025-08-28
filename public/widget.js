@@ -22,9 +22,12 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
     statusEl.textContent = 'Uploading...';
     const file = document.getElementById('w-image').files[0];
     if (!file) {
+      submitBtn.disabled = false;
       statusEl.textContent = 'Please choose an image.';
       return;
     }
@@ -53,6 +56,8 @@
     } catch (err) {
       console.error(err);
       statusEl.textContent = 'Error: ' + err.message;
+    } finally {
+      submitBtn.disabled = false;
     }
   });
 })();

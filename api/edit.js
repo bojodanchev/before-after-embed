@@ -16,10 +16,10 @@ export default async function handler(req, res){
       form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
     });
 
-    const embedId = (fields.embedId?.toString() || '').trim();
-    if (!embedId) return res.status(400).json({ error: 'Missing embedId' });
-    const embedConfig = await getEmbedConfig(embedId);
-    if (!embedConfig) return res.status(404).json({ error: 'Unknown embedId' });
+    let embedId = (fields.embedId?.toString() || '').trim();
+    if (!embedId) embedId = 'anonymous';
+    let embedConfig = await getEmbedConfig(embedId);
+    // If not found, continue with sane defaults
 
     const promptField = (fields.prompt?.toString() || '').trim();
     const verticalField = (fields.vertical?.toString() || '').trim().toLowerCase();
@@ -32,7 +32,8 @@ export default async function handler(req, res){
     const mime = file.mimetype || 'image/png';
     const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
 
-    const effectivePrompt = [verticalPromptPresets[verticalField || embedConfig.vertical] || null, promptField || null]
+    const chosenVertical = verticalField || embedConfig?.vertical || 'barber';
+    const effectivePrompt = [verticalPromptPresets[chosenVertical] || null, promptField || null]
       .filter(Boolean)
       .join(' ');
 
@@ -69,7 +70,7 @@ export default async function handler(req, res){
     res.status(200).json({ outputUrl, prompt: effectivePrompt });
   }catch(err){
     console.error('/api/edit error', err);
-    const embedId = (req.query?.embedId || req.body?.embedId || '').toString();
+    const embedId = (req.query?.embedId || req.body?.embedId || '').toString() || 'anonymous';
     if (embedId) await logUsage('edit_error', embedId, { reason: 'exception', message: err?.message || '' });
     res.status(500).json({ error: 'Edit failed' });
   }
