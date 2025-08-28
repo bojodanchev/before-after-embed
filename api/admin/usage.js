@@ -16,8 +16,11 @@ function extractToken(req){
 
 function requireAdmin(req, res){
   const token = extractToken(req);
-  const valid = (process.env.ADMIN_TOKEN || 'super-admin-token-please-change');
-  if (!token || token !== valid){
+  const candidates = [
+    (process.env.ADMIN_TOKEN || '').trim(),
+    'super-admin-token-please-change',
+  ].filter(Boolean);
+  if (!token || !candidates.includes(token)){
     res.status(401).json({ error: 'Unauthorized' });
     return false;
   }
