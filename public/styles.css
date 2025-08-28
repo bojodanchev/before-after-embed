@@ -7,6 +7,15 @@
   --border: #222734;
   --ring: 0 0 0 3px rgba(106,165,255,0.35);
 }
+[data-theme="dark"]:root, html[data-theme="dark"]{
+  --bg: #0b0d10;
+  --fg: #e6eaf2;
+  --muted: #9aa4b2;
+  --card: #141820;
+  --accent: #6aa5ff;
+  --border: #222734;
+  --ring: 0 0 0 3px rgba(106,165,255,0.35);
+}
 [data-theme="light"]:root, html[data-theme="light"]{
   --bg: #ffffff;
   --fg: #0f172a;

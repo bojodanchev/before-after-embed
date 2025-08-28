@@ -50,6 +50,10 @@
       statusEl.textContent = 'Rendering complete';
       if (json.outputUrl) {
         afterImg.src = json.outputUrl;
+        // record usage client-side too (redundant to server logging)
+        if (embedId){
+          fetch('/api/usage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embedId, event: 'client_render', meta: { theme, vertical, prompt: Boolean(prompt) } }) }).catch(()=>{});
+        }
       } else {
         statusEl.textContent = 'No image returned';
       }
