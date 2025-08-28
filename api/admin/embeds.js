@@ -4,7 +4,13 @@ function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
   const bearer = auth.replace(/^Bearer\s+/i, '').trim();
   const alt = (req.headers['x-admin-token'] || '').toString().trim();
-  const fromQuery = (req.query.token || '').toString().trim();
+  let fromQuery = (req.query && req.query.token ? req.query.token.toString() : '').trim();
+  if (!fromQuery && req.url){
+    try{
+      const url = new URL(req.url, 'http://localhost');
+      fromQuery = (url.searchParams.get('token') || '').trim();
+    }catch{}
+  }
   return bearer || alt || fromQuery;
 }
 
