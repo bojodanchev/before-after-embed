@@ -12,7 +12,7 @@
   function renderIframe(cfg){
     const width = widthOverride || cfg.width || '100%';
     const height = heightOverride || cfg.height || '520px';
-    const theme = themeOverride || cfg.theme || 'light';
+    const theme = (themeOverride || cfg.theme || 'light').toLowerCase();
     const vertical = verticalOverride || cfg.vertical || '';
 
     const iframe = document.createElement('iframe');

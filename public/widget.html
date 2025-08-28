@@ -17,7 +17,7 @@
           <option value="detailing">Detailing</option>
         </select>
         <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" />
-        <button type="submit">Visualize</button>
+        <button type="submit">Generate</button>
       </form>
       <div class="compare compact">
         <img id="w-before" alt="Before" />
@@ -28,6 +28,13 @@
       </div>
       <div id="w-status" class="status small"></div>
     </div>
+    <script>
+      (function(){
+        const params = new URLSearchParams(location.search);
+        const theme = (params.get('theme') || 'light').toLowerCase();
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
     <script src="/widget.js"></script>
   </body>
   </html>
