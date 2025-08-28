@@ -1,8 +1,15 @@
 import { listEmbeds, setEmbedConfig } from "../_shared.js";
 
-function requireAdmin(req, res){
+function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
-  const token = auth.replace(/^Bearer\s+/i, '');
+  const bearer = auth.replace(/^Bearer\s+/i, '').trim();
+  const alt = (req.headers['x-admin-token'] || '').toString().trim();
+  const fromQuery = (req.query.token || '').toString().trim();
+  return bearer || alt || fromQuery;
+}
+
+function requireAdmin(req, res){
+  const token = extractToken(req);
   if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN){
     res.status(401).json({ error: 'Unauthorized' });
     return false;

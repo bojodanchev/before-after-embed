@@ -2,9 +2,24 @@
   const tokenInput = document.getElementById('adm-token');
   const status = document.getElementById('create-status');
 
+  // Load token from query or localStorage
+  const qp = new URLSearchParams(location.search);
+  const tokenFromQuery = qp.get('token');
+  const saved = localStorage.getItem('adminToken');
+  if (tokenFromQuery){
+    tokenInput.value = tokenFromQuery;
+    localStorage.setItem('adminToken', tokenFromQuery);
+  } else if (saved){
+    tokenInput.value = saved;
+  }
+
+  tokenInput.addEventListener('change', () => {
+    localStorage.setItem('adminToken', tokenInput.value.trim());
+  });
+
   async function authedFetch(url, opts){
     const token = tokenInput.value.trim();
-    const headers = Object.assign({}, opts?.headers || {}, token ? { Authorization: 'Bearer ' + token } : {});
+    const headers = Object.assign({}, opts?.headers || {}, token ? { Authorization: 'Bearer ' + token, 'X-Admin-Token': token } : {});
     return fetch(url, Object.assign({}, opts, { headers }));
   }
 
