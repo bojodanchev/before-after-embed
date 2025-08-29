@@ -88,5 +88,12 @@
       pre('s-code', code);
       try{ await navigator.clipboard.writeText(code); }catch{}
     });
+
+    document.getElementById('c-signout').addEventListener('click', ()=>{
+      try{ localStorage.removeItem('clientToken'); }catch{}
+      const url = new URL(location.href);
+      url.searchParams.delete('token');
+      location.href = '/client.html';
+    });
   })();
 })();
