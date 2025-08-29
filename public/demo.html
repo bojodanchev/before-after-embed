@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Before/After Embed - Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="container">
+      <h1>Before/After Embed Demo</h1>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <form id="edit-form">
+          <div class="row">
+            <label class="label">Upload image</label>
+            <input type="file" id="image" name="image" accept="image/*" required />
+          </div>
+          <div class="row">
+            <label class="label">Vertical preset</label>
+            <select id="vertical" name="vertical">
+              <option value="">None</option>
+              <option value="barber">Barber</option>
+              <option value="dental">Dental</option>
+              <option value="detailing">Car detailing</option>
+            </select>
+          </div>
+          <div class="row">
+            <label class="label">Prompt (optional)</label>
+            <input type="text" id="prompt" name="prompt" placeholder="e.g., apply natural fade haircut" />
+          </div>
+          <div class="row">
+            <button type="submit">Generate</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div id="compare" class="compare">
+          <img id="beforeImg" alt="Before" />
+          <div class="after-wrapper">
+            <img id="afterImg" alt="After" />
+          </div>
+          <input id="slider" class="slider" type="range" min="0" max="100" value="50" />
+        </div>
+        <div id="status" class="status"></div>
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const embedIdParam = params.get('embedId');
+      const EMBED_ID = embedIdParam || 'demo-barber';
+
+      const form = document.getElementById('edit-form');
+      const beforeImg = document.getElementById('beforeImg');
+      const afterImg = document.getElementById('afterImg');
+      const slider = document.getElementById('slider');
+      const statusEl = document.getElementById('status');
+      const afterWrapper = document.querySelector('.after-wrapper');
+
+      slider.addEventListener('input', () => {
+        const percent = Number(slider.value);
+        afterWrapper.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        statusEl.textContent = 'Uploading...';
+        const file = document.getElementById('image').files[0];
+        if (!file) {
+          statusEl.textContent = 'Please choose an image.';
+          return;
+        }
+        beforeImg.src = URL.createObjectURL(file);
+        afterImg.removeAttribute('src');
+        afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
+
+        const formData = new FormData();
+        formData.append('image', file);
+        const vertical = document.getElementById('vertical').value;
+        const prompt = document.getElementById('prompt').value;
+        if (vertical) formData.append('vertical', vertical);
+        if (prompt) formData.append('prompt', prompt);
+        formData.append('embedId', EMBED_ID);
+
+        try {
+          const resp = await fetch('/api/edit', { method: 'POST', body: formData });
+          const json = await resp.json();
+          if (!resp.ok) throw new Error(json.error || 'Failed');
+          statusEl.textContent = 'Rendering complete';
+          if (json.outputUrl) {
+            afterImg.src = json.outputUrl;
+          } else {
+            statusEl.textContent = 'No image returned';
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'Error: ' + err.message;
+        }
+      });
+    </script>
+  </body>
+  </html>
+
+
