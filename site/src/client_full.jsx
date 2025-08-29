@@ -13,10 +13,10 @@ const Card = ({ className = "", children }) => (
 );
 
 const CardHeader = ({ title, subtitle, right }) => (
-  <div className="flex items-start justify-between gap-4 border-b border-neutral-100 p-4 dark:border-white/10">
+  <div className="flex items-start justify-between gap-4 border-b border-neutral-200 p-4 dark:border-white/10">
     <div>
-      <h3 className="text-base font-semibold">{title}</h3>
-      {subtitle ? <p className="mt-1 text-sm text-neutral-600 dark:text-white/60">{subtitle}</p> : null}
+      <h3 className="ba-title text-base font-semibold">{title}</h3>
+      {subtitle ? <p className="ba-subtle mt-1 text-sm">{subtitle}</p> : null}
     </div>
     {right}
   </div>
@@ -47,14 +47,14 @@ const Button = ({ variant = "primary", className = "", children, ...props }) => 
 
 const Input = ({ className = "", ...props }) => (
   <input
-    className={`w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 dark:border-white/20 dark:bg-white/5 dark:text-white ${className}`}
+    className={`w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 dark:border-white/20 dark:bg-slate-900 dark:text-white ${className}`}
     {...props}
   />
 );
 
 const Select = ({ className = "", children, ...props }) => (
   <select
-    className={`w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 dark:border-white/20 dark:bg-white/5 dark:text-white ${className}`}
+    className={`w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-violet-500 dark:border-white/20 dark:bg-slate-900 dark:text-white ${className}`}
     {...props}
   >
     {children}
@@ -313,7 +313,7 @@ const SnippetBuilder = ({ defaultEmbedId = "", embedsHook }) => {
             <div className="grid gap-1.5"><Label>Preset</Label><Select value={preset} onChange={(e) => setPreset(e.target.value)}><option value="compact">compact</option><option value="card">card</option></Select></div>
             <div className="grid gap-1.5"><Label>Theme</Label><Select value={theme} onChange={(e) => setTheme(e.target.value)}><option value="light">light</option><option value="dark">dark</option></Select></div>
           </div>
-          <div className="grid content-start gap-3"><div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs dark:border-white/10 dark:bg-black/40"><pre className="whitespace-pre-wrap break-words">{snippet}</pre></div><div className="flex items-center gap-2"><Button onClick={copy}>Copy snippet</Button><span className="text-xs opacity-70">Includes <Code>data-variant</Code>, <Code>data-theme</Code>, sizing and styles.</span></div></div>
+          <div className="grid content-start gap-3"><div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-900 dark:border-white/10 dark:bg-slate-900 dark:text-white"><pre className="whitespace-pre-wrap break-words">{snippet}</pre></div><div className="flex items-center gap-2"><Button onClick={copy}>Copy snippet</Button><span className="text-xs opacity-70">Includes <Code>data-variant</Code>, <Code>data-theme</Code>, sizing and styles.</span></div></div>
         </CardBody>
       </Card>
     </Container>
