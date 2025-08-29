@@ -3,6 +3,7 @@
   const preset = params.get('vertical') || '';
   const theme = params.get('theme') || 'light';
   const embedId = params.get('embedId') || '';
+  const variant = (params.get('variant') || 'card').toLowerCase();
 
   document.documentElement.dataset.theme = theme;
 
@@ -14,6 +15,11 @@
   const afterWrapper = document.querySelector('.after-wrapper');
   const verticalSel = document.getElementById('w-vertical');
   if (preset) verticalSel.value = preset;
+
+  if (variant === 'compact'){
+    const cmp = document.querySelector('.compare');
+    cmp.classList.add('compact');
+  }
 
   slider.addEventListener('input', () => {
     const percent = Number(slider.value);
@@ -50,10 +56,7 @@
       statusEl.textContent = 'Rendering complete';
       if (json.outputUrl) {
         afterImg.src = json.outputUrl;
-        // record usage client-side too (redundant to server logging)
-        if (embedId){
-          fetch('/api/usage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embedId, event: 'client_render', meta: { theme, vertical, prompt: Boolean(prompt) } }) }).catch(()=>{});
-        }
+        if (embedId){ fetch('/api/usage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embedId, event: 'client_render', meta: { theme, vertical, prompt: Boolean(prompt) } }) }).catch(()=>{}); }
       } else {
         statusEl.textContent = 'No image returned';
       }
