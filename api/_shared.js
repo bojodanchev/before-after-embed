@@ -17,6 +17,8 @@ const memoryEmbeds = {
   "demo-detailing": { id: "demo-detailing", name: "Auto Detailing Demo", vertical: "detailing", theme: "light", width: "100%", height: "520px" },
 };
 const memoryUsage = [];
+const memoryClients = {};
+const memoryClientEmbeds = {}; // clientId -> Set<embedId>
 
 function isKvEnabled(){
   return Boolean((process.env.KV_REST_API_URL || process.env.KV_URL || process.env.UPSTASH_REDIS_REST_URL));
@@ -45,14 +47,45 @@ async function kvRestLrange(key, start, stop){
   return Array.isArray(r?.result) ? r.result : [];
 }
 
+async function kvRestIncr(key, by){
+  return kvRest(`/INCRBY/${encodeURIComponent(key)}/${by}`);
+}
+
+function today(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+export function buildSnippet(embedId, opts){
+  const o = Object.assign({ theme:'light', variant:'compact', maxWidth:'640px', align:'center', radius:'14px', shadow:'true', border:'true', width:'100%', height:'460px' }, opts||{});
+  const attrs = Object.entries({
+    'data-embed-id': embedId,
+    'data-theme': o.theme,
+    'data-variant': o.variant,
+    'data-max-width': o.maxWidth,
+    'data-align': o.align,
+    'data-radius': o.radius,
+    'data-shadow': o.shadow,
+    'data-border': o.border,
+    'data-width': o.width,
+    'data-height': o.height,
+  }).map(([k,v])=> `${k}="${v}"`).join(' ');
+  return `<script async src="https://before-after-embed.vercel.app/embed.js" ${attrs}></script>`;
+}
+
 export async function setEmbedConfig(config){
   const cfg = { ...config, id: config.id };
   if (!cfg.id) throw new Error("Embed id is required");
   if (isKvEnabled() && kvClient){
     await kvClient.set(`embeds:${cfg.id}`, cfg);
     await kvClient.sadd("embeds:index", cfg.id);
+    if (cfg.clientId){ await kvClient.sadd(`clientEmbeds:${cfg.clientId}`, cfg.id); }
   }
   memoryEmbeds[cfg.id] = cfg;
+  if (cfg.clientId){
+    memoryClientEmbeds[cfg.clientId] = memoryClientEmbeds[cfg.clientId] || new Set();
+    memoryClientEmbeds[cfg.clientId].add(cfg.id);
+  }
   return cfg;
 }
 
@@ -94,13 +127,16 @@ export async function logUsage(event, embedId, meta){
         await kvClient.lpush(`usage:all`, JSON.stringify(record));
         await kvClient.ltrim(`usage:${embedId || 'all'}`, 0, 999);
         await kvClient.ltrim(`usage:all`, 0, 1999);
+        if (event === 'edit_success') await kvClient.incr(`meter:${today()}:${embedId}`);
       } else {
         await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
         await kvRestLpush('usage:all', JSON.stringify(record));
+        if (event === 'edit_success') await kvRestIncr(`meter:${today()}:${embedId}`, 1);
       }
     } catch(_e){
       try{ await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record)); }catch{}
       try{ await kvRestLpush('usage:all', JSON.stringify(record)); }catch{}
+      if (event === 'edit_success'){ try{ await kvRestIncr(`meter:${today()}:${embedId}`, 1); }catch{} }
     }
   } else {
     memoryUsage.unshift(record);
@@ -125,6 +161,81 @@ export async function listUsage(embedId, limit = 50){
     }
   }
   return memoryUsage.filter((u) => !embedId || u.embedId === embedId).slice(0, limit);
+}
+
+// ==== Client model helpers ====
+export async function createClient(client){
+  const now = Date.now();
+  const token = client.token || `${now}-${Math.random().toString(36).slice(2)}`;
+  const rec = { id: client.id, name: client.name || client.id, email: client.email || '', token, createdAt: now };
+  if (!rec.id) throw new Error('client.id required');
+  if (isKvEnabled() && kvClient){
+    await kvClient.set(`clients:${rec.id}`, rec);
+    await kvClient.sadd('clients:index', rec.id);
+    await kvClient.set(`clients:token:${token}`, rec.id);
+  }
+  memoryClients[rec.id] = rec;
+  return rec;
+}
+
+export async function listClients(){
+  if (isKvEnabled() && kvClient){
+    const ids = await kvClient.smembers('clients:index');
+    const out = [];
+    for (const id of ids || []){
+      const c = await kvClient.get(`clients:${id}`);
+      if (c) out.push(c);
+    }
+    return out;
+  }
+  return Object.values(memoryClients);
+}
+
+export async function getClientById(id){
+  if (!id) return null;
+  if (isKvEnabled() && kvClient){
+    const c = await kvClient.get(`clients:${id}`);
+    if (c) return c;
+  }
+  return memoryClients[id] || null;
+}
+
+export async function getClientByToken(token){
+  if (!token) return null;
+  if (isKvEnabled() && kvClient){
+    const id = await kvClient.get(`clients:token:${token}`);
+    if (id){
+      const c = await kvClient.get(`clients:${id}`);
+      if (c) return c;
+    }
+  }
+  for (const c of Object.values(memoryClients)) if (c.token === token) return c;
+  return null;
+}
+
+export async function assignEmbedToClient(clientId, embedId){
+  const embed = await getEmbedConfig(embedId);
+  const updated = { ...(embed || {}), id: embedId, clientId };
+  await setEmbedConfig(updated);
+  if (isKvEnabled() && kvClient){ await kvClient.sadd(`clientEmbeds:${clientId}`, embedId); }
+  memoryClientEmbeds[clientId] = memoryClientEmbeds[clientId] || new Set();
+  memoryClientEmbeds[clientId].add(embedId);
+  return updated;
+}
+
+export async function listEmbedsForClient(clientId){
+  if (isKvEnabled() && kvClient){
+    const ids = await kvClient.smembers(`clientEmbeds:${clientId}`);
+    const out = [];
+    for (const id of ids || []){
+      const e = await kvClient.get(`embeds:${id}`);
+      if (e) out.push(e);
+    }
+    return out;
+  }
+  const set = memoryClientEmbeds[clientId];
+  if (!set) return [];
+  return Array.from(set).map((id)=> memoryEmbeds[id]).filter(Boolean);
 }
 
 export { fal };
