@@ -14,9 +14,10 @@
       if (!me.client) throw new Error('no client');
       set('c-info', `Hello, ${me.client.name} (id: ${me.client.id})`);
     }catch(err){
-      // show auth form
+      // show auth form and hide signout
       document.getElementById('auth').style.display = 'flex';
       set('c-info', 'Sign in to your Client Portal');
+      const so = document.getElementById('c-signout'); if (so) so.style.display = 'none';
       document.getElementById('auth-start').addEventListener('click', async ()=>{
         const email = document.getElementById('auth-email').value.trim();
         const s = document.getElementById('auth-status'); s.textContent = 'Creating link...';
@@ -38,6 +39,7 @@
       const data = await jget('/api/client/embeds');
       pre('c-embeds', data.embeds || []);
     };
+    const so = document.getElementById('c-signout'); if (so) so.style.display = 'inline-block';
     document.getElementById('c-refresh').addEventListener('click', refresh);
     await refresh();
 

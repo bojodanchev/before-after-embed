@@ -10,11 +10,14 @@ function extractToken(req){
 export default async function handler(req, res){
   if (req.method === 'POST'){
     const email = (req.body?.email || '').toString().trim();
-    const id = (req.body?.id || '').toString().trim();
-    if (!email && !id) return res.status(400).json({ error: 'email or id required' });
-    let client = id ? await getClientByEmail(email) : null;
+    if (!email) return res.status(400).json({ error: 'email required' });
+    let client = await getClientByEmail(email);
     if (!client){
-      const cid = id || (email.split('@')[0] + '-' + Math.random().toString(36).slice(2,6));
+      // Stable id derived from email (prefix + short hash)
+      const prefix = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$|--+/g,'');
+      let hash = 0; for (let i=0;i<email.length;i++){ hash = ((hash<<5)-hash + email.charCodeAt(i)) | 0; }
+      const suffix = Math.abs(hash).toString(36).slice(0,4);
+      const cid = `${prefix}-${suffix}`;
       client = await createClient({ id: cid, name: cid, email });
     }
     const origin = req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']
