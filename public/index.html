@@ -50,8 +50,9 @@
     </main>
 
     <script>
-      // Example embed loader usage (business website snippet):
-      // <script src="/embed.js" data-embed-id="demo-barber" data-width="100%" data-height="520px" data-theme="light"><\/script>
+      const params = new URLSearchParams(location.search);
+      const embedIdParam = params.get('embedId');
+      const EMBED_ID = embedIdParam || 'demo-barber';
 
       const form = document.getElementById('edit-form');
       const beforeImg = document.getElementById('beforeImg');
@@ -83,8 +84,7 @@
         const prompt = document.getElementById('prompt').value;
         if (vertical) formData.append('vertical', vertical);
         if (prompt) formData.append('prompt', prompt);
-        // For demo, use a known embed ID
-        formData.append('embedId', 'demo-barber');
+        formData.append('embedId', EMBED_ID);
 
         try {
           const resp = await fetch('/api/edit', { method: 'POST', body: formData });
