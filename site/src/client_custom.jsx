@@ -165,12 +165,19 @@ function Dashboard({ token, onSignOut }) {
   const [embeds, setEmbeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ id: "", vertical: "", theme: "dark" });
+  const [form, setForm] = useState({ id: "", vertical: "barber", theme: "dark" });
 
   const [embedId, setEmbedId] = useState("");
   const [preset, setPreset] = useState("compact");
   const [theme, setTheme] = useState("dark");
   const snippetCode = useMemo(() => buildEmbedSnippet(embedId, preset, theme), [embedId, preset, theme]);
+
+  // Usage & Stats
+  const [usageEmbedId, setUsageEmbedId] = useState("");
+  const [usage, setUsage] = useState([]);
+  const [usageLoading, setUsageLoading] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -185,6 +192,8 @@ function Dashboard({ token, onSignOut }) {
       const embData = await emb.json();
       const list = Array.isArray(embData) ? embData : embData?.embeds || [];
       setEmbeds(list);
+      if (!embedId && list.length) setEmbedId(list[0].id);
+      if (!usageEmbedId && list.length) setUsageEmbedId(list[0].id);
     } catch (err) {
       setError("Failed to load data");
     } finally {
@@ -203,11 +212,47 @@ function Dashboard({ token, onSignOut }) {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error(await safeError(res));
-      setForm({ id: "", vertical: "", theme: "dark" });
+      setForm({ id: "", vertical: form.vertical, theme: form.theme });
       fetchData();
     } catch (err) {
       setError(typeof err?.message === "string" ? err.message : "Failed to create embed");
     }
+  };
+
+  const handleUpdateTheme = async (id, nextTheme) => {
+    try{
+      const res = await fetch("/api/client/embeds", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id, theme: nextTheme }),
+      });
+      if (!res.ok) throw new Error(await safeError(res));
+      fetchData();
+    }catch(e){ setError(typeof e?.message === "string" ? e.message : "Failed to update embed"); }
+  };
+
+  const fetchUsage = async (id) => {
+    if (!id) return;
+    setUsageLoading(true);
+    try{
+      const res = await fetch(`/api/client/usage?embedId=${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(await safeError(res));
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : (data?.events || []);
+      setUsage(arr);
+    }catch(e){ setUsage([]); }
+    finally{ setUsageLoading(false); }
+  };
+
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try{
+      const res = await fetch(`/api/client/stats`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(await safeError(res));
+      const j = await res.json();
+      setStats(j || null);
+    }catch(e){ setStats(null); }
+    finally{ setStatsLoading(false); }
   };
 
   if (loading) return <div className="p-6 text-white">Loading…</div>;
@@ -238,19 +283,34 @@ function Dashboard({ token, onSignOut }) {
         <Section title="Embeds">
           <ul className="space-y-2 text-sm">
             {embeds.map((e) => (
-              <li key={e.id} className="rounded-md border border-white/10 bg-black/20 p-2">
-                {e.id} – {e.vertical} – {e.theme}
+              <li key={e.id} className="flex flex-col gap-2 rounded-md border border-white/10 bg-black/20 p-3 md:flex-row md:items-center md:justify-between">
+                <div className="truncate">{e.id} – {e.vertical} – {e.theme}</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select value={e.theme} onChange={(ev)=>handleUpdateTheme(e.id, ev.target.value)}>
+                    <option value="dark">dark</option>
+                    <option value="light">light</option>
+                  </Select>
+                  <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
+                  <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Snippet</Button>
+                  <a className="text-xs underline" target="_blank" rel="noreferrer" href={`/widget.html?embedId=${encodeURIComponent(e.id)}&theme=${encodeURIComponent(e.theme)}`}>Open</a>
+                </div>
               </li>
             ))}
           </ul>
-          <form onSubmit={handleCreate} className="mt-4 grid gap-2 md:grid-cols-3">
+          <form onSubmit={handleCreate} className="mt-4 grid gap-2 md:grid-cols-4">
             <Input placeholder="id" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} required />
-            <Input placeholder="vertical" value={form.vertical} onChange={(e) => setForm({ ...form, vertical: e.target.value })} required />
+            <Select value={form.vertical} onChange={(e) => setForm({ ...form, vertical: e.target.value })}>
+              <option value="barber">barber</option>
+              <option value="dental">dental</option>
+              <option value="detailing">detailing</option>
+              <option value="cosmetics">cosmetics</option>
+              <option value="custom">custom</option>
+            </Select>
             <Select value={form.theme} onChange={(e) => setForm({ ...form, theme: e.target.value })}>
               <option value="dark">dark</option>
               <option value="light">light</option>
             </Select>
-            <Button type="submit" className="md:col-span-3">Create</Button>
+            <Button type="submit" className="md:col-span-4">Create</Button>
           </form>
         </Section>
 
@@ -268,6 +328,44 @@ function Dashboard({ token, onSignOut }) {
           </div>
           <pre className="mt-4 whitespace-pre-wrap break-words rounded-md bg-black/60 p-2 text-xs">{snippetCode}</pre>
           <Button className="mt-2" onClick={() => navigator.clipboard.writeText(snippetCode)}>Copy snippet</Button>
+        </Section>
+
+        <Section title="Usage">
+          <div className="mb-2 flex items-center gap-2">
+            <Select value={usageEmbedId} onChange={(e)=>{ setUsageEmbedId(e.target.value); fetchUsage(e.target.value); }}>
+              {embeds.map(e => (<option key={e.id} value={e.id}>{e.id}</option>))}
+            </Select>
+            <Button variant="subtle" onClick={()=> fetchUsage(usageEmbedId)} disabled={!usageEmbedId || usageLoading}>{usageLoading ? 'Loading…' : 'Refresh'}</Button>
+          </div>
+          {usage.length === 0 ? (
+            <div className="text-sm text-white/70">No events yet.</div>
+          ) : (
+            <ul className="space-y-1 text-xs">
+              {usage.map((u) => (
+                <li key={u.id || u.ts} className="rounded border border-white/10 bg-black/20 p-2">
+                  <span className="opacity-80">{u.event}</span> · <span className="opacity-60">{new Date(u.ts).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Section>
+
+        <Section title="Stats (last 24h)">
+          <div className="mb-2"><Button variant="subtle" onClick={fetchStats} disabled={statsLoading}>{statsLoading ? 'Loading…' : 'Refresh stats'}</Button></div>
+          {!stats ? (
+            <div className="text-sm text-white/70">No stats yet.</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                <div className="text-2xl font-semibold">{stats?.totals?.overall ?? 0}</div>
+                <div className="text-xs opacity-70">Total events</div>
+              </div>
+              <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                <div className="text-2xl font-semibold">{stats?.last24h?.overall ?? 0}</div>
+                <div className="text-xs opacity-70">Events (24h)</div>
+              </div>
+            </div>
+          )}
         </Section>
       </main>
     </div>
