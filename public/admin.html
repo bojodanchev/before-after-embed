@@ -52,6 +52,29 @@
         <div class="row"><button id="stats-btn">Refresh stats</button></div>
         <div id="stats" class="status" style="white-space:pre-wrap"></div>
       </section>
+
+      <section class="card">
+        <h2>Clients</h2>
+        <div class="row">
+          <input id="c-id" placeholder="client id (e.g., acme)" />
+          <input id="c-name" placeholder="name" />
+          <input id="c-email" placeholder="email" />
+          <button id="c-create">Create client</button>
+        </div>
+        <div class="row"><button id="c-list">List clients</button></div>
+        <pre id="c-out" style="white-space:pre-wrap"></pre>
+        <hr />
+        <div class="row">
+          <input id="ca-client" placeholder="clientId" />
+          <input id="ca-embed" placeholder="embedId" />
+          <button id="ca-assign">Assign embed</button>
+        </div>
+        <div class="row">
+          <input id="cl-client" placeholder="clientId" />
+          <button id="cl-link">Generate client link</button>
+        </div>
+        <pre id="cl-out" style="white-space:pre-wrap"></pre>
+      </section>
     </main>
 
     <script src="/admin.js"></script>
