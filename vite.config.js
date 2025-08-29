@@ -4,6 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: resolve(__dirname, 'site'),
+  base: '/app/',
   plugins: [react()],
   resolve: {
     alias: {

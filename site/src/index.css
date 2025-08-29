@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark background matching the design */
+:root{ color-scheme: dark; }
+body{ background-color:#0a0a0a; color:#fff; }
+
+
