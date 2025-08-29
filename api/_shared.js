@@ -37,11 +37,11 @@ async function kvRest(commandUrl){
 
 async function kvRestLpush(key, value){
   const encoded = encodeURIComponent(value);
-  return kvRest(`/lpush/${encodeURIComponent(key)}/${encoded}`);
+  return kvRest(`/LPUSH/${encodeURIComponent(key)}/${encoded}`);
 }
 
 async function kvRestLrange(key, start, stop){
-  const r = await kvRest(`/lrange/${encodeURIComponent(key)}/${start}/${stop}`);
+  const r = await kvRest(`/LRANGE/${encodeURIComponent(key)}/${start}/${stop}`);
   return Array.isArray(r?.result) ? r.result : [];
 }
 
@@ -99,7 +99,6 @@ export async function logUsage(event, embedId, meta){
         await kvRestLpush('usage:all', JSON.stringify(record));
       }
     } catch(_e){
-      // fallback to REST if client path failed
       try{ await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record)); }catch{}
       try{ await kvRestLpush('usage:all', JSON.stringify(record)); }catch{}
     }
@@ -118,7 +117,6 @@ export async function listUsage(embedId, limit = 50){
         const items = await kvClient.lrange(key, 0, limit - 1);
         if (items && items.length) return items.map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
       }
-      // REST fallback or second attempt
       const key = embedId ? `usage:${embedId}` : `usage:all`;
       const items = await kvRestLrange(key, 0, limit - 1);
       return (items || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
