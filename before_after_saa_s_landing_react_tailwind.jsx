@@ -170,7 +170,7 @@ export default function BeforeAfterLanding() {
             <a href="/client.html" className="hover:text-white">Client Portal</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/client.html"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Sign in</Button></a>
+            <a href="/client.html"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Client Portal</Button></a>
             <a href="#demo"><Button className="gap-2">Try the demo <ArrowRight className="h-4 w-4"/></Button></a>
           </div>
         </Container>
