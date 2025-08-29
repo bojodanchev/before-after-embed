@@ -16,6 +16,14 @@
   --bg:#ffffff; --fg:#0f172a; --muted:#334155; --card:#ffffff; --accent:#2563eb; --border:#d6dee9; --ring:0 0 0 3px rgba(37,99,235,0.25); --tag-bg: rgba(255,255,255,.85); --tag-fg:#0f172a;
 }
 html, body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"}
+.topbar{position:sticky;top:0;backdrop-filter:saturate(140%) blur(8px);background:color-mix(in hsl, var(--bg) 85%, transparent);border-bottom:1px solid var(--border);z-index:40}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand-mark{width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:inline-block}
+.brand-name{color:var(--fg);text-decoration:none}
+.nav{display:flex;gap:16px}
+.nav-link{color:var(--muted);text-decoration:none}
+.nav-link:hover{color:var(--fg)}
 .container{max-width:960px;margin:0 auto;padding:24px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
 .row{display:flex;gap:12px;align-items:center;margin:10px 0}
