@@ -11,9 +11,28 @@
   (async () => {
     try{
       const me = await jget('/api/client/me');
-      if (!me.client){ set('c-info', 'Unauthorized'); return; }
+      if (!me.client) throw new Error('no client');
       set('c-info', `Hello, ${me.client.name} (id: ${me.client.id})`);
-    }catch(err){ set('c-info', 'Unauthorized'); return; }
+    }catch(err){
+      // show auth form
+      document.getElementById('auth').style.display = 'flex';
+      set('c-info', 'Sign in to your Client Portal');
+      document.getElementById('auth-start').addEventListener('click', async ()=>{
+        const email = document.getElementById('auth-email').value.trim();
+        const s = document.getElementById('auth-status'); s.textContent = 'Creating link...';
+        try{
+          const resp = await fetch('/api/client/me', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+          const json = await resp.json();
+          if (!resp.ok) throw new Error(json.error || 'Failed');
+          s.textContent = 'Opening portal...';
+          // store token locally for future visits and redirect
+          const url = new URL(json.link, location.origin);
+          const t = url.searchParams.get('token');
+          if (t){ localStorage.setItem('clientToken', t); location.href = '/client?token='+encodeURIComponent(t); }
+        }catch(e){ s.textContent = 'Error: ' + e.message; }
+      });
+      return;
+    }
 
     const refresh = async ()=>{
       const data = await jget('/api/client/embeds');
@@ -32,6 +51,16 @@
     document.getElementById('c-stats').addEventListener('click', async () =>{
       const data = await jget('/api/client/stats');
       pre('c-stats-out', data || {});
+    });
+
+    document.getElementById('ne-create').addEventListener('click', async ()=>{
+      const id = document.getElementById('ne-id').value.trim();
+      const vertical = document.getElementById('ne-vertical').value;
+      const theme = document.getElementById('ne-theme').value;
+      const resp = await fetch('/api/client/embeds', { method:'POST', headers: Object.assign({'Content-Type':'application/json'}, headers), body: JSON.stringify({ id, vertical, theme }) });
+      const json = await resp.json();
+      if (!resp.ok){ pre('c-embeds', json); return; }
+      await refresh();
     });
 
     document.getElementById('s-generate').addEventListener('click', async () =>{

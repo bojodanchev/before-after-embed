@@ -191,6 +191,13 @@ export async function listClients(){
   return Object.values(memoryClients);
 }
 
+export async function getClientByEmail(email){
+  if (!email) return null;
+  const all = await listClients();
+  const lower = email.toLowerCase();
+  return all.find(c => (c.email || '').toLowerCase() === lower) || null;
+}
+
 export async function getClientById(id){
   if (!id) return null;
   if (isKvEnabled() && kvClient){

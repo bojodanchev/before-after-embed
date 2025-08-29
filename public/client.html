@@ -11,12 +11,23 @@
       <section class="card">
         <h2>Client</h2>
         <div id="c-info" class="status">Loading...</div>
+        <div id="auth" class="row" style="display:none;gap:8px">
+          <input id="auth-email" placeholder="your@email.com" />
+          <button id="auth-start">Send magic link</button>
+          <div id="auth-status" class="status small"></div>
+        </div>
       </section>
 
       <section class="card">
         <h2>Your Embeds</h2>
         <div class="row"><button id="c-refresh">Refresh</button></div>
         <pre id="c-embeds" style="white-space:pre-wrap"></pre>
+        <div class="row" style="margin-top:8px;gap:8px">
+          <input id="ne-id" placeholder="new embed id" />
+          <select id="ne-vertical"><option value="barber">barber</option><option value="dental">dental</option><option value="detailing">detailing</option></select>
+          <select id="ne-theme"><option value="light">light</option><option value="dark">dark</option></select>
+          <button id="ne-create">Create embed</button>
+        </div>
       </section>
 
       <section class="card">
