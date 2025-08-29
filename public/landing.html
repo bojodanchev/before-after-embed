@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Before/After Embed – AI Visualizer</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .hero{padding:48px 0}
+      .hero h1{font-size:40px;line-height:1.1;margin:0 0 12px}
+      .hero p{color:var(--muted);max-width:640px}
+      .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+      .badge{display:inline-block;padding:4px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:12px}
+      .footer{color:var(--muted);text-align:center;padding:24px}
+      .topnav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+      .links{display:flex;gap:12px}
+      .links a{color:var(--fg);text-decoration:none;border:1px solid var(--border);padding:8px 12px;border-radius:10px}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="topnav">
+        <div class="badge">Before/After Embed</div>
+        <div class="links">
+          <a href="/">Try Demo</a>
+          <a href="/admin">Admin</a>
+        </div>
+      </div>
+
+      <section class="hero">
+        <h1>Let customers visualize results before they buy</h1>
+        <p>Embed a beautiful, one‑click AI visualizer on any website. Perfect for barbers, dental clinics, car detailing and more. Upload a photo, click Generate, slide to compare.</p>
+        <div class="row">
+          <a href="/" style="text-decoration:none"><button>Try the Live Demo</button></a>
+          <a href="/client" style="text-decoration:none"><button>Client Portal</button></a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card"><h3>Drop‑in embed</h3><p class="status">Paste one script tag. Configure layout (max width, alignment, theme) with data‑attributes.</p></div>
+        <div class="card"><h3>Multi‑tenant</h3><p class="status">Provision embeds per client, manage themes/verticals, and track usage.</p></div>
+        <div class="card"><h3>Modern UI</h3><p class="status">Clean dropzone, compact or card variants, “Before/After” badges and slider.</p></div>
+      </section>
+
+      <section class="card">
+        <h3>Get started in 60 seconds</h3>
+        <pre style="white-space:pre-wrap">&lt;script async src="https://before-after-embed.vercel.app/embed.js"
+  data-embed-id="your-embed-id"
+  data-theme="dark"
+  data-variant="compact"
+  data-max-width="640px"
+  data-align="center"
+  data-radius="14px"
+  data-shadow="true"
+  data-border="true"
+  data-width="100%" data-height="460px"&gt;&lt;/script&gt;</pre>
+      </section>
+
+      <div class="footer">© <span id="y"></span> Before/After Embed</div>
+    </div>
+    <script>document.getElementById('y').textContent=new Date().getFullYear();</script>
+  </body>
+  </html>
