@@ -20,7 +20,7 @@ export default async function handler(req, res){
     const origin = req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']
       ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
       : '';
-    const link = `${origin}/client?token=${encodeURIComponent(client.token)}`;
+    const link = `${origin}/client.html?token=${encodeURIComponent(client.token)}`;
     return res.status(200).json({ client, link });
   }
   const token = extractToken(req);

@@ -1,6 +1,6 @@
 (function(){
   const qp = new URLSearchParams(location.search);
-  const token = qp.get('token') || '';
+  const token = qp.get('token') || localStorage.getItem('clientToken') || '';
   const headers = token ? { Authorization: 'Bearer ' + token } : {};
 
   function set(el, text){ document.getElementById(el).textContent = text; }
@@ -28,7 +28,7 @@
           // store token locally for future visits and redirect
           const url = new URL(json.link, location.origin);
           const t = url.searchParams.get('token');
-          if (t){ localStorage.setItem('clientToken', t); location.href = '/client?token='+encodeURIComponent(t); }
+          if (t){ localStorage.setItem('clientToken', t); location.href = '/client.html?token='+encodeURIComponent(t); }
         }catch(e){ s.textContent = 'Error: ' + e.message; }
       });
       return;
