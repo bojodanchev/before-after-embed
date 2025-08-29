@@ -7,7 +7,8 @@
     "dev": "nodemon",
     "start": "node src/server.js",
     "vercel-dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "build:site": "vite build"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +22,14 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "formidable": "^3.5.4",
-    "multer": "^2.0.2"
+    "lucide-react": "^0.542.0",
+    "multer": "^2.0.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@vitejs/plugin-react": "^4.3.1",
+    "nodemon": "^3.1.10",
+    "vite": "^5.4.8"
   }
 }
