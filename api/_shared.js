@@ -23,7 +23,26 @@ function isKvEnabled(){
 }
 
 export function getStorageMode(){
-  return (isKvEnabled() && kvClient) ? 'kv' : 'memory';
+  return (isKvEnabled() && kvClient) ? 'kv' : (isKvEnabled() ? 'kv-rest' : 'memory');
+}
+
+async function kvRest(commandUrl){
+  const base = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!base || !token) return null;
+  const resp = await fetch(`${base}${commandUrl}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!resp.ok) return null;
+  return resp.json();
+}
+
+async function kvRestLpush(key, value){
+  const encoded = encodeURIComponent(value);
+  return kvRest(`/lpush/${encodeURIComponent(key)}/${encoded}`);
+}
+
+async function kvRestLrange(key, start, stop){
+  const r = await kvRest(`/lrange/${encodeURIComponent(key)}/${start}/${stop}`);
+  return Array.isArray(r?.result) ? r.result : [];
 }
 
 export async function setEmbedConfig(config){
@@ -68,11 +87,22 @@ export async function listEmbeds(){
 
 export async function logUsage(event, embedId, meta){
   const record = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, ts: Date.now(), event, embedId, meta: meta || {} };
-  if (isKvEnabled() && kvClient){
-    await kvClient.lpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
-    await kvClient.lpush(`usage:all`, JSON.stringify(record));
-    await kvClient.ltrim(`usage:${embedId || 'all'}`, 0, 999);
-    await kvClient.ltrim(`usage:all`, 0, 1999);
+  if (isKvEnabled()){
+    try {
+      if (kvClient){
+        await kvClient.lpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
+        await kvClient.lpush(`usage:all`, JSON.stringify(record));
+        await kvClient.ltrim(`usage:${embedId || 'all'}`, 0, 999);
+        await kvClient.ltrim(`usage:all`, 0, 1999);
+      } else {
+        await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
+        await kvRestLpush('usage:all', JSON.stringify(record));
+      }
+    } catch(_e){
+      // fallback to REST if client path failed
+      try{ await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record)); }catch{}
+      try{ await kvRestLpush('usage:all', JSON.stringify(record)); }catch{}
+    }
   } else {
     memoryUsage.unshift(record);
     if (memoryUsage.length > 2000) memoryUsage.length = 2000;
@@ -81,12 +111,20 @@ export async function logUsage(event, embedId, meta){
 }
 
 export async function listUsage(embedId, limit = 50){
-  if (isKvEnabled() && kvClient){
-    const key = embedId ? `usage:${embedId}` : `usage:all`;
-    const items = await kvClient.lrange(key, 0, limit - 1);
-    return (items || []).map((s) => {
-      try { return JSON.parse(s); } catch { return null; }
-    }).filter(Boolean);
+  if (isKvEnabled()){
+    try{
+      if (kvClient){
+        const key = embedId ? `usage:${embedId}` : `usage:all`;
+        const items = await kvClient.lrange(key, 0, limit - 1);
+        if (items && items.length) return items.map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+      }
+      // REST fallback or second attempt
+      const key = embedId ? `usage:${embedId}` : `usage:all`;
+      const items = await kvRestLrange(key, 0, limit - 1);
+      return (items || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+    }catch(_e){
+      return [];
+    }
   }
   return memoryUsage.filter((u) => !embedId || u.embedId === embedId).slice(0, limit);
 }
