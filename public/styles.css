@@ -51,6 +51,6 @@ button:disabled{opacity:.65;cursor:not-allowed}
 
 .widget-body{padding:0;margin:0}
 .widget-root{padding:12px}
-.w-form{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.w-form{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 
 

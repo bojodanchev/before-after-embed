@@ -8,16 +8,19 @@
   </head>
   <body class="widget-body">
     <div class="widget-root">
-      <form id="w-form" class="w-form">
-        <input type="file" id="w-image" name="image" accept="image/*" required />
-        <select id="w-vertical" name="vertical">
+      <form id="w-form" class="w-form" style="gap:12px;flex-wrap:wrap">
+        <div id="dropzone" style="flex:1;min-width:240px;border:1px dashed var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)">
+          <input type="file" id="w-image" name="image" accept="image/*" style="display:none" />
+          <button type="button" id="pick" style="background:transparent;color:var(--fg);border:1px solid var(--border)">Choose image</button>
+        </div>
+        <button type="submit" id="w-generate">Generate</button>
+        <select id="w-vertical" name="vertical" style="display:none">
           <option value="">Preset</option>
           <option value="barber">Barber</option>
           <option value="dental">Dental</option>
           <option value="detailing">Detailing</option>
         </select>
-        <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" />
-        <button type="submit">Generate</button>
+        <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" style="display:none" />
       </form>
       <div class="compare compact">
         <img id="w-before" alt="Before" />
@@ -30,9 +33,21 @@
     </div>
     <script>
       (function(){
+        // apply theme
         const params = new URLSearchParams(location.search);
         const theme = (params.get('theme') || 'light').toLowerCase();
         document.documentElement.setAttribute('data-theme', theme);
+        // infer vertical from embed config: if present in URL (set by loader), default it silently
+        const guessed = params.get('vertical');
+        if (guessed) document.getElementById('w-vertical').value = guessed;
+        // dropzone interactions
+        const dz = document.getElementById('dropzone');
+        const input = document.getElementById('w-image');
+        const pick = document.getElementById('pick');
+        pick.addEventListener('click', ()=> input.click());
+        dz.addEventListener('dragover', (e)=>{ e.preventDefault(); dz.style.borderColor = 'var(--accent)';});
+        dz.addEventListener('dragleave', ()=>{ dz.style.borderColor = 'var(--border)';});
+        dz.addEventListener('drop', (e)=>{ e.preventDefault(); dz.style.borderColor = 'var(--border)'; if (e.dataTransfer.files[0]) input.files = e.dataTransfer.files;});
       })();
     </script>
     <script src="/widget.js"></script>
