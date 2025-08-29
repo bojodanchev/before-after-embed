@@ -19,7 +19,6 @@ export default async function handler(req, res){
     let embedId = (fields.embedId?.toString() || '').trim();
     if (!embedId) embedId = 'anonymous';
     let embedConfig = await getEmbedConfig(embedId);
-    // If not found, continue with sane defaults
 
     const promptField = (fields.prompt?.toString() || '').trim();
     const verticalField = (fields.vertical?.toString() || '').trim().toLowerCase();
@@ -38,6 +37,9 @@ export default async function handler(req, res){
       .join(' ');
 
     if (!effectivePrompt) return res.status(400).json({ error: "Missing prompt. Provide 'prompt' or choose a 'vertical'." });
+
+    // log start
+    await logUsage('edit_start', embedId, { vertical: chosenVertical, hasPrompt: Boolean(promptField) });
 
     const result = await fal.subscribe("fal-ai/nano-banana/edit", {
       input: {
@@ -70,8 +72,8 @@ export default async function handler(req, res){
     res.status(200).json({ outputUrl, prompt: effectivePrompt });
   }catch(err){
     console.error('/api/edit error', err);
-    const embedId = (req.query?.embedId || req.body?.embedId || '').toString() || 'anonymous';
-    if (embedId) await logUsage('edit_error', embedId, { reason: 'exception', message: err?.message || '' });
+    const fallbackEmbedId = 'anonymous';
+    try { await logUsage('edit_error', fallbackEmbedId, { reason: 'exception', message: err?.message || '' }); } catch {}
     res.status(500).json({ error: 'Edit failed' });
   }
 }
