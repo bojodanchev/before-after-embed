@@ -14,6 +14,12 @@ export default defineConfig({
   build: {
     outDir: resolve(__dirname, 'public/app'),
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        index: resolve(__dirname, 'site/index.html'),
+        client: resolve(__dirname, 'site/client.html'),
+      },
+    },
   },
 });
 
