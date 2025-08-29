@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Improve contrast and match landing vibe */
+:root{
+  --ba-bg: #0b0d10;
+  --ba-card: rgba(255,255,255,0.9);
+}
+.dark :root{ --ba-card: rgba(15,23,42,0.6); }
+
+body{ color: rgb(15 23 42); }
+.dark body{ color: white; }
+
+.ba-card{
+  @apply backdrop-blur border rounded-2xl shadow-sm;
+  background: var(--ba-card);
+}
+
 /* Dark background matching the design */
 :root{ color-scheme: dark; }
 body{ background-color:#0a0a0a; color:#fff; }

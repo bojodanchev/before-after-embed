@@ -7,7 +7,7 @@ const Container = ({ className = "", children }) => (
 );
 
 const Card = ({ className = "", children }) => (
-  <div className={`rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5 ${className}`}>
+  <div className={`ba-card border-neutral-200 dark:border-white/10 ${className}`}>
     {children}
   </div>
 );
@@ -192,7 +192,7 @@ const useStats = (token) => {
 };
 
 const Topbar = ({ me, onSignOut }) => (
-  <header className="sticky top-0 z-40 border-b border-neutral-200 bg-neutral-50/75 backdrop-blur dark:border-white/10 dark:bg-neutral-950/75">
+  <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-neutral-950/70">
     <Container className="flex h-14 items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-violet-500 via-pink-500 to-cyan-400 shadow"><span className="text-xs font-bold text-white">B/A</span></div>
