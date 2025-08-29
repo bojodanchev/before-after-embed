@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Client Dashboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h2>Client</h2>
+        <div id="c-info" class="status">Loading...</div>
+      </section>
+
+      <section class="card">
+        <h2>Your Embeds</h2>
+        <div class="row"><button id="c-refresh">Refresh</button></div>
+        <pre id="c-embeds" style="white-space:pre-wrap"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Usage</h2>
+        <div class="row">
+          <input id="c-embedId" placeholder="embedId" />
+          <button id="c-usage">Fetch usage</button>
+        </div>
+        <pre id="c-usage-out" style="white-space:pre-wrap"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Stats (Last 24h)</h2>
+        <div class="row"><button id="c-stats">Refresh stats</button></div>
+        <pre id="c-stats-out" style="white-space:pre-wrap"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Snippet Preset</h2>
+        <div class="row">
+          <input id="s-embedId" placeholder="embedId" />
+          <select id="s-preset">
+            <option value="compact">Compact</option>
+            <option value="card">Card</option>
+          </select>
+          <select id="s-theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+          <button id="s-generate">Copy snippet</button>
+        </div>
+        <pre id="s-code" style="white-space:pre-wrap"></pre>
+      </section>
+    </main>
+
+    <script src="/client.js"></script>
+  </body>
+  </html>
