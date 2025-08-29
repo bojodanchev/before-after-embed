@@ -239,12 +239,20 @@ const SignInCard = ({ onToken }) => {
   );
 };
 
-const EmbedsSection = ({ token }) => {
-  const { embeds, loading, err, refresh, create } = useEmbeds(token);
+const EmbedsSection = ({ token, hook }) => {
+  const { embeds, loading, err, refresh, create } = hook || useEmbeds(token);
   const [form, setForm] = useState({ id: "", vertical: "barber", theme: "dark" });
   const [creating, setCreating] = useState(false);
   const [createErr, setCreateErr] = useState("");
-  const onCreate = async (e) => { e.preventDefault(); setCreateErr(""); setCreating(true); try{ await create({ id: form.id.trim(), vertical: form.vertical, theme: form.theme }); setForm({ id: "", vertical: form.vertical, theme: form.theme }); }catch(e2){ setCreateErr(e2.message); }finally{ setCreating(false); } };
+  const onCreate = async (e) => {
+    e.preventDefault(); setCreateErr("");
+    const clean = form.id.trim();
+    if (!/^[a-z0-9-]{3,32}$/.test(clean)){ setCreateErr('Use 3-32 chars: lowercase letters, numbers, dashes'); return; }
+    setCreating(true);
+    try{ await create({ id: clean, vertical: form.vertical, theme: form.theme }); setForm({ id: "", vertical: form.vertical, theme: form.theme }); }
+    catch(e2){ setCreateErr(e2.message); }
+    finally{ setCreating(false); }
+  };
   return (
     <Container className="py-6">
       <div className="grid gap-6 md:grid-cols-2">
@@ -253,7 +261,16 @@ const EmbedsSection = ({ token }) => {
           <CardBody>
             {loading ? (<div className="text-sm opacity-70">Loading…</div>) : err ? (<div className="text-sm text-red-600 dark:text-red-400">{err}</div>) : embeds.length === 0 ? (<div className="text-sm opacity-70">No embeds yet. Create your first embed.</div>) : (
               <div className="divide-y divide-neutral-200 dark:divide-white/10">{embeds.map((e) => (
-                <div key={e.id} className="flex items-center justify-between gap-3 py-3"><div className="min-w-0"><div className="truncate text-sm font-medium">{e.id}</div><div className="text-xs opacity-70"><span className="uppercase">{e.vertical}</span> · <Code>{e.theme}</Code></div></div><Badge>Embed</Badge></div>
+                <div key={e.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{e.id}</div>
+                    <div className="text-xs opacity-70"><span className="uppercase">{e.vertical}</span> · <Code>{e.theme}</Code></div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button className="text-xs underline opacity-80 hover:opacity-100" onClick={()=>{ try{ navigator.clipboard.writeText(e.id);}catch{} }}>Copy ID</button>
+                    <a className="text-xs underline opacity-80 hover:opacity-100" target="_blank" rel="noreferrer" href={`/widget.html?embedId=${encodeURIComponent(e.id)}&theme=${encodeURIComponent(e.theme)}`}>Open</a>
+                  </div>
+                </div>
               ))}</div>
             )}
           </CardBody>
@@ -274,11 +291,13 @@ const EmbedsSection = ({ token }) => {
   );
 };
 
-const SnippetBuilder = ({ defaultEmbedId = "" }) => {
+const SnippetBuilder = ({ defaultEmbedId = "", embedsHook }) => {
   const [embedId, setEmbedId] = useState(defaultEmbedId);
   const [preset, setPreset] = useState("compact");
   const [theme, setTheme] = useState("dark");
   const [copied, setCopied] = useState(false);
+  const embeds = embedsHook?.embeds || [];
+  useEffect(() => { if (!embedId && embeds.length) setEmbedId(embeds[0].id); }, [embeds, embedId]);
   const snippet = useMemo(() => {
     const attrs = ["async", "src=\"https://before-after-embed.vercel.app/embed.js\"", `data-embed-id=\"${embedId || "your-embed-id"}\"`, `data-theme=\"${theme}\"`, `data-variant=\"${preset}\"`, `data-max-width=\"640px\"`, `data-align=\"center\"`, `data-radius=\"14px\"`, `data-shadow=\"true\"`, `data-border=\"true\"`, `data-width=\"100%\"`, `data-height=\"460px\"`].join(" ");
     return `<script ${attrs}></script>`;
@@ -290,7 +309,7 @@ const SnippetBuilder = ({ defaultEmbedId = "" }) => {
         <CardHeader title="Snippet builder" subtitle="Configure and copy a ready-to-paste embed script." right={copied ? <Badge className="border-emerald-400 text-emerald-500 dark:border-emerald-400/60">Copied</Badge> : null} />
         <CardBody className="grid gap-6 md:grid-cols-2">
           <div className="grid gap-3">
-            <div className="grid gap-1.5"><Label>Embed ID</Label><Input placeholder="your-embed-id" value={embedId} onChange={(e) => setEmbedId(e.target.value)} /></div>
+            <div className="grid gap-1.5"><Label>Embed ID</Label>{embeds.length ? (<Select value={embedId} onChange={(e) => setEmbedId(e.target.value)}>{embeds.map(e => (<option key={e.id} value={e.id}>{e.id}</option>))}</Select>) : (<Input placeholder="your-embed-id" value={embedId} onChange={(e) => setEmbedId(e.target.value)} />)}</div>
             <div className="grid gap-1.5"><Label>Preset</Label><Select value={preset} onChange={(e) => setPreset(e.target.value)}><option value="compact">compact</option><option value="card">card</option></Select></div>
             <div className="grid gap-1.5"><Label>Theme</Label><Select value={theme} onChange={(e) => setTheme(e.target.value)}><option value="light">light</option><option value="dark">dark</option></Select></div>
           </div>
@@ -339,11 +358,12 @@ const StatTile = ({ label, value }) => (
 
 const App = () => {
   const { token, setToken, me, loadingMe, errorMe, signOut } = useAuth();
+  const embedsHook = useEmbeds(token);
   useEffect(() => { const sp = new URLSearchParams(window.location.search); const urlToken = sp.get("token"); if (urlToken) { try { localStorage.setItem("clientToken", urlToken); } catch {} persistTokenToUrl(urlToken); } }, []);
   return (
     <div className="min-h-screen pb-16">
       <Topbar me={me} onSignOut={signOut} />
-      {!token ? (<SignInCard onToken={setToken} />) : loadingMe ? (<Container className="py-10"><Card><CardBody><div className="text-sm opacity-70">Loading account…</div></CardBody></Card></Container>) : errorMe ? (<Container className="py-10"><Card><CardBody className="flex items-center justify-between"><div className="text-sm text-red-600 dark:text-red-400">{errorMe}</div><Button variant="outline" onClick={() => setToken("")}>Sign in</Button></CardBody></Card></Container>) : !me ? (<SignInCard onToken={setToken} />) : (<><Container className="py-6"><Card><CardBody className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center"><div><div className="text-sm opacity-70">Welcome</div><div className="text-lg font-semibold">{me.name}</div><div className="text-xs opacity-60">Client ID: <Code>{me.id}</Code></div></div><div className="flex gap-2"><Button variant="ghost" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top</Button></div></CardBody></Card></Container><EmbedsSection token={token} /><SnippetBuilder /><UsageAndStatsWrapper token={token} /></>)}
+      {!token ? (<SignInCard onToken={setToken} />) : loadingMe ? (<Container className="py-10"><Card><CardBody><div className="text-sm opacity-70">Loading account…</div></CardBody></Card></Container>) : errorMe ? (<Container className="py-10"><Card><CardBody className="flex items-center justify-between"><div className="text-sm text-red-600 dark:text-red-400">{errorMe}</div><Button variant="outline" onClick={() => setToken("")}>Sign in</Button></CardBody></Card></Container>) : !me ? (<SignInCard onToken={setToken} />) : (<><Container className="py-6"><Card><CardBody className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center"><div><div className="text-sm opacity-70">Welcome</div><div className="text-lg font-semibold">{me.name}</div><div className="text-xs opacity-60">Client ID: <Code>{me.id}</Code></div></div><div className="flex gap-2"><Button variant="ghost" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Back to top</Button></div></CardBody></Card></Container><EmbedsSection token={token} hook={embedsHook} /><SnippetBuilder embedsHook={embedsHook} /><UsageAndStatsWrapper token={token} /></>)}
       <footer className="mt-10 border-t border-neutral-200 py-8 text-center text-sm opacity-70 dark:border-white/10">© 2025 Before/After Embed</footer>
     </div>
   );
