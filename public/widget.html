@@ -8,12 +8,16 @@
   </head>
   <body class="widget-body">
     <div class="widget-root">
-      <form id="w-form" class="w-form" style="gap:12px;flex-wrap:wrap">
-        <div id="dropzone" style="flex:1;min-width:240px;border:1px dashed var(--border);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)">
+      <form id="w-form" class="w-form">
+        <div id="dropzone" class="dropzone">
           <input type="file" id="w-image" name="image" accept="image/*" style="display:none" />
-          <button type="button" id="pick" style="background:transparent;color:var(--fg);border:1px solid var(--border)">Choose image</button>
+          <div class="dz-inner">
+            <div class="dz-icon">🖼️</div>
+            <div class="dz-text">Drop an image here or</div>
+            <button type="button" id="pick" class="btn-outline">Choose image</button>
+          </div>
         </div>
-        <button type="submit" id="w-generate">Generate</button>
+        <button type="submit" id="w-generate" class="btn-primary">Generate</button>
         <select id="w-vertical" name="vertical" style="display:none">
           <option value="">Preset</option>
           <option value="barber">Barber</option>

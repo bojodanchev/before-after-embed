@@ -55,4 +55,13 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .widget-root{padding:12px}
 .w-form{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 
+/* Landing-parity dropzone and buttons */
+.dropzone{flex:1;min-width:260px;border:1px dashed var(--border);border-radius:14px;padding:18px;display:flex;align-items:center;justify-content:center;background:color-mix(in hsl, var(--bg) 92%, transparent)}
+.dz-inner{text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.dz-icon{font-size:22px;opacity:.85}
+.btn-primary{background:linear-gradient(90deg,#7c3aed,#ec4899,#22d3ee);background-size:200% 100%;color:#fff;border:0}
+[data-theme="light"] .btn-primary{color:#fff}
+.btn-primary:hover{filter:brightness(1.02)}
+.btn-outline{background:transparent;color:var(--fg);border:1px solid var(--border)}
+
 
