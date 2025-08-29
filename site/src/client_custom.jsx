@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import * as ReactDOMClient from "react-dom/client"; // React 18+
 import ReactDOMLegacy from "react-dom"; // Fallback for React 17
+import "./index.css";
 
 /* ===============================================================
    Utilities (token, errors, snippet)
