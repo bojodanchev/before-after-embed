@@ -6,24 +6,14 @@
   --accent: #6aa5ff;
   --border: #222734;
   --ring: 0 0 0 3px rgba(106,165,255,0.35);
+  --tag-bg: rgba(0,0,0,.55);
+  --tag-fg: #e6eaf2;
 }
 [data-theme="dark"]:root, html[data-theme="dark"]{
-  --bg: #0b0d10;
-  --fg: #e6eaf2;
-  --muted: #9aa4b2;
-  --card: #141820;
-  --accent: #6aa5ff;
-  --border: #222734;
-  --ring: 0 0 0 3px rgba(106,165,255,0.35);
+  --bg: #0b0d10; --fg: #e6eaf2; --muted: #9aa4b2; --card: #141820; --accent: #6aa5ff; --border: #222734; --ring: 0 0 0 3px rgba(106,165,255,0.35); --tag-bg: rgba(0,0,0,.55); --tag-fg:#e6eaf2;
 }
 [data-theme="light"]:root, html[data-theme="light"]{
-  --bg: #ffffff;
-  --fg: #0f172a;
-  --muted: #334155;
-  --card: #ffffff;
-  --accent: #2563eb;
-  --border: #d6dee9;
-  --ring: 0 0 0 3px rgba(37,99,235,0.25);
+  --bg:#ffffff; --fg:#0f172a; --muted:#334155; --card:#ffffff; --accent:#2563eb; --border:#d6dee9; --ring:0 0 0 3px rgba(37,99,235,0.25); --tag-bg: rgba(255,255,255,.85); --tag-fg:#0f172a;
 }
 html, body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"}
 .container{max-width:960px;margin:0 auto;padding:24px}
@@ -46,7 +36,10 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .compare.compact{aspect-ratio:auto;height:360px}
 .compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .compare .after-wrapper{position:absolute;inset:0;clip-path:inset(0 50% 0 0)}
-.slider{position:absolute;left:12px;right:12px;bottom:14px;margin:0;-webkit-appearance:none;height:6px;background:rgba(255,255,255,.25);border-radius:999px}
+.tag{position:absolute;top:10px;padding:4px 8px;border-radius:999px;font-size:12px;background:var(--tag-bg);color:var(--tag-fg);z-index:3}
+.tag-before{left:12px}
+.tag-after{right:12px}
+.slider{position:absolute;left:12px;right:12px;bottom:14px;margin:0;-webkit-appearance:none;height:6px;background:rgba(255,255,255,.25);border-radius:999px;z-index:4}
 .slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.15)}
 
 .widget-body{padding:0;margin:0}

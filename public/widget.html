@@ -23,9 +23,11 @@
         <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" style="display:none" />
       </form>
       <div class="compare compact">
-        <img id="w-before" alt="Before" />
+        <span class="tag tag-before">Before</span>
+        <span class="tag tag-after">After</span>
+        <img id="w-before" alt="Before" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
         <div class="after-wrapper">
-          <img id="w-after" alt="After" />
+          <img id="w-after" alt="After" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
         </div>
         <input id="w-slider" class="slider" type="range" min="0" max="100" value="50" />
       </div>
@@ -33,14 +35,11 @@
     </div>
     <script>
       (function(){
-        // apply theme
         const params = new URLSearchParams(location.search);
         const theme = (params.get('theme') || 'light').toLowerCase();
         document.documentElement.setAttribute('data-theme', theme);
-        // infer vertical from embed config: if present in URL (set by loader), default it silently
         const guessed = params.get('vertical');
         if (guessed) document.getElementById('w-vertical').value = guessed;
-        // dropzone interactions
         const dz = document.getElementById('dropzone');
         const input = document.getElementById('w-image');
         const pick = document.getElementById('pick');
