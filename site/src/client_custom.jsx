@@ -26,20 +26,30 @@ async function safeError(res) {
   try { const j = await res.json(); return j?.error || j?.message || `${res.status}`; } catch { return `${res.status} ${res.statusText}`; }
 }
 
-const buildEmbedSnippet = (embedId, preset, theme) => {
+const buildEmbedSnippet = (embedId, preset, theme, opt={}) => {
+  const defaults = {
+    maxWidth: '640px',
+    align: 'center',
+    radius: '14px',
+    shadow: 'true',
+    border: 'true',
+    width: '100%',
+    height: '460px',
+  };
+  const o = Object.assign({}, defaults, opt);
   const attrs = [
     `async`,
     `src="https://before-after-embed.vercel.app/embed.js"`,
     `data-embed-id="${embedId || "your-embed-id"}"`,
     `data-theme="${theme}"`,
     `data-variant="${preset}"`,
-    `data-max-width="640px"`,
-    `data-align="center"`,
-    `data-radius="14px"`,
-    `data-shadow="true"`,
-    `data-border="true"`,
-    `data-width="100%"`,
-    `data-height="460px"`,
+    `data-max-width="${o.maxWidth}"`,
+    `data-align="${o.align}"`,
+    `data-radius="${o.radius}"`,
+    `data-shadow="${o.shadow}"`,
+    `data-border="${o.border}"`,
+    `data-width="${o.width}"`,
+    `data-height="${o.height}"`,
   ].join(" ");
   return `<script ${attrs}></script>`;
 };
@@ -170,7 +180,8 @@ function Dashboard({ token, onSignOut }) {
   const [embedId, setEmbedId] = useState("");
   const [preset, setPreset] = useState("compact");
   const [theme, setTheme] = useState("dark");
-  const snippetCode = useMemo(() => buildEmbedSnippet(embedId, preset, theme), [embedId, preset, theme]);
+  const [opts, setOpts] = useState({ maxWidth:'640px', align:'center', radius:'14px', shadow:'true', border:'true', width:'100%', height:'460px' });
+  const snippetCode = useMemo(() => buildEmbedSnippet(embedId, preset, theme, opts), [embedId, preset, theme, opts]);
   // Live snippet preview
   const [previewCode, setPreviewCode] = useState("");
   const previewRef = React.useRef(null);
@@ -179,11 +190,13 @@ function Dashboard({ token, onSignOut }) {
     try{
       const iframe = previewRef.current; if (!iframe) return;
       const doc = iframe.contentDocument || iframe.contentWindow?.document; if (!doc) return;
-      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:#0b0d10;color:#e6eaf2;font-family:Inter,ui-sans-serif,system-ui">${code}</body></html>`;
+      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${previewBg};color:#e6eaf2;font-family:Inter,ui-sans-serif,system-ui;display:flex;justify-content:${opts.align==='center'?'center':'flex-start'};padding:16px">${code}</body></html>`;
       doc.open(); doc.write(html); doc.close();
     }catch(_e){/* ignore */}
   };
-  useEffect(() => { const t = setTimeout(() => renderPreview(previewCode), 250); return () => clearTimeout(t); }, [previewCode]);
+  const [previewBg, setPreviewBg] = useState('#0b0d10');
+  const [previewError, setPreviewError] = useState('');
+  useEffect(() => { const t = setTimeout(() => { try{ renderPreview(previewCode); setPreviewError(''); }catch(e){ setPreviewError('Failed to render preview'); } }, 300); return () => clearTimeout(t); }, [previewCode, previewBg, opts.align]);
 
   // Usage & Stats
   const [usageEmbedId, setUsageEmbedId] = useState("");
@@ -378,6 +391,11 @@ function Dashboard({ token, onSignOut }) {
               <option value="light">light</option>
             </Select>
           </div>
+          <div className="mt-2 grid gap-2 md:grid-cols-3">
+            <Button variant="subtle" onClick={()=>{ setPreset('compact'); setOpts({ ...opts, maxWidth:'640px', align:'center', radius:'14px', width:'100%', height:'460px' }); }}>Preset: Compact</Button>
+            <Button variant="subtle" onClick={()=>{ setPreset('card'); setOpts({ ...opts, maxWidth:'980px', align:'left', radius:'12px', width:'100%', height:'520px' }); }}>Preset: Card</Button>
+            <Button variant="subtle" onClick={()=>{ setPreset('card'); setOpts({ ...opts, maxWidth:'100%', align:'center', radius:'0px', width:'100%', height:'600px', border:'false', shadow:'false' }); }}>Preset: Full‑bleed</Button>
+          </div>
           <pre className="mt-4 whitespace-pre-wrap break-words rounded-md bg-black/60 p-2 text-xs">{snippetCode}</pre>
           <Button className="mt-2" onClick={() => navigator.clipboard.writeText(snippetCode)}>Copy snippet</Button>
         </Section>
@@ -386,10 +404,20 @@ function Dashboard({ token, onSignOut }) {
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <textarea value={previewCode} onChange={(e)=> setPreviewCode(e.target.value)} rows={10} className="w-full rounded-md border border-white/10 bg-black/40 p-2 text-xs font-mono" />
-              <div className="mt-2 flex gap-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 <Button variant="subtle" onClick={()=> setPreviewCode(snippetCode)}>Reset to builder</Button>
                 <Button onClick={()=> renderPreview(previewCode)}>Run preview</Button>
+                <Select value={previewBg} onChange={(e)=> setPreviewBg(e.target.value)}>
+                  <option value="#0b0d10">dark page</option>
+                  <option value="#ffffff">white page</option>
+                  <option value="#f1f5f9">light grey</option>
+                </Select>
+                <Select value={opts.align} onChange={(e)=> setOpts(o=> ({...o, align:e.target.value}))}>
+                  <option value="center">center</option>
+                  <option value="left">left</option>
+                </Select>
               </div>
+              {!!previewError && <div className="mt-2 rounded-md border border-red-500/40 bg-red-500/10 p-2 text-xs text-red-300">{previewError}</div>}
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-2">
               <iframe ref={previewRef} title="snippet-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'520px',border:'0',borderRadius:'10px',background:'#0b0d10'}} />
