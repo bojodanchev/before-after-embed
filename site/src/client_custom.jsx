@@ -432,13 +432,16 @@ function Dashboard({ token, onSignOut }) {
             </Select>
             <Button variant="subtle" onClick={()=> fetchUsage(usageEmbedId)} disabled={!usageEmbedId || usageLoading}>{usageLoading ? 'Loading…' : 'Refresh'}</Button>
           </div>
-          {usage.length === 0 ? (
+          {usage.filter(u=> u && u.event === 'client_render').length === 0 ? (
             <div className="text-sm text-white/70">No events yet.</div>
           ) : (
             <ul className="space-y-1 text-xs">
-              {[...usage].sort((a,b)=> (b?.ts||0)-(a?.ts||0)).map((u) => (
+              {[...usage]
+                .filter(u => u && u.event === 'client_render')
+                .sort((a,b)=> (b?.ts||0)-(a?.ts||0))
+                .map((u) => (
                 <li key={u.id || u.ts} className="rounded border border-white/10 bg-black/20 p-2">
-                  <span className="opacity-80">{u.event}</span> · <span className="opacity-60">{new Date(u.ts).toLocaleString(undefined, { timeZoneName: 'short' })}</span>
+                  <span className="opacity-80">render</span> · <span className="opacity-60">{new Date(u.ts).toLocaleString(undefined, { timeZoneName: 'short' })}</span>
                 </li>
               ))}
             </ul>
