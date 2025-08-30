@@ -367,9 +367,10 @@ function Dashboard({ token, onSignOut }) {
                 <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} />
               </div>
               {/* Vertical-specific options */}
-              <div className="grid gap-1 md:col-span-2">
+              <div className="grid gap-2 md:col-span-2">
                 <Label>Vertical options</Label>
-                <div className="grid gap-2 md:grid-cols-2">
+                <div className="grid gap-2 md:grid-cols-3">
+                  {/* Detailing */}
                   <div className="grid gap-1">
                     <Label>Detailing focus</Label>
                     <Select value={settings.detailingFocus || 'exterior'} onChange={(e)=> setSettings(s=> ({...s, detailingFocus:e.target.value}))}>
@@ -377,7 +378,27 @@ function Dashboard({ token, onSignOut }) {
                       <option value="interior">interior</option>
                     </Select>
                   </div>
+                  {/* Dental */}
+                  <div className="grid gap-1">
+                    <Label>Dental treatment</Label>
+                    <Select value={settings.dentalTreatment || 'whitening'} onChange={(e)=> setSettings(s=> ({...s, dentalTreatment:e.target.value}))}>
+                      <option value="whitening">whitening</option>
+                      <option value="alignment">alignment</option>
+                      <option value="veneers">veneers</option>
+                    </Select>
+                  </div>
+                  {/* Barber */}
+                  <div className="grid gap-1">
+                    <Label>Barber style</Label>
+                    <Select value={settings.barberStyle || 'fade'} onChange={(e)=> setSettings(s=> ({...s, barberStyle:e.target.value}))}>
+                      <option value="fade">fade</option>
+                      <option value="buzz">buzz</option>
+                      <option value="undercut">undercut</option>
+                      <option value="pompadour">pompadour</option>
+                    </Select>
+                  </div>
                 </div>
+                <div className="text-xs text-white/50">Only the chosen vertical’s options will be presented to end users in the widget.</div>
               </div>
               <div className="grid gap-1">
                 <Label>Default theme</Label>

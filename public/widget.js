@@ -15,6 +15,9 @@
   const afterWrapper = document.querySelector('.after-wrapper');
   const verticalSel = document.getElementById('w-vertical');
   if (preset) verticalSel.value = preset;
+  const optionsContainer = document.createElement('div');
+  optionsContainer.id = 'w-vertical-options';
+  form.insertBefore(optionsContainer, form.children[1]);
 
   if (variant === 'compact'){
     const cmp = document.querySelector('.compare');
@@ -44,10 +47,14 @@
     const formData = new FormData();
     formData.append('image', file);
     const vertical = verticalSel.value;
+    // collect any vertical-specific inputs
+    const extra = {};
+    Array.from(optionsContainer.querySelectorAll('[data-opt]')).forEach(el => { extra[el.getAttribute('data-opt')] = el.value; });
     const prompt = document.getElementById('w-prompt').value;
     if (vertical) formData.append('vertical', vertical);
     if (prompt) formData.append('prompt', prompt);
     if (embedId) formData.append('embedId', embedId);
+    Object.entries(extra).forEach(([k,v])=> formData.append(`opt_${k}`, v));
 
     try {
       const resp = await fetch('/api/edit', { method: 'POST', body: formData });
@@ -67,6 +74,37 @@
       submitBtn.disabled = false;
     }
   });
+
+  // Load vertical options from embed config if provided
+  (async ()=>{
+    try{
+      if (!embedId) return;
+      const res = await fetch(`/api/embed/${encodeURIComponent(embedId)}`);
+      if (!res.ok) return;
+      const cfg = await res.json();
+      const vo = cfg.verticalOptions || {};
+      const v = (cfg.vertical || '').toLowerCase();
+      optionsContainer.innerHTML = '';
+      if (v === 'detailing'){
+        const select = document.createElement('select');
+        select.setAttribute('data-opt','focus');
+        ['exterior','interior'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
+        optionsContainer.appendChild(select);
+      } else if (v === 'dental'){
+        const select = document.createElement('select');
+        select.setAttribute('data-opt','treatment');
+        ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
+        optionsContainer.appendChild(select);
+      } else if (v === 'barber'){
+        const select = document.createElement('select');
+        select.setAttribute('data-opt','style');
+        ['fade','buzz','undercut','pompadour'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
+        optionsContainer.appendChild(select);
+      }
+      // override from config verticalOptions defaults if any
+      Object.entries(vo).forEach(([k,v])=>{ const el = optionsContainer.querySelector(`[data-opt="${k}"]`); if (el) el.value = v; });
+    }catch{}
+  })();
 })();
 
 
