@@ -42,16 +42,16 @@ async function kvRest(commandUrl){
 
 async function kvRestLpush(key, value){
   const encoded = encodeURIComponent(value);
-  return kvRest(`/LPUSH/${encodeURIComponent(key)}/${encoded}`);
+  return kvRest(`/lpush/${encodeURIComponent(key)}/${encoded}`);
 }
 
 async function kvRestLrange(key, start, stop){
-  const r = await kvRest(`/LRANGE/${encodeURIComponent(key)}/${start}/${stop}`);
+  const r = await kvRest(`/lrange/${encodeURIComponent(key)}/${start}/${stop}`);
   return Array.isArray(r?.result) ? r.result : [];
 }
 
 async function kvRestIncr(key, by){
-  return kvRest(`/INCRBY/${encodeURIComponent(key)}/${by}`);
+  return kvRest(`/incrby/${encodeURIComponent(key)}/${by}`);
 }
 
 function today(){
