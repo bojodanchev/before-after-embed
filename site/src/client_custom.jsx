@@ -171,6 +171,19 @@ function Dashboard({ token, onSignOut }) {
   const [preset, setPreset] = useState("compact");
   const [theme, setTheme] = useState("dark");
   const snippetCode = useMemo(() => buildEmbedSnippet(embedId, preset, theme), [embedId, preset, theme]);
+  // Live snippet preview
+  const [previewCode, setPreviewCode] = useState("");
+  const previewRef = React.useRef(null);
+  useEffect(() => { setPreviewCode(snippetCode); }, [snippetCode]);
+  const renderPreview = (code) => {
+    try{
+      const iframe = previewRef.current; if (!iframe) return;
+      const doc = iframe.contentDocument || iframe.contentWindow?.document; if (!doc) return;
+      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:#0b0d10;color:#e6eaf2;font-family:Inter,ui-sans-serif,system-ui">${code}</body></html>`;
+      doc.open(); doc.write(html); doc.close();
+    }catch(_e){/* ignore */}
+  };
+  useEffect(() => { const t = setTimeout(() => renderPreview(previewCode), 250); return () => clearTimeout(t); }, [previewCode]);
 
   // Usage & Stats
   const [usageEmbedId, setUsageEmbedId] = useState("");
@@ -328,6 +341,21 @@ function Dashboard({ token, onSignOut }) {
           </div>
           <pre className="mt-4 whitespace-pre-wrap break-words rounded-md bg-black/60 p-2 text-xs">{snippetCode}</pre>
           <Button className="mt-2" onClick={() => navigator.clipboard.writeText(snippetCode)}>Copy snippet</Button>
+        </Section>
+
+        <Section title="Live Snippet Preview (iframe sandbox)">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <textarea value={previewCode} onChange={(e)=> setPreviewCode(e.target.value)} rows={10} className="w-full rounded-md border border-white/10 bg-black/40 p-2 text-xs font-mono" />
+              <div className="mt-2 flex gap-2">
+                <Button variant="subtle" onClick={()=> setPreviewCode(snippetCode)}>Reset to builder</Button>
+                <Button onClick={()=> renderPreview(previewCode)}>Run preview</Button>
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-2">
+              <iframe ref={previewRef} title="snippet-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'520px',border:'0',borderRadius:'10px',background:'#0b0d10'}} />
+            </div>
+          </div>
         </Section>
 
         <Section title="Usage">
