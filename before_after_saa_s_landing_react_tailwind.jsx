@@ -167,10 +167,10 @@ export default function BeforeAfterLanding() {
             <a href="#features" className="hover:text-white">Features</a>
             <a href="#docs" className="hover:text-white">Docs</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="/client.html" className="hover:text-white">Client Portal</a>
+            <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/client.html"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Client Portal</Button></a>
+            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Client Portal</Button></a>
             <a href="#demo"><Button className="gap-2">Try the demo <ArrowRight className="h-4 w-4"/></Button></a>
           </div>
         </Container>
@@ -187,7 +187,7 @@ export default function BeforeAfterLanding() {
               <a href="#demo"><Button size="lg" className="gap-2">
                 Try the Live Demo <ArrowRight className="h-5 w-5" />
               </Button></a>
-              <a href="/client.html"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
+              <a href="/client.html" target="_top"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
                 Client Portal
               </Button></a>
             </div>
