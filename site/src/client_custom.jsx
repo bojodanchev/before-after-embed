@@ -93,6 +93,7 @@ const Select = ({ children, ...props }) => (
   </select>
 );
 const Code = ({ children }) => <code className="rounded-md bg-black/40 px-1.5 py-0.5 text-[12px]">{children}</code>;
+const Label = ({ children }) => (<span className="text-xs font-medium text-white/70">{children}</span>);
 
 /* ===============================================================
    Auth hook
