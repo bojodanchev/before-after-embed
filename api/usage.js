@@ -1,13 +1,7 @@
-import { logUsage } from "./_shared.js";
-
-export default async function handler(req, res){
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  try{
-    const { embedId, event, meta } = req.body || {};
-    if (!embedId || !event) return res.status(400).json({ error: 'embedId and event required' });
-    await logUsage(event, embedId, meta || {});
-    res.status(200).json({ ok: true });
-  }catch(e){ res.status(500).json({ error: 'failed' }); }
+// NOTE: This endpoint can be removed to stay under the Vercel Hobby limit.
+// The widget now relies on the server-side logging in /api/edit and the portal reads from KV.
+export default async function handler(_req, res){
+  res.status(410).json({ error: 'Gone' });
 }
 
 

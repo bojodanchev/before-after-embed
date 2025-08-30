@@ -68,6 +68,8 @@ export default async function handler(req, res){
     }
 
     await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
+    // Also log a client_render to drive analytics without requiring a separate endpoint
+    try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
 
     res.status(200).json({ outputUrl, prompt: effectivePrompt });
   }catch(err){
