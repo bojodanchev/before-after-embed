@@ -10,6 +10,9 @@ export const verticalPromptPresets = {
 };
 
 const kvClient = vercelKv || null;
+// Detect REST config explicitly as well for environments where @vercel/kv is not provisioned
+const REST_BASE = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
+const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
 
 const memoryEmbeds = {
   "demo-barber": { id: "demo-barber", name: "Barber Demo", vertical: "barber", theme: "light", width: "100%", height: "520px" },
@@ -21,7 +24,7 @@ const memoryClients = {};
 const memoryClientEmbeds = {}; // clientId -> Set<embedId>
 
 function isKvEnabled(){
-  return Boolean((process.env.KV_REST_API_URL || process.env.KV_URL || process.env.UPSTASH_REDIS_REST_URL));
+  return Boolean((REST_BASE && REST_TOKEN) || process.env.KV_URL || kvClient);
 }
 
 export function getStorageMode(){
@@ -29,8 +32,8 @@ export function getStorageMode(){
 }
 
 async function kvRest(commandUrl){
-  const base = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  const base = REST_BASE;
+  const token = REST_TOKEN;
   if (!base || !token) return null;
   const resp = await fetch(`${base}${commandUrl}`, { headers: { Authorization: `Bearer ${token}` } });
   if (!resp.ok) return null;
