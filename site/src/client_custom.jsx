@@ -204,6 +204,9 @@ function Dashboard({ token, onSignOut }) {
   const [usageLoading, setUsageLoading] = useState(false);
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  // Client settings
+  const [settings, setSettings] = useState(null);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -222,6 +225,8 @@ function Dashboard({ token, onSignOut }) {
       const embData = await emb.json();
       const list = Array.isArray(embData) ? embData : embData?.embeds || [];
       setEmbeds(list);
+      // settings
+      try{ const s = await fetch('/api/client/settings', { headers:{ Authorization:`Bearer ${token}` } }); const sj = await s.json(); setSettings(sj?.settings || {}); }catch{}
       if (!embedId && list.length) setEmbedId(list[0].id);
       if (!usageEmbedId && list.length) setUsageEmbedId(list[0].id);
     } catch (err) {
@@ -345,6 +350,55 @@ function Dashboard({ token, onSignOut }) {
             </Select>
             <Button type="submit" className="md:col-span-4">Create</Button>
           </form>
+        </Section>
+
+        <Section title="Client settings">
+          {!settings ? (
+            <div className="text-sm opacity-70">Loading…</div>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-1">
+                <Label>Display name</Label>
+                <Input value={settings.displayName || ''} onChange={(e)=> setSettings(s=> ({...s, displayName:e.target.value}))} />
+              </div>
+              <div className="grid gap-1">
+                <Label>Brand color</Label>
+                <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} />
+              </div>
+              {/* Vertical-specific options */}
+              <div className="grid gap-1 md:col-span-2">
+                <Label>Vertical options</Label>
+                <div className="grid gap-2 md:grid-cols-2">
+                  <div className="grid gap-1">
+                    <Label>Detailing focus</Label>
+                    <Select value={settings.detailingFocus || 'exterior'} onChange={(e)=> setSettings(s=> ({...s, detailingFocus:e.target.value}))}>
+                      <option value="exterior">exterior</option>
+                      <option value="interior">interior</option>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-1">
+                <Label>Default theme</Label>
+                <Select value={settings.defaultTheme || 'dark'} onChange={(e)=> setSettings(s=> ({...s, defaultTheme:e.target.value}))}><option value="dark">dark</option><option value="light">light</option></Select>
+              </div>
+              <div className="grid gap-1">
+                <Label>Default variant</Label>
+                <Select value={settings.defaultVariant || 'card'} onChange={(e)=> setSettings(s=> ({...s, defaultVariant:e.target.value}))}><option value="compact">compact</option><option value="card">card</option></Select>
+              </div>
+              <div className="grid gap-1">
+                <Label>Powered by</Label>
+                <Select value={settings.poweredBy || 'false'} onChange={(e)=> setSettings(s=> ({...s, poweredBy:e.target.value}))}><option value="false">hidden</option><option value="true">show</option></Select>
+              </div>
+              <div className="grid gap-1 md:col-span-2">
+                <Label>Webhook URL (optional)</Label>
+                <Input placeholder="https://example.com/webhook" value={settings.webhookUrl || ''} onChange={(e)=> setSettings(s=> ({...s, webhookUrl:e.target.value}))} />
+              </div>
+              <div className="md:col-span-2 flex gap-2 justify-end">
+                <Button disabled={savingSettings} onClick={async()=>{ setSavingSettings(true); try{ await fetch('/api/client/settings', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(settings) }); }finally{ setSavingSettings(false);} }}>Save settings</Button>
+              </div>
+            </div>
+          )}
         </Section>
 
         {editOpen && (

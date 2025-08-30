@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, getEmbedConfig, logUsage } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook } from "./_shared.js";
 
 export const config = {
   api: {
@@ -70,6 +70,8 @@ export default async function handler(req, res){
     await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
     // Also log a client_render to drive analytics without requiring a separate endpoint
     try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
+    // optional webhook
+    try { await deliverWebhook(embedId, { type:'render', embedId, outputUrl, ts: Date.now() }); } catch {}
 
     res.status(200).json({ outputUrl, prompt: effectivePrompt });
   }catch(err){

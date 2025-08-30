@@ -103,6 +103,46 @@ export async function getEmbedConfig(id){
   return memoryEmbeds[id] || null;
 }
 
+// ===== Client settings, API key and webhook =====
+export async function getClientSettings(clientId){
+  const def = { displayName: clientId, brandColor: '#7c3aed', defaultTheme: 'dark', defaultVariant: 'card', poweredBy: 'false', webhookUrl: '' };
+  if (!clientId) return def;
+  if (isKvEnabled() && kvClient){
+    const s = await kvClient.get(`clients:settings:${clientId}`);
+    return { ...def, ...(s || {}) };
+  }
+  return def;
+}
+
+export async function updateClientSettings(clientId, patch){
+  const current = await getClientSettings(clientId);
+  const next = { ...current, ...(patch || {}) };
+  if (isKvEnabled() && kvClient){ await kvClient.set(`clients:settings:${clientId}`, next); }
+  return next;
+}
+
+export async function getClientApiKey(clientId){
+  if (!clientId) return null;
+  if (isKvEnabled() && kvClient){ return await kvClient.get(`clients:apiKey:${clientId}`); }
+  return null;
+}
+
+export async function generateClientApiKey(clientId){
+  const key = `${clientId}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  if (isKvEnabled() && kvClient){ await kvClient.set(`clients:apiKey:${clientId}`, key); }
+  return key;
+}
+
+export async function deliverWebhook(clientId, payload){
+  try{
+    const s = await getClientSettings(clientId);
+    const url = (s?.webhookUrl || '').trim();
+    if (!url) return false;
+    await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+    return true;
+  }catch{ return false; }
+}
+
 export async function deleteEmbedConfig(id){
   if (!id) return false;
   const existing = await getEmbedConfig(id);
