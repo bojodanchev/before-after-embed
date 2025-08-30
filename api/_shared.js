@@ -171,10 +171,22 @@ export async function listUsage(embedId, limit = 50){
         const key = embedId ? `usage:${embedId}` : `usage:all`;
         const items = await kvClient.lrange(key, 0, limit - 1);
         if (items && items.length) return items.map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+        // Fallback: read from global stream and filter by embedId if specific list is empty
+        if (embedId){
+          const all = await kvClient.lrange('usage:all', 0, limit - 1);
+          if (all && all.length){
+            return all.map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean).filter(r=> r && r.embedId === embedId).slice(0, limit);
+          }
+        }
       }
       const key = embedId ? `usage:${embedId}` : `usage:all`;
       const items = await kvRestLrange(key, 0, limit - 1);
-      return (items || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+      let parsed = (items || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+      if ((!parsed.length) && embedId){
+        const all = await kvRestLrange('usage:all', 0, limit - 1);
+        parsed = (all || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean).filter(r=> r && r.embedId === embedId).slice(0, limit);
+      }
+      return parsed;
     }catch(_e){
       return [];
     }

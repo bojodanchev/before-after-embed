@@ -56,7 +56,8 @@
       statusEl.textContent = 'Rendering complete';
       if (json.outputUrl) {
         afterImg.src = json.outputUrl;
-        if (embedId){ fetch('/api/usage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embedId, event: 'client_render', meta: { theme, vertical, prompt: Boolean(prompt) } }) }).catch(()=>{}); }
+        // Explicitly log a client_render event so analytics pick up renders initiated via widget
+        try{ if (embedId){ await fetch('/api/usage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embedId, event: 'client_render', meta: { theme, vertical, prompt: Boolean(prompt) } }) }); } }catch(_e){}
       } else {
         statusEl.textContent = 'No image returned';
       }
