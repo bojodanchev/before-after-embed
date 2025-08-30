@@ -192,6 +192,10 @@ function Dashboard({ token, onSignOut }) {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
 
+  // Edit drawer
+  const [editOpen, setEditOpen] = useState(false);
+  const [editModel, setEditModel] = useState({ id:"", name:"", vertical:"barber", theme:"dark", width:"100%", height:"520px", variant:"card", radius:"12px", shadow:"true", border:"true" });
+
   const fetchData = async () => {
     try {
       setLoading(true); setError("");
@@ -306,6 +310,9 @@ function Dashboard({ token, onSignOut }) {
                   <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
                   <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Snippet</Button>
                   <a className="text-xs underline" target="_blank" rel="noreferrer" href={`/widget.html?embedId=${encodeURIComponent(e.id)}&theme=${encodeURIComponent(e.theme)}`}>Open</a>
+                  <Button variant="outline" onClick={()=> { setEditModel({ ...e, variant: e.variant || 'card', radius: e.radius || '12px', shadow: e.shadow ?? 'true', border: e.border ?? 'true' }); setEditOpen(true); }}>Edit</Button>
+                  <Button variant="outline" onClick={async()=>{ const nid = `${e.id}-copy`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({ ...e, id: nid, name: e.name || nid }) }); fetchData(); }}>Duplicate</Button>
+                  <Button variant="outline" onClick={async()=>{ if (!confirm(`Delete embed ${e.id}?`)) return; const u = new URL('/api/client/embeds', location.origin); u.searchParams.set('id', e.id); await fetch(u.toString(), { method:'DELETE', headers:{ Authorization:`Bearer ${token}` } }); fetchData(); }}>Delete</Button>
                 </div>
               </li>
             ))}
@@ -326,6 +333,38 @@ function Dashboard({ token, onSignOut }) {
             <Button type="submit" className="md:col-span-4">Create</Button>
           </form>
         </Section>
+
+        {editOpen && (
+          <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
+            <div className="w-full max-w-xl rounded-xl border border-white/10 bg-neutral-950 p-4 text-white">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-lg font-semibold">Edit embed</div>
+                <button className="text-white/70" onClick={()=> setEditOpen(false)}>✕</button>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid gap-1"><label className="text-xs text-white/70">ID</label><Input value={editModel.id} disabled /></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Name</label><Input value={editModel.name || ''} onChange={(e)=> setEditModel(m=> ({...m, name:e.target.value}))} /></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Vertical</label><Select value={editModel.vertical} onChange={(e)=> setEditModel(m=> ({...m, vertical:e.target.value}))}><option value="barber">barber</option><option value="dental">dental</option><option value="detailing">detailing</option><option value="cosmetics">cosmetics</option><option value="custom">custom</option></Select></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Variant</label><Select value={editModel.variant} onChange={(e)=> setEditModel(m=> ({...m, variant:e.target.value}))}><option value="compact">compact</option><option value="card">card</option></Select></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Width</label><Input value={editModel.width} onChange={(e)=> setEditModel(m=> ({...m, width:e.target.value}))} /></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Height</label><Input value={editModel.height} onChange={(e)=> setEditModel(m=> ({...m, height:e.target.value}))} /></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Radius</label><Input value={editModel.radius} onChange={(e)=> setEditModel(m=> ({...m, radius:e.target.value}))} /></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Border</label><Select value={editModel.border} onChange={(e)=> setEditModel(m=> ({...m, border:e.target.value}))}><option value="true">true</option><option value="false">false</option></Select></div>
+                <div className="grid gap-1"><label className="text-xs text-white/70">Shadow</label><Select value={editModel.shadow} onChange={(e)=> setEditModel(m=> ({...m, shadow:e.target.value}))}><option value="true">true</option><option value="false">false</option></Select></div>
+              </div>
+              <div className="mt-4 grid gap-2 md:grid-cols-2">
+                <div>
+                  <div className="mb-2 text-xs text-white/70">Live preview</div>
+                  <iframe title="edit-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'360px',border:'0',borderRadius:'10px',background:'#0b0d10'}} ref={(el)=>{ if (!el) return; const code = buildEmbedSnippet(editModel.id, editModel.variant, editModel.theme || 'dark').replace('data-width="100%"','data-width="'+(editModel.width||'100%')+'"').replace('data-height="460px"','data-height="'+(editModel.height||'520px')+'"'); const doc = el.contentDocument || el.contentWindow?.document; if (!doc) return; doc.open(); doc.write(`<!doctype html><html><body style=\"margin:0;background:#0b0d10\">${code}</body></html>`); doc.close(); }} />
+                </div>
+                <div className="flex flex-col justify-end gap-2">
+                  <Button onClick={async()=>{ const payload = { ...editModel }; await fetch('/api/client/embeds', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(payload) }); setEditOpen(false); fetchData(); }}>Save changes</Button>
+                  <Button variant="subtle" onClick={()=> setEditOpen(false)}>Cancel</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Section title="Snippet Builder">
           <div className="grid gap-2 md:grid-cols-3">

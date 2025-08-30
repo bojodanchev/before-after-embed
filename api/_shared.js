@@ -98,6 +98,25 @@ export async function getEmbedConfig(id){
   return memoryEmbeds[id] || null;
 }
 
+export async function deleteEmbedConfig(id){
+  if (!id) return false;
+  const existing = await getEmbedConfig(id);
+  if (!existing) return false;
+  if (isKvEnabled() && kvClient){
+    try{
+      await kvClient.del(`embeds:${id}`);
+      await kvClient.srem('embeds:index', id);
+      if (existing.clientId){ await kvClient.srem(`clientEmbeds:${existing.clientId}`, id); }
+    }catch(_e){}
+  }
+  try{ delete memoryEmbeds[id]; }catch{}
+  if (existing?.clientId){
+    const set = memoryClientEmbeds[existing.clientId];
+    if (set) set.delete(id);
+  }
+  return true;
+}
+
 export async function listEmbeds(){
   if (isKvEnabled() && kvClient){
     const ids = await kvClient.smembers("embeds:index");

@@ -1,4 +1,4 @@
-import { getClientByToken, listEmbedsForClient, setEmbedConfig, getEmbedConfig } from "../_shared.js";
+import { getClientByToken, listEmbedsForClient, setEmbedConfig, getEmbedConfig, deleteEmbedConfig } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -38,6 +38,14 @@ export default async function handler(req, res){
     if (!current || current.clientId !== client.id) return res.status(404).json({ error: 'Embed not found' });
     const cfg = await setEmbedConfig({ ...current, ...body, id });
     return res.status(200).json({ embed: cfg });
+  }
+  if (req.method === 'DELETE'){
+    const id = (req.query?.id || '').toString().trim();
+    if (!id) return res.status(400).json({ error: 'id required' });
+    const current = await getEmbedConfig(id);
+    if (!current || current.clientId !== client.id) return res.status(404).json({ error: 'Embed not found' });
+    await deleteEmbedConfig(id);
+    return res.status(200).json({ ok: true });
   }
   res.status(405).json({ error: 'Method not allowed' });
 }
