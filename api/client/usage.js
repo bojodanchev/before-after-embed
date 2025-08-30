@@ -1,4 +1,4 @@
-import { getClientByToken, listEmbedsForClient, listUsage } from "../_shared.js";
+import { getClientByToken, listEmbedsForClient, listUsage, getStorageMode } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -17,10 +17,11 @@ export default async function handler(req, res){
   // If you need strict tenancy, re-enable the check below.
   // const allowed = (await listEmbedsForClient(client.id)).some(e=> e.id === embedId);
   // if (!allowed) return res.status(403).json({ error: 'Forbidden' });
+  res.setHeader('Cache-Control', 'no-store');
   let events = await listUsage(embedId, 100);
   if (!events || events.length === 0){
     const all = await listUsage(undefined, 200);
     events = (all || []).filter(e => e && e.embedId === embedId);
   }
-  res.status(200).json({ events });
+  res.status(200).json({ events, storage: getStorageMode() });
 }
