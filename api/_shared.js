@@ -13,6 +13,7 @@ const kvClient = vercelKv || null;
 // Detect REST config explicitly as well for environments where @vercel/kv is not provisioned
 const REST_BASE = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
 const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
+const USE_REST = Boolean(REST_BASE && REST_TOKEN);
 
 const memoryEmbeds = {
   "demo-barber": { id: "demo-barber", name: "Barber Demo", vertical: "barber", theme: "light", width: "100%", height: "520px" },
@@ -24,11 +25,12 @@ const memoryClients = {};
 const memoryClientEmbeds = {}; // clientId -> Set<embedId>
 
 function isKvEnabled(){
-  return Boolean((REST_BASE && REST_TOKEN) || process.env.KV_URL || kvClient);
+  return Boolean(USE_REST || process.env.KV_URL || kvClient);
 }
 
 export function getStorageMode(){
-  return (isKvEnabled() && kvClient) ? 'kv' : (isKvEnabled() ? 'kv-rest' : 'memory');
+  if (USE_REST) return 'kv-rest';
+  return kvClient ? 'kv' : (isKvEnabled() ? 'kv-rest' : 'memory');
 }
 
 async function kvRest(commandUrl){
@@ -144,18 +146,19 @@ export async function logUsage(event, embedId, meta){
   const record = { id: `${Date.now()}-${Math.random().toString(36).slice(2)}`, ts: Date.now(), event, embedId, meta: meta || {} };
   if (isKvEnabled()){
     try {
-      if (kvClient){
+      if (USE_REST){
+        await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
+        await kvRestLpush('usage:all', JSON.stringify(record));
+        if (event === 'edit_success') await kvRestIncr(`meter:${today()}:${embedId}`, 1);
+      } else if (kvClient){
         await kvClient.lpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
         await kvClient.lpush(`usage:all`, JSON.stringify(record));
         await kvClient.ltrim(`usage:${embedId || 'all'}`, 0, 999);
         await kvClient.ltrim(`usage:all`, 0, 1999);
         if (event === 'edit_success') await kvClient.incr(`meter:${today()}:${embedId}`);
-      } else {
-        await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record));
-        await kvRestLpush('usage:all', JSON.stringify(record));
-        if (event === 'edit_success') await kvRestIncr(`meter:${today()}:${embedId}`, 1);
       }
     } catch(_e){
+      // Final fallback: REST
       try{ await kvRestLpush(`usage:${embedId || 'all'}`, JSON.stringify(record)); }catch{}
       try{ await kvRestLpush('usage:all', JSON.stringify(record)); }catch{}
       if (event === 'edit_success'){ try{ await kvRestIncr(`meter:${today()}:${embedId}`, 1); }catch{} }
@@ -170,6 +173,16 @@ export async function logUsage(event, embedId, meta){
 export async function listUsage(embedId, limit = 50){
   if (isKvEnabled()){
     try{
+      if (USE_REST){
+        const key = embedId ? `usage:${embedId}` : `usage:all`;
+        const items = await kvRestLrange(key, 0, limit - 1);
+        let parsed = (items || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean);
+        if ((!parsed.length) && embedId){
+          const all = await kvRestLrange('usage:all', 0, limit - 1);
+          parsed = (all || []).map((s)=>{ try{return JSON.parse(s);}catch{return null;}}).filter(Boolean).filter(r=> r && r.embedId === embedId).slice(0, limit);
+        }
+        return parsed;
+      }
       if (kvClient){
         const key = embedId ? `usage:${embedId}` : `usage:all`;
         const items = await kvClient.lrange(key, 0, limit - 1);
