@@ -436,9 +436,9 @@ function Dashboard({ token, onSignOut }) {
             <div className="text-sm text-white/70">No events yet.</div>
           ) : (
             <ul className="space-y-1 text-xs">
-              {usage.map((u) => (
+              {[...usage].sort((a,b)=> (b?.ts||0)-(a?.ts||0)).map((u) => (
                 <li key={u.id || u.ts} className="rounded border border-white/10 bg-black/20 p-2">
-                  <span className="opacity-80">{u.event}</span> · <span className="opacity-60">{new Date(u.ts).toLocaleString()}</span>
+                  <span className="opacity-80">{u.event}</span> · <span className="opacity-60">{new Date(u.ts).toLocaleString(undefined, { timeZoneName: 'short' })}</span>
                 </li>
               ))}
             </ul>
