@@ -26,7 +26,7 @@
         </select>
         <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" style="display:none" />
       </form>
-      <div class="compare compact">
+      <div class="compare" id="compare">
         <span class="tag tag-before">Before</span>
         <span class="tag tag-after">After</span>
         <img id="w-before" alt="Before" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
@@ -54,6 +54,14 @@
       })();
     </script>
     <script src="/widget.js"></script>
+    <script>
+      (function(){
+        const params = new URLSearchParams(location.search);
+        const variant = (params.get('variant') || 'card').toLowerCase();
+        const cmp = document.getElementById('compare');
+        cmp.classList.add(variant === 'compact' ? 'compact' : 'card');
+      })();
+    </script>
   </body>
   </html>
 
