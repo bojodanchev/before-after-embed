@@ -5,6 +5,8 @@
   const embedId = params.get('embedId') || '';
   const variant = (params.get('variant') || 'card').toLowerCase();
   const background = params.get('background') || 'auto';
+  const mode = params.get('mode') || 'full';
+  const hideHeader = params.get('hideHeader') === 'true';
 
   document.documentElement.dataset.theme = theme;
   
@@ -15,6 +17,20 @@
   } else if (background === 'inherit') {
     document.body.style.background = 'inherit';
     document.documentElement.style.background = 'inherit';
+  }
+
+  // Handle content-only mode and header hiding
+  if (mode === 'content-only' || hideHeader) {
+    // Hide any headers/titles in the widget
+    const headers = document.querySelectorAll('h1, h2, h3, .widget-header, .demo-header');
+    headers.forEach(header => header.style.display = 'none');
+    
+    // Remove padding/margins from widget root for tighter integration
+    const widgetRoot = document.querySelector('.widget-root');
+    if (widgetRoot) {
+      widgetRoot.style.padding = '0';
+      widgetRoot.style.margin = '0';
+    }
   }
 
   const form = document.getElementById('w-form');
