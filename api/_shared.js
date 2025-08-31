@@ -219,6 +219,41 @@ export async function incrMonthlyUsageForClient(clientId, by){
   return 0;
 }
 
+// Bonus (top-ups) for the current month
+export async function getMonthlyBonusForClient(clientId){
+  if (!clientId) return 0;
+  const key = `meterBonus:client:${currentMonth()}:${clientId}`;
+  try{
+    if (USE_REST){
+      const r = await kvRest(`/get/${encodeURIComponent(key)}`);
+      const v = (r && r.result) != null ? Number(r.result) : 0;
+      return Number.isFinite(v) ? v : 0;
+    }
+    if (kvClient){
+      const v = await kvClient.get(key);
+      return Number(v || 0);
+    }
+  }catch{}
+  return 0;
+}
+
+export async function incrMonthlyBonusForClient(clientId, by){
+  if (!clientId) return 0;
+  const key = `meterBonus:client:${currentMonth()}:${clientId}`;
+  try{
+    if (USE_REST){
+      const r = await kvRestIncr(key, by || 0);
+      const v = (r && r.result) != null ? Number(r.result) : 0;
+      return Number.isFinite(v) ? v : 0;
+    }
+    if (kvClient){
+      const v = await kvClient.incrby(key, by || 0);
+      return Number(v || 0);
+    }
+  }catch{}
+  return 0;
+}
+
 export async function deliverWebhook(clientId, payload){
   try{
     const s = await getClientSettings(clientId);

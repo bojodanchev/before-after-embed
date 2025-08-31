@@ -1,4 +1,4 @@
-import { getClientByToken, listEmbedsForClient, listUsage, getClientPlan, getMonthlyUsageForClient } from "../_shared.js";
+import { getClientByToken, listEmbedsForClient, listUsage, getClientPlan, getMonthlyUsageForClient, getMonthlyBonusForClient } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -26,8 +26,9 @@ export default async function handler(req, res){
     }
   }
   // Plan + monthly usage for progress bar
-  let plan = null; let monthlyUsed = 0;
+  let plan = null; let monthlyUsed = 0; let monthlyBonus = 0;
   try{ plan = await getClientPlan(client.id); }catch{}
   try{ monthlyUsed = await getMonthlyUsageForClient(client.id); }catch{}
-  res.status(200).json({ totals, last24h, plan, monthlyUsed });
+  try{ monthlyBonus = await getMonthlyBonusForClient(client.id); }catch{}
+  res.status(200).json({ totals, last24h, plan, monthlyUsed, monthlyBonus });
 }

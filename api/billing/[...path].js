@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getClientByToken, setClientPlan, plans, getClientPlan } from '../_shared.js';
+import { getClientByToken, setClientPlan, plans, incrMonthlyBonusForClient } from '../_shared.js';
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -69,6 +69,26 @@ export default async function handler(req, res){
     }catch(e){ return res.status(500).json({ error: e?.message || 'Portal failed' }); }
   }
 
+  if (resource === 'topup' && req.method === 'POST'){
+    try{
+      const token = extractToken(req);
+      const client = await getClientByToken(token);
+      if (!client) return res.status(401).json({ error: 'Unauthorized' });
+      const { units } = req.body || {}; // units of 100 generations
+      const n = Math.max(1, Number(units || 1));
+      const price = (process.env.STRIPE_PRICE_TOPUP || '').trim();
+      if (!price) return res.status(400).json({ error: 'Top-up price not configured' });
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{ price, quantity: n }],
+        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        cancel_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        metadata: { clientId: client.id, topup: String(n * 100) },
+      });
+      return res.status(200).json({ url: session.url });
+    }catch(e){ return res.status(500).json({ error: e?.message || 'Top-up failed' }); }
+  }
+
   if (resource === 'webhook'){
     // Minimal webhook: set plan on checkout completion
     const sig = req.headers['stripe-signature'];
@@ -87,6 +107,15 @@ export default async function handler(req, res){
         if (clientId && plans[planId]){
           await setClientPlan(clientId, planId);
         }
+        // Handle top-up one-time purchases via metadata
+        const bonus = Number(session?.metadata?.topup || 0);
+        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); }
+      }
+      if (event.type === 'checkout.session.async_payment_succeeded'){
+        const session = event.data.object;
+        const clientId = session?.metadata?.clientId;
+        const bonus = Number(session?.metadata?.topup || 0);
+        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); }
       }
     }catch{}
     return res.status(200).json({ received: true });

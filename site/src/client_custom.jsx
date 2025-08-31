@@ -552,24 +552,32 @@ function Dashboard({ token, onSignOut }) {
                 </div>
               </div>
 
-              {/* Progress bar + upsell */}
+              {/* Progress bar + top-up */}
               <div className="mt-4 rounded-md border border-white/10 bg-black/30 p-3">
                 {(() => {
                   const used = Number(stats?.monthlyUsed || 0);
-                  const cap = Number(stats?.plan?.monthlyGenerations || 0);
+                  const cap = Number(stats?.plan?.monthlyGenerations || 0) + Number(stats?.monthlyBonus || 0);
                   const pct = cap > 0 ? Math.min(100, Math.round((used / cap) * 100)) : 0;
                   return (
                     <div>
                       <div className="mb-1 flex items-center justify-between text-xs">
                         <div className="opacity-80">Monthly generations</div>
-                        <div className="opacity-70">{used} / {cap}</div>
+                        <div className="opacity-70">{used} / {cap} {stats?.monthlyBonus ? `(+${stats.monthlyBonus} bonus)` : ''}</div>
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded bg-white/10">
                         <div className="h-full bg-gradient-to-r from-violet-500 via-pink-500 to-cyan-400" style={{ width: pct + '%' }} />
                       </div>
                       <div className="mt-2 flex flex-wrap items-center justify-between text-xs">
                         <div className="opacity-70">$10 per extra 100 gens after limit</div>
-                        <Button className="px-3 py-1" onClick={() => alert('Top-up coming soon')}>Buy top-up</Button>
+                        <Button className="px-3 py-1" onClick={async()=>{
+                          try{
+                            const units = 1; // one block of 100
+                            const resp = await fetch('/api/billing/topup', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ units }) });
+                            const j = await resp.json();
+                            if (!resp.ok) throw new Error(j?.error || 'Top-up failed');
+                            if (j?.url) window.location.href = j.url;
+                          }catch(e){ alert(e.message || 'Top-up failed'); }
+                        }}>Buy top-up</Button>
                       </div>
                     </div>
                   );
