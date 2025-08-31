@@ -439,7 +439,12 @@ function Dashboard({ token, onSignOut }) {
               </div>
               <div className="grid gap-1">
                 <Label>Brand color</Label>
-                <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} />
+                <div className="flex items-center gap-2">
+                  <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} disabled={!planInfo || (planInfo.themeCustomization !== 'custom')} />
+                  {(!planInfo || planInfo.themeCustomization !== 'custom') && (
+                    <span className="text-xs text-white/50">Growth/Pro only</span>
+                  )}
+                </div>
               </div>
               {/* Vertical-specific options removed: now selected directly in widget */}
               <div className="grid gap-1">

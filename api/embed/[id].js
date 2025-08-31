@@ -1,4 +1,4 @@
-import { getEmbedConfig, handleCorsPreflight, setCorsHeaders } from "../_shared.js";
+import { getEmbedConfig, getClientPlan, getClientSettings, handleCorsPreflight, setCorsHeaders } from "../_shared.js";
 
 export default async function handler(req, res){
   // Handle CORS preflight
@@ -20,8 +20,22 @@ export default async function handler(req, res){
   try {
     const cfg = await getEmbedConfig(id);
     if (!cfg) return res.status(404).json({ error: "Embed not found" });
-    const { width, height, theme, vertical, id: cfgId, name, verticalOptions } = cfg;
-    res.status(200).json({ id: cfgId, name, vertical, theme, width, height, verticalOptions: verticalOptions || {} });
+    const { width, height, theme, vertical, id: cfgId, name, verticalOptions, clientId } = cfg;
+    // Theme customization (brand color) only for growth/pro where themeCustomization === 'custom'
+    let accent = null;
+    let customization = 'basic';
+    try{
+      if (clientId){
+        const plan = await getClientPlan(clientId);
+        customization = plan?.themeCustomization || 'basic';
+        if (customization === 'custom'){
+          const s = await getClientSettings(clientId);
+          const bc = (s?.brandColor || '').toString().trim();
+          if (bc) accent = bc;
+        }
+      }
+    }catch(_e){}
+    res.status(200).json({ id: cfgId, name, vertical, theme, width, height, verticalOptions: verticalOptions || {}, accent, customization });
   } catch (error) {
     console.error('Error fetching embed config:', error);
     res.status(500).json({ error: 'Internal server error' });

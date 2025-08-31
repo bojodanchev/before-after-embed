@@ -174,7 +174,7 @@
           --ba-fg: ${token('fg', cfg.theme)};
           --ba-border: ${token('border', cfg.theme)}; 
           --ba-muted: ${token('muted', cfg.theme)};
-          --ba-accent: #7c3aed;
+          --ba-accent: var(--ba-accent-internal, #7c3aed);
         }
       </style>
       <div class="wrap" part="container">
@@ -214,6 +214,12 @@
       .then(r => r.json())
       .then(conf => {
         const vertical = conf.vertical || 'barber';
+        // Apply brand accent if customization is allowed by plan
+        try{
+          if (conf && conf.customization === 'custom' && conf.accent){
+            root.host.style.setProperty('--ba-accent-internal', conf.accent);
+          }
+        }catch(_e){}
         if (conf.watermark) {
           root.getElementById('wm').style.display = 'block';
         }
