@@ -135,7 +135,7 @@
           position: absolute;
           left: 0;
           right: 0;
-          bottom: 8px;
+          bottom: 14px;
           width: 100%;
           height: 4px;
           background: linear-gradient(90deg, rgba(124,58,237,.35), rgba(34,211,238,.35));
@@ -143,9 +143,9 @@
         }
         .slider-thumb {
           position: absolute;
-          top: -6px;
-          width: 16px;
-          height: 16px;
+          top: -8px;
+          width: 18px;
+          height: 18px;
           background: #fff;
           border-radius: 50%;
           cursor: pointer;
@@ -179,7 +179,7 @@
       </style>
       <div class="wrap" part="container">
         <div class="row" style="justify-content: space-between; margin-bottom: 8px">
-          <span class="muted">After</span><span class="muted">Before</span>
+          <span class="muted">Before</span><span class="muted">After</span>
         </div>
         <div class="row">
           <div class="drop" id="dropzone">
