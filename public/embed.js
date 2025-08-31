@@ -244,8 +244,24 @@
           body: formData
         });
 
-        const result = await response.json();
-        if (response.ok && result.outputUrl) {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        if (!text) {
+          throw new Error('Empty response from server');
+        }
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error('Invalid JSON response:', text);
+          throw new Error('Invalid response format');
+        }
+
+        if (result.outputUrl) {
           beforeImage.src = URL.createObjectURL(selectedFile);
           afterImage.src = result.outputUrl;
           resultArea.style.display = 'block';
@@ -254,6 +270,7 @@
           status.textContent = 'Error: ' + (result.error || 'Generation failed');
         }
       } catch (error) {
+        console.error('Generation error:', error);
         status.textContent = 'Error: ' + error.message;
       } finally {
         generateBtn.disabled = false;
@@ -285,13 +302,40 @@
     return keys[vertical] || 'option';
   }
 
-  if (embedId) {
-    fetch(origin + '/api/embed/' + encodeURIComponent(embedId))
-      .then(r => r.ok ? r.json() : Promise.reject(new Error('Embed not found')))
-      .then(cfg => renderWidget(cfg))
-      .catch(() => renderWidget({}));
+  // Ensure DOM is ready before rendering
+  function initWidget() {
+    if (embedId) {
+      fetch(origin + '/api/embed/' + encodeURIComponent(embedId))
+        .then(async r => {
+          if (!r.ok) {
+            throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+          }
+          const text = await r.text();
+          if (!text) {
+            throw new Error('Empty response');
+          }
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            console.error('Invalid JSON response:', text);
+            throw new Error('Invalid JSON response');
+          }
+        })
+        .then(cfg => renderWidget(cfg))
+        .catch(err => {
+          console.error('Error loading embed config:', err);
+          renderWidget({});
+        });
+    } else {
+      renderWidget({});
+    }
+  }
+
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWidget);
   } else {
-    renderWidget({});
+    initWidget();
   }
 })();
 
