@@ -22,6 +22,10 @@ export default async function handler(req, res){
 
     const promptField = (fields.prompt?.toString() || '').trim();
     const verticalField = (fields.vertical?.toString() || '').trim().toLowerCase();
+    const optionEntries = Object.keys(fields)
+      .filter(k => k.startsWith('opt_'))
+      .map(k => [k.slice(4), (fields[k]?.toString() || '').trim().toLowerCase()]);
+    const options = Object.fromEntries(optionEntries);
 
     const fileObj = files.image;
     const file = Array.isArray(fileObj) ? fileObj[0] : fileObj;
@@ -32,9 +36,35 @@ export default async function handler(req, res){
     const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
 
     const chosenVertical = verticalField || embedConfig?.vertical || 'barber';
-    const effectivePrompt = [verticalPromptPresets[chosenVertical] || null, promptField || null]
-      .filter(Boolean)
-      .join(' ');
+
+    function optionPromptFor(vertical, opts){
+      const v = (vertical || '').toLowerCase();
+      if (v === 'barber'){
+        const style = opts.style;
+        if (style === 'fade') return 'Apply a clean skin fade haircut with tapered sides and back; keep natural hairline.';
+        if (style === 'buzz') return 'Buzz cut with even length across the scalp; neat edges and natural texture.';
+        if (style === 'undercut') return 'Undercut: short sides and back with longer top; clean contrast between lengths.';
+        if (style === 'pompadour') return 'Pompadour hairstyle with volume at the front, smooth sides, and polished finish.';
+      }
+      if (v === 'dental'){
+        const treatment = opts.treatment;
+        if (treatment === 'whitening') return 'Whiten teeth naturally to a brighter but realistic shade; preserve enamel texture.';
+        if (treatment === 'alignment') return 'Subtly align teeth for a straighter smile without altering facial identity.';
+        if (treatment === 'veneers') return 'Simulate natural-looking veneers with improved shape and shade; avoid over-whitening.';
+      }
+      if (v === 'detailing'){
+        const focus = opts.focus;
+        if (focus === 'interior') return 'Focus on car interior: deep-clean upholstery, remove stains, crisp textures, subtle matte finish.';
+        if (focus === 'exterior') return 'Focus on car exterior: glossy paint, remove swirls and minor scratches, sharp reflections.';
+      }
+      return '';
+    }
+
+    const effectivePrompt = [
+      verticalPromptPresets[chosenVertical] || null,
+      optionPromptFor(chosenVertical, options) || null,
+      promptField || null,
+    ].filter(Boolean).join(' ');
 
     if (!effectivePrompt) return res.status(400).json({ error: "Missing prompt. Provide 'prompt' or choose a 'vertical'." });
 
@@ -67,7 +97,7 @@ export default async function handler(req, res){
       outputUrl = data.url;
     }
 
-    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl) });
+    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl), options });
     // Also log a client_render to drive analytics without requiring a separate endpoint
     try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
     // optional webhook
