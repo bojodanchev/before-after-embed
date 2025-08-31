@@ -4,8 +4,18 @@
   const theme = params.get('theme') || 'light';
   const embedId = params.get('embedId') || '';
   const variant = (params.get('variant') || 'card').toLowerCase();
+  const background = params.get('background') || 'auto';
 
   document.documentElement.dataset.theme = theme;
+  
+  // Handle background transparency
+  if (background === 'transparent') {
+    document.body.style.background = 'transparent';
+    document.documentElement.style.background = 'transparent';
+  } else if (background === 'inherit') {
+    document.body.style.background = 'inherit';
+    document.documentElement.style.background = 'inherit';
+  }
 
   const form = document.getElementById('w-form');
   const beforeImg = document.getElementById('w-before');
