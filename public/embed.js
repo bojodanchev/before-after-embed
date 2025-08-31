@@ -28,93 +28,94 @@
     const wrapper = document.createElement('div');
     wrapper.className = 'before-after-embed-widget';
     wrapper.style.cssText = `
-      display: block;
+      display: inline-block;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: ${maxWidth || '640px'};
-      margin: 0 auto;
-      background: ${background === 'transparent' ? 'transparent' : background === 'inherit' ? 'inherit' : theme === 'dark' ? '#1a1a1a' : '#ffffff'};
+      max-width: ${maxWidth || '400px'};
+      width: 100%;
+      margin: 0;
+      background: ${background === 'transparent' ? 'transparent' : background === 'inherit' ? 'inherit' : theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};
       border-radius: ${radius};
       box-shadow: ${shadow};
       border: ${border};
       overflow: hidden;
     `;
 
-    // Create the widget HTML structure (similar to landing page demo)
+    // Create the widget HTML structure (compact version)
     wrapper.innerHTML = `
-      <div class="widget-content" style="padding: 24px;">
+      <div class="widget-content" style="padding: 16px;">
         <div class="image-upload-area" style="
           border: 2px dashed ${theme === 'dark' ? '#374151' : '#d1d5db'};
-          border-radius: 12px;
-          padding: 40px 20px;
+          border-radius: 8px;
+          padding: 20px 12px;
           text-align: center;
-          background: ${theme === 'dark' ? '#111827' : '#f9fafb'};
-          margin-bottom: 20px;
+          background: ${theme === 'dark' ? 'rgba(17,24,39,0.5)' : 'rgba(249,250,251,0.5)'};
+          margin-bottom: 12px;
           cursor: pointer;
           transition: all 0.2s;
         ">
-          <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
-          <div style="font-size: 16px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 8px;">
-            Drop an image here or
+          <div style="font-size: 24px; margin-bottom: 8px;">🖼️</div>
+          <div style="font-size: 12px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 6px;">
+            Drop image or
           </div>
           <button type="button" class="choose-image-btn" style="
             background: ${theme === 'dark' ? '#374151' : '#ffffff'};
             border: 1px solid ${theme === 'dark' ? '#4b5563' : '#d1d5db'};
-            border-radius: 8px;
-            padding: 8px 16px;
+            border-radius: 6px;
+            padding: 4px 12px;
             color: ${theme === 'dark' ? '#ffffff' : '#374151'};
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
-          ">Choose image</button>
+          ">Choose</button>
           <input type="file" accept="image/*" style="display: none;" />
         </div>
         
-        <div class="vertical-options" style="margin-bottom: 20px; display: none;">
-          <div style="font-size: 14px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 8px;">Choose option:</div>
-          <div class="options-buttons" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        <div class="vertical-options" style="margin-bottom: 12px; display: none;">
+          <div style="font-size: 11px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 6px;">Choose option:</div>
+          <div class="options-buttons" style="display: flex; gap: 4px; flex-wrap: wrap;"></div>
         </div>
         
         <button type="button" class="generate-btn" style="
           width: 100%;
           background: linear-gradient(135deg, #8b5cf6, #ec4899, #06b6d4);
           border: none;
-          border-radius: 8px;
-          padding: 12px 24px;
+          border-radius: 6px;
+          padding: 8px 16px;
           color: white;
-          font-size: 16px;
+          font-size: 12px;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.2s;
-          margin-bottom: 20px;
+          margin-bottom: 12px;
         " disabled>Generate →</button>
         
         <div class="result-area" style="display: none;">
           <div class="before-after-container" style="
             position: relative;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            background: ${theme === 'dark' ? '#111827' : '#f9fafb'};
+            background: ${theme === 'dark' ? 'rgba(17,24,39,0.5)' : 'rgba(249,250,251,0.5)'};
           ">
             <div class="before-label" style="
               position: absolute;
-              top: 12px;
-              right: 12px;
+              top: 8px;
+              right: 8px;
               background: rgba(0,0,0,0.7);
               color: white;
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-size: 12px;
+              padding: 2px 6px;
+              border-radius: 3px;
+              font-size: 10px;
               z-index: 10;
             ">Before</div>
             <div class="after-label" style="
               position: absolute;
-              top: 12px;
-              left: 12px;
+              top: 8px;
+              left: 8px;
               background: rgba(0,0,0,0.7);
               color: white;
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-size: 12px;
+              padding: 2px 6px;
+              border-radius: 3px;
+              font-size: 10px;
               z-index: 10;
             ">After</div>
             <div class="slider-container" style="position: relative;">
@@ -239,10 +240,12 @@
       if (selectedOption) formData.append(`opt_${getOptionKey(vertical)}`, selectedOption);
 
       try {
+        console.log('Sending request to /api/edit with method POST');
         const response = await fetch('/api/edit', {
           method: 'POST',
           body: formData
         });
+        console.log('Response status:', response.status, response.statusText);
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);

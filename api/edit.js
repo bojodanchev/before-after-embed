@@ -14,7 +14,10 @@ export default async function handler(req, res){
   // Set CORS headers for all requests
   setCorsHeaders(res);
 
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    console.log('Method not allowed:', req.method);
+    return res.status(405).json({ error: 'Method not allowed', received: req.method, expected: 'POST' });
+  }
 
   try{
     const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 10 * 1024 * 1024 });
