@@ -54,12 +54,12 @@
         <h1>🎨 Before/After Widget Demo</h1>
         
         <div class="demo-section">
-            <h2>Default Shadow DOM Version</h2>
-            <p>This is the default version using Shadow DOM for perfect CSS isolation and transparency. Notice how it appears inline with the text:</p>
+            <h2>Shadow DOM – Light</h2>
+            <p>Exact production snippet using explicit light theme:</p>
             <p>Here's some text before the widget 
                 <script async src="https://before-after-embed.vercel.app/embed.js"
                     data-embed-id="bojo"
-                    data-theme="auto"
+                    data-theme="light"
                     data-max-width="300px"
                     data-align="left"
                     data-radius="14px"
@@ -71,7 +71,34 @@
             <div class="code">
 &lt;script async src="https://before-after-embed.vercel.app/embed.js"
     data-embed-id="bojo"
-    data-theme="auto"
+    data-theme="light"
+    data-max-width="300px"
+    data-align="left"
+    data-radius="14px"
+    data-shadow="true"
+    data-border="true"&gt;
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Shadow DOM – Dark</h2>
+            <p>Exact production snippet using explicit dark theme:</p>
+            <div class="widget-demo" style="background:#0b0d10; padding:16px; border-radius:12px;">
+                <script async src="https://before-after-embed.vercel.app/embed.js"
+                    data-embed-id="bojo"
+                    data-theme="dark"
+                    data-max-width="300px"
+                    data-align="left"
+                    data-radius="14px"
+                    data-shadow="true"
+                    data-border="true">
+                </script>
+            </div>
+            <div class="code">
+&lt;script async src="https://before-after-embed.vercel.app/embed.js"
+    data-embed-id="bojo"
+    data-theme="dark"
     data-max-width="300px"
     data-align="left"
     data-radius="14px"

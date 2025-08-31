@@ -192,7 +192,8 @@ function Dashboard({ token, onSignOut }) {
     try{
       const iframe = previewRef.current; if (!iframe) return;
       const doc = iframe.contentDocument || iframe.contentWindow?.document; if (!doc) return;
-      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${previewBg};color:#e6eaf2;font-family:Inter,ui-sans-serif,system-ui;display:flex;justify-content:${opts.align==='center'?'center':'flex-start'};padding:16px">${code}</body></html>`;
+      // Preview MUST match production: no extra wrappers, just the snippet on a page with chosen bg
+      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${previewBg};display:flex;justify-content:${opts.align==='center'?'center':'flex-start'};padding:16px">${code}</body></html>`;
       doc.open(); doc.write(html); doc.close();
     }catch(_e){/* ignore */}
   };
@@ -520,6 +521,7 @@ function Dashboard({ token, onSignOut }) {
             <Button variant="subtle" onClick={()=>{ setPreset('card'); setOpts({ ...opts, maxWidth:'100%', align:'center', radius:'0px', width:'100%', height:'600px', border:'false', shadow:'false' }); }}>Preset: Full‑bleed</Button>
           </div>
           <pre className="mt-4 whitespace-pre-wrap break-words rounded-md bg-black/60 p-2 text-xs">{snippetCode}</pre>
+          <div className="mt-2 text-xs text-white/70">Preview is a raw HTML page containing only your snippet—identical to what a client site will execute.</div>
           <Button className="mt-2" onClick={() => navigator.clipboard.writeText(snippetCode)}>Copy snippet</Button>
         </Section>
 
