@@ -20,7 +20,7 @@
   if (!cfg.id) return console.warn('[B/A] missing data-embed-id');
 
   const supportsShadow = !!HTMLElement.prototype.attachShadow;
-  const preferShadow = cfg.variant === 'compact';
+  const preferShadow = cfg.variant !== 'card'; // Default to Shadow DOM unless explicitly card
   
   (preferShadow && supportsShadow) ? mountShadow() : mountIframe();
 
@@ -386,7 +386,7 @@
 
   function mountIframe() {
     const f = document.createElement('iframe');
-    f.src = `https://before-after-embed.vercel.app/widget.html?embedId=${encodeURIComponent(cfg.id)}&variant=${cfg.variant}&theme=${cfg.theme}`;
+    f.src = `https://before-after-embed.vercel.app/widget.html?embedId=${encodeURIComponent(cfg.id)}&variant=${cfg.variant}&theme=${cfg.theme}&background=transparent`;
     f.style.background = 'transparent'; 
     f.style.border = cfg.border ? '1px solid rgba(255,255,255,.12)' : '0';
     f.style.borderRadius = cfg.radius; 
@@ -397,6 +397,8 @@
     f.style.maxWidth = cfg.maxWidth;
     f.style.margin = cfg.align === 'center' ? '0 auto' : (cfg.align === 'right' ? '0 0 0 auto' : '0');
     f.style.verticalAlign = 'top';
+    f.style.overflow = 'hidden';
+    f.allowTransparency = 'true';
     S.parentNode.replaceChild(f, S);
     
     // Auto-height
