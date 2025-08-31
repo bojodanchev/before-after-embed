@@ -1,4 +1,4 @@
-import { getClientByToken, getClientSettings, updateClientSettings, getClientApiKey, generateClientApiKey } from "../_shared.js";
+import { getClientByToken, getClientSettings, updateClientSettings, getClientApiKey, generateClientApiKey, getClientPlan, setClientPlan, plans } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -15,7 +15,8 @@ export default async function handler(req, res){
   if (req.method === 'GET'){
     const settings = await getClientSettings(client.id);
     const apiKey = await getClientApiKey(client.id);
-    return res.status(200).json({ settings, apiKey: apiKey || null });
+    const plan = await getClientPlan(client.id);
+    return res.status(200).json({ settings, apiKey: apiKey || null, plan });
   }
   if (req.method === 'PATCH'){
     const next = await updateClientSettings(client.id, req.body || {});
@@ -25,6 +26,15 @@ export default async function handler(req, res){
     if (req.query?.action === 'generateKey'){
       const key = await generateClientApiKey(client.id);
       return res.status(200).json({ apiKey: key });
+    }
+    if (req.query?.action === 'setPlan'){
+      const { planId } = req.body || {};
+      try{
+        const p = await setClientPlan(client.id, planId);
+        return res.status(200).json({ plan: p });
+      }catch(e){
+        return res.status(400).json({ error: e?.message || 'Invalid plan' });
+      }
     }
   }
   res.status(405).json({ error: 'Method not allowed' });

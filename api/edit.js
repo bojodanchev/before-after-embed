@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings } from "./_shared.js";
 
 export const config = {
   api: {
@@ -36,6 +36,23 @@ export default async function handler(req, res){
     const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
 
     const chosenVertical = verticalField || embedConfig?.vertical || 'barber';
+    const embedClientId = embedConfig?.clientId || '';
+
+    // Enforce monthly generation quota if embed belongs to a client
+    let plan = null;
+    let monthlyUsed = 0;
+    let monthlyLimit = Infinity;
+    if (embedClientId){
+      try{
+        plan = await getClientPlan(embedClientId);
+        monthlyLimit = Number(plan?.monthlyGenerations || Infinity);
+        monthlyUsed = await getMonthlyUsageForClient(embedClientId);
+        if (Number.isFinite(monthlyLimit) && monthlyUsed >= monthlyLimit){
+          await logUsage('edit_quota_exceeded', embedId, { clientId: embedClientId, plan: plan?.id || 'unknown', monthlyUsed, monthlyLimit });
+          return res.status(402).json({ error: 'Generation limit reached for current plan. Upgrade to continue.' });
+        }
+      }catch{}
+    }
 
     function optionPromptFor(vertical, opts){
       const v = (vertical || '').toLowerCase();
@@ -97,13 +114,25 @@ export default async function handler(req, res){
       outputUrl = data.url;
     }
 
-    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl), options });
+    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl), options, clientId: embedClientId, plan: plan?.id || undefined });
+    // Increment client monthly usage after success
+    if (embedClientId && outputUrl){
+      try{ await incrMonthlyUsageForClient(embedClientId, 1); }catch{}
+    }
     // Also log a client_render to drive analytics without requiring a separate endpoint
     try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
     // optional webhook
     try { await deliverWebhook(embedId, { type:'render', embedId, outputUrl, ts: Date.now() }); } catch {}
 
-    res.status(200).json({ outputUrl, prompt: effectivePrompt });
+    // Watermark: required by plan or opted-in via settings (poweredBy)
+    let watermark = false;
+    try{
+      const s = embedClientId ? await getClientSettings(embedClientId) : null;
+      const poweredBy = (s?.poweredBy || 'false').toString() === 'true';
+      watermark = Boolean((plan && plan.watermarkRequired) || poweredBy);
+    }catch{}
+
+    res.status(200).json({ outputUrl, prompt: effectivePrompt, watermark });
   }catch(err){
     console.error('/api/edit error', err);
     const fallbackEmbedId = 'anonymous';

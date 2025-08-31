@@ -1,4 +1,4 @@
-import { listEmbeds, setEmbedConfig, listClients, createClient, assignEmbedToClient, listEmbedsForClient, getClientById, listUsage, getStorageMode } from "../_shared.js";
+import { listEmbeds, setEmbedConfig, listClients, createClient, assignEmbedToClient, listEmbedsForClient, getClientById, listUsage, getStorageMode, getClientPlan, setClientPlan, plans } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -95,6 +95,23 @@ export default async function handler(req, res){
         }
       }
       return res.status(200).json({ totals, last24h, sampleSize: events.length });
+    }
+
+    if (resource === 'plans'){
+      if (req.method === 'GET'){
+        return res.status(200).json({ plans });
+      }
+      if (req.method === 'POST'){
+        const { clientId, planId } = req.body || {};
+        if (!clientId || !planId) return res.status(400).json({ error: 'clientId and planId required' });
+        try{
+          const p = await setClientPlan(clientId, planId);
+          return res.status(200).json({ clientId, plan: p });
+        }catch(e){
+          return res.status(400).json({ error: e?.message || 'Invalid plan' });
+        }
+      }
+      return res.status(405).json({ error: 'Method not allowed' });
     }
 
     if (resource === 'link'){

@@ -71,6 +71,9 @@
       } else {
         statusEl.textContent = 'No image returned';
       }
+      // Show watermark if required by plan
+      const wm = document.getElementById('w-watermark');
+      if (json.watermark) { wm.style.display = 'block'; } else { wm.style.display = 'none'; }
     } catch (err) {
       console.error(err);
       statusEl.textContent = 'Error: ' + err.message;

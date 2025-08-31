@@ -9,6 +9,34 @@ export const verticalPromptPresets = {
   detailing: "Make the car paint glossy like just detailed, remove minor scratches and swirl marks; realistic reflections; do not change car model or color drastically.",
 };
 
+// ===== SaaS plans =====
+export const plans = {
+  free: {
+    id: 'free', name: 'Free', price: 0,
+    monthlyGenerations: 10, maxEmbeds: 1,
+    watermarkRequired: true, themeCustomization: 'basic',
+    analyticsLevel: 'basic', apiAccess: false, webhooks: false
+  },
+  starter: {
+    id: 'starter', name: 'Starter', price: 24,
+    monthlyGenerations: 300, maxEmbeds: 1,
+    watermarkRequired: true, themeCustomization: 'basic',
+    analyticsLevel: 'basic', apiAccess: false, webhooks: false
+  },
+  growth: {
+    id: 'growth', name: 'Growth', price: 49,
+    monthlyGenerations: 600, maxEmbeds: 3,
+    watermarkRequired: false, themeCustomization: 'custom',
+    analyticsLevel: 'basic', apiAccess: false, webhooks: false
+  },
+  pro: {
+    id: 'pro', name: 'Pro', price: 99,
+    monthlyGenerations: 1500, maxEmbeds: 10,
+    watermarkRequired: false, themeCustomization: 'custom',
+    analyticsLevel: 'advanced', apiAccess: true, webhooks: true
+  }
+};
+
 const kvClient = vercelKv || null;
 // Detect REST config explicitly as well for environments where @vercel/kv is not provisioned
 const REST_BASE = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
@@ -59,6 +87,11 @@ async function kvRestIncr(key, by){
 function today(){
   const d = new Date();
   return d.toISOString().slice(0,10);
+}
+
+function currentMonth(){
+  const d = new Date();
+  return d.toISOString().slice(0,7); // YYYY-MM
 }
 
 export function buildSnippet(embedId, opts){
@@ -131,6 +164,59 @@ export async function generateClientApiKey(clientId){
   const key = `${clientId}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
   if (isKvEnabled() && kvClient){ await kvClient.set(`clients:apiKey:${clientId}`, key); }
   return key;
+}
+
+// ===== Plans and metering =====
+export async function getClientPlan(clientId){
+  const def = 'free';
+  if (!clientId) return plans[def];
+  if (isKvEnabled() && kvClient){
+    const pid = await kvClient.get(`clients:plan:${clientId}`);
+    return plans[pid] || plans[def];
+  }
+  return plans[def];
+}
+
+export async function setClientPlan(clientId, planId){
+  if (!clientId) throw new Error('clientId required');
+  const pid = (planId || '').toLowerCase();
+  if (!plans[pid]) throw new Error('Unknown plan');
+  if (isKvEnabled() && kvClient){ await kvClient.set(`clients:plan:${clientId}`, pid); }
+  return plans[pid];
+}
+
+export async function getMonthlyUsageForClient(clientId){
+  if (!clientId) return 0;
+  const key = `meter:client:${currentMonth()}:${clientId}`;
+  try{
+    if (USE_REST){
+      const r = await kvRest(`/get/${encodeURIComponent(key)}`);
+      const v = (r && r.result) != null ? Number(r.result) : 0;
+      return Number.isFinite(v) ? v : 0;
+    }
+    if (kvClient){
+      const v = await kvClient.get(key);
+      return Number(v || 0);
+    }
+  }catch{}
+  return 0;
+}
+
+export async function incrMonthlyUsageForClient(clientId, by){
+  if (!clientId) return 0;
+  const key = `meter:client:${currentMonth()}:${clientId}`;
+  try{
+    if (USE_REST){
+      const r = await kvRestIncr(key, by || 1);
+      const v = (r && r.result) != null ? Number(r.result) : 0;
+      return Number.isFinite(v) ? v : 0;
+    }
+    if (kvClient){
+      const v = await kvClient.incrby(key, by || 1);
+      return Number(v || 0);
+    }
+  }catch{}
+  return 0;
 }
 
 export async function deliverWebhook(clientId, payload){

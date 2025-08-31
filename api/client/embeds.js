@@ -1,4 +1,4 @@
-import { getClientByToken, listEmbedsForClient, setEmbedConfig, getEmbedConfig, deleteEmbedConfig } from "../_shared.js";
+import { getClientByToken, listEmbedsForClient, setEmbedConfig, getEmbedConfig, deleteEmbedConfig, getClientPlan } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -19,6 +19,13 @@ export default async function handler(req, res){
     const body = req.body || {};
     const id = (body.id || '').toString().trim();
     if (!id) return res.status(400).json({ error: 'id required' });
+    // Enforce embed count limit per plan
+    const existing = await listEmbedsForClient(client.id);
+    const plan = await getClientPlan(client.id);
+    const maxEmbeds = Number(plan?.maxEmbeds || 1);
+    if (existing.length >= maxEmbeds){
+      return res.status(402).json({ error: `Embed limit reached for plan '${plan.id}'.` });
+    }
     const cfg = await setEmbedConfig({
       id,
       name: body.name || id,
