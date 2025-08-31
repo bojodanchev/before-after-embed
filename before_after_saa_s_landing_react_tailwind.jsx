@@ -330,7 +330,7 @@ export default function BeforeAfterLanding() {
               {
                 name: "Starter", price: "$24", badge: null, popular:false,
                 includes: "300 generations / mo",
-                bullets: ["1 embed", "Watermark", "Basic light/dark theme"],
+                bullets: ["1 embed", "Basic light/dark theme", "Watermark removed"],
                 footnote: "+ $10 per 100 extra gens"
               },
               {

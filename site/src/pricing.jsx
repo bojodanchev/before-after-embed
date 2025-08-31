@@ -24,7 +24,7 @@ const Badge = ({ children, className = "" }) => (
 
 const plans = [
   { id:'free', name: "Free", price: "$0", includes: "10 generations / mo", bullets: ["1 embed", "Watermark required", "Basic light/dark theme"], note: "For trials; limited usage", popular:false },
-  { id:'starter', name: "Starter", price: "$24", includes: "300 generations / mo", bullets: ["1 embed", "Watermark", "Basic light/dark theme"], note: "+ $10 per 100 extra gens", popular:false },
+  { id:'starter', name: "Starter", price: "$24", includes: "300 generations / mo", bullets: ["1 embed", "Basic light/dark theme", "Watermark removed"], note: "+ $10 per 100 extra gens", popular:false },
   { id:'growth', name: "Growth", price: "$49", includes: "600 generations / mo", bullets: ["Up to 3 embeds", "Customizable theme", "Remove watermark", "Basic analytics"], note: "+ $10 per 100 extra gens", popular:true, badge:"Most Popular" },
   { id:'pro', name: "Pro", price: "$99", includes: "1,500 generations / mo", bullets: ["Up to 10 embeds", "Advanced analytics", "API + Webhooks", "Priority support"], note: "+ $10 per 100 extra gens", popular:false },
 ];

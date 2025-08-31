@@ -20,7 +20,7 @@ export const plans = {
   starter: {
     id: 'starter', name: 'Starter', price: 24,
     monthlyGenerations: 300, maxEmbeds: 1,
-    watermarkRequired: true, themeCustomization: 'basic',
+    watermarkRequired: false, themeCustomization: 'basic',
     analyticsLevel: 'basic', apiAccess: false, webhooks: false
   },
   growth: {
