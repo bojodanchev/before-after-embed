@@ -318,26 +318,51 @@ export default function BeforeAfterLanding() {
       {/* Pricing */}
       <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
-          <SectionTitle eyebrow="Pricing" title="Simple, usage‑based plans" subtitle="Start free. Upgrade as your tenants grow." />
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <SectionTitle eyebrow="Pricing" title="Clear, adoption‑first plans" subtitle="All paid tiers include overage: $10 per extra 100 generations." />
+          <div className="mt-10 grid gap-6 md:grid-cols-4">
             {[
-              { name: "Starter", price: "$0", tagline: "For testing & small sites", features: ["1 tenant", "100 generations/mo", "Basic themes", "Email support"] },
-              { name: "Pro", price: "$79", tagline: "For growing teams", features: ["10 tenants", "5k generations/mo", "Custom themes", "Webhooks + API", "Priority support"] },
-              { name: "Scale", price: "Custom", tagline: "For platforms & marketplaces", features: ["Unlimited tenants", "SLA & SSO", "Dedicated infra", "White‑label"] },
+              {
+                name: "Free", price: "$0", badge: "Test Drive", popular:false,
+                includes: "10 generations / mo",
+                bullets: ["1 embed", "Watermark required", "Basic light/dark theme"],
+                footnote: "For trials; limited usage"
+              },
+              {
+                name: "Starter", price: "$24", badge: null, popular:false,
+                includes: "300 generations / mo",
+                bullets: ["1 embed", "Watermark", "Basic light/dark theme"],
+                footnote: "+ $10 per 100 extra gens"
+              },
+              {
+                name: "Growth", price: "$49", badge: "Most Popular", popular:true,
+                includes: "600 generations / mo",
+                bullets: ["Up to 3 embeds", "Customizable theme", "Remove watermark", "Basic analytics"],
+                footnote: "+ $10 per 100 extra gens"
+              },
+              {
+                name: "Pro", price: "$99", badge: null, popular:false,
+                includes: "1,500 generations / mo",
+                bullets: ["Up to 10 embeds", "Advanced analytics", "API + Webhooks", "Priority support"],
+                footnote: "+ $10 per 100 extra gens"
+              }
             ].map((p, i) => (
-              <Card key={i} className={`border-white/10 ${i===1 ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
+              <Card key={i} className={`relative border-white/10 ${p.popular ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
                 <CardHeader>
-                  <CardTitle className="text-base">{p.name}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">{p.name}</CardTitle>
+                    {p.badge && <Badge className="border-amber-300/40 text-amber-300">{p.badge}</Badge>}
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-semibold">{p.price}</div>
-                  <div className="mt-1 text-sm text-white/70">{p.tagline}</div>
+                  <div className="text-3xl font-semibold">{p.price}<span className="text-sm text-white/60">/mo</span></div>
+                  <div className="mt-1 text-sm text-emerald-300">Includes {p.includes}</div>
                   <ul className="mt-4 space-y-2 text-sm text-white/80">
-                    {p.features.map((f, idx) => (
+                    {p.bullets.map((f, idx) => (
                       <li key={idx} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {f}</li>
                     ))}
                   </ul>
-                  <a href="/client"><Button className="mt-6 w-full">Choose {p.name}</Button></a>
+                  <div className="mt-4 text-xs text-white/60">{p.footnote}</div>
+                  <a href="/client.html" target="_top"><Button className="mt-6 w-full">Choose {p.name}</Button></a>
                 </CardContent>
               </Card>
             ))}

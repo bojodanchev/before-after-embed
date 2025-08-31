@@ -491,21 +491,57 @@ function Dashboard({ token, onSignOut }) {
           )}
         </Section>
 
-        <Section title="Stats (last 24h)">
-          <div className="mb-2"><Button variant="subtle" onClick={fetchStats} disabled={statsLoading}>{statsLoading ? 'Loading…' : 'Refresh stats'}</Button></div>
+        <Section title="Stats & Usage">
+          <div className="mb-3 flex items-center gap-2">
+            <Button variant="subtle" onClick={fetchStats} disabled={statsLoading}>{statsLoading ? 'Loading…' : 'Refresh stats'}</Button>
+          </div>
           {!stats ? (
             <div className="text-sm text-white/70">No stats yet.</div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
-                <div className="text-2xl font-semibold">{stats?.totals?.overall ?? 0}</div>
-                <div className="text-xs opacity-70">Total events</div>
+            <>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.totals?.overall ?? 0}</div>
+                  <div className="text-xs opacity-70">Total events</div>
+                </div>
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.last24h?.overall ?? 0}</div>
+                  <div className="text-xs opacity-70">Events (24h)</div>
+                </div>
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.plan?.monthlyGenerations ?? 0}</div>
+                  <div className="text-xs opacity-70">Plan gens / mo</div>
+                </div>
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.monthlyUsed ?? 0}</div>
+                  <div className="text-xs opacity-70">Used this month</div>
+                </div>
               </div>
-              <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
-                <div className="text-2xl font-semibold">{stats?.last24h?.overall ?? 0}</div>
-                <div className="text-xs opacity-70">Events (24h)</div>
+
+              {/* Progress bar + upsell */}
+              <div className="mt-4 rounded-md border border-white/10 bg-black/30 p-3">
+                {(() => {
+                  const used = Number(stats?.monthlyUsed || 0);
+                  const cap = Number(stats?.plan?.monthlyGenerations || 0);
+                  const pct = cap > 0 ? Math.min(100, Math.round((used / cap) * 100)) : 0;
+                  return (
+                    <div>
+                      <div className="mb-1 flex items-center justify-between text-xs">
+                        <div className="opacity-80">Monthly generations</div>
+                        <div className="opacity-70">{used} / {cap}</div>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded bg-white/10">
+                        <div className="h-full bg-gradient-to-r from-violet-500 via-pink-500 to-cyan-400" style={{ width: pct + '%' }} />
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center justify-between text-xs">
+                        <div className="opacity-70">$10 per extra 100 gens after limit</div>
+                        <Button className="px-3 py-1" onClick={() => alert('Top-up coming soon')}>Buy top-up</Button>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
-            </div>
+            </>
           )}
         </Section>
       </main>
