@@ -20,10 +20,14 @@ export default async function handler(req, res){
   }
 
   try{
+    console.log('Processing edit request...');
     const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 10 * 1024 * 1024 });
     const { fields, files } = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
     });
+    
+    console.log('Parsed fields:', Object.keys(fields));
+    console.log('Parsed files:', Object.keys(files));
 
     let embedId = (fields.embedId?.toString() || '').trim();
     if (!embedId) embedId = 'anonymous';
@@ -144,9 +148,14 @@ export default async function handler(req, res){
     res.status(200).json({ outputUrl, prompt: effectivePrompt, watermark });
   }catch(err){
     console.error('/api/edit error', err);
+    console.error('Error details:', {
+      message: err?.message,
+      stack: err?.stack,
+      name: err?.name
+    });
     const fallbackEmbedId = 'anonymous';
     try { await logUsage('edit_error', fallbackEmbedId, { reason: 'exception', message: err?.message || '' }); } catch {}
-    res.status(500).json({ error: 'Edit failed' });
+    res.status(500).json({ error: 'Edit failed', details: err?.message });
   }
 }
 
