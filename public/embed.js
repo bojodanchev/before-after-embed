@@ -22,77 +22,278 @@
 
   const origin = new URL(script.src).origin;
 
-  function renderIframe(cfg){
-    const width = widthOverride || cfg.width || '100%';
-    const height = heightOverride || cfg.height || '520px';
+  function renderWidget(cfg){
     const theme = (themeOverride || cfg.theme || 'light').toLowerCase();
     const vertical = verticalOverride || cfg.vertical || '';
 
-    // wrapper to control layout gracefully across sites
+    // Create the widget container
     const wrapper = document.createElement('div');
-    wrapper.style.display = 'block';
     wrapper.className = 'before-after-embed-widget';
-    
-    // Handle background transparency
-    if (background === 'transparent') {
-      wrapper.style.background = 'transparent';
-    } else if (background === 'inherit') {
-      wrapper.style.background = 'inherit';
-    }
-    
-    // Handle width constraints
-    if (width !== 'auto') {
-      wrapper.style.width = width;
-    }
-    if (maxWidth) {
-      wrapper.style.maxWidth = maxWidth;
-    }
-    if (responsive) {
-      wrapper.style.width = '100%';
-      wrapper.style.maxWidth = '100%';
-    }
-    
-    if (align === 'center') wrapper.style.margin = '0 auto';
-    if (align === 'left') wrapper.style.margin = '0';
-    if (align === 'right') { wrapper.style.marginLeft = 'auto'; wrapper.style.marginRight = '0'; }
+    wrapper.style.cssText = `
+      display: block;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: ${maxWidth || '640px'};
+      margin: 0 auto;
+      background: ${background === 'transparent' ? 'transparent' : background === 'inherit' ? 'inherit' : theme === 'dark' ? '#1a1a1a' : '#ffffff'};
+      border-radius: ${radius};
+      box-shadow: ${shadow};
+      border: ${border};
+      overflow: hidden;
+    `;
 
-    const iframe = document.createElement('iframe');
-    iframe.style.width = width || '100%';
-    iframe.style.height = height;
-    iframe.style.border = '0';
-    iframe.style.borderRadius = radius;
-    iframe.style.boxShadow = shadow;
-    iframe.style.border = border;
-    iframe.style.overflow = 'hidden';
-    iframe.allow = 'clipboard-read; clipboard-write;';
+    // Create the widget HTML structure (similar to landing page demo)
+    wrapper.innerHTML = `
+      <div class="widget-content" style="padding: 24px;">
+        <div class="image-upload-area" style="
+          border: 2px dashed ${theme === 'dark' ? '#374151' : '#d1d5db'};
+          border-radius: 12px;
+          padding: 40px 20px;
+          text-align: center;
+          background: ${theme === 'dark' ? '#111827' : '#f9fafb'};
+          margin-bottom: 20px;
+          cursor: pointer;
+          transition: all 0.2s;
+        ">
+          <div style="font-size: 48px; margin-bottom: 16px;">🖼️</div>
+          <div style="font-size: 16px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 8px;">
+            Drop an image here or
+          </div>
+          <button type="button" class="choose-image-btn" style="
+            background: ${theme === 'dark' ? '#374151' : '#ffffff'};
+            border: 1px solid ${theme === 'dark' ? '#4b5563' : '#d1d5db'};
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: ${theme === 'dark' ? '#ffffff' : '#374151'};
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+          ">Choose image</button>
+          <input type="file" accept="image/*" style="display: none;" />
+        </div>
+        
+        <div class="vertical-options" style="margin-bottom: 20px; display: none;">
+          <div style="font-size: 14px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 8px;">Choose option:</div>
+          <div class="options-buttons" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        </div>
+        
+        <button type="button" class="generate-btn" style="
+          width: 100%;
+          background: linear-gradient(135deg, #8b5cf6, #ec4899, #06b6d4);
+          border: none;
+          border-radius: 8px;
+          padding: 12px 24px;
+          color: white;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-bottom: 20px;
+        " disabled>Generate →</button>
+        
+        <div class="result-area" style="display: none;">
+          <div class="before-after-container" style="
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: ${theme === 'dark' ? '#111827' : '#f9fafb'};
+          ">
+            <div class="before-label" style="
+              position: absolute;
+              top: 12px;
+              right: 12px;
+              background: rgba(0,0,0,0.7);
+              color: white;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              z-index: 10;
+            ">Before</div>
+            <div class="after-label" style="
+              position: absolute;
+              top: 12px;
+              left: 12px;
+              background: rgba(0,0,0,0.7);
+              color: white;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
+              z-index: 10;
+            ">After</div>
+            <div class="slider-container" style="position: relative;">
+              <img class="before-image" style="width: 100%; height: auto; display: block;" />
+              <div class="after-overlay" style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 50%;
+                height: 100%;
+                overflow: hidden;
+                clip-path: inset(0 50% 0 0);
+              ">
+                <img class="after-image" style="width: 200%; height: auto; display: block;" />
+              </div>
+              <input type="range" class="slider" min="0" max="100" value="50" style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0;
+                cursor: ew-resize;
+                z-index: 20;
+              " />
+            </div>
+          </div>
+        </div>
+        
+        <div class="status" style="
+          text-align: center;
+          font-size: 14px;
+          color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'};
+          margin-top: 12px;
+        "></div>
+      </div>
+    `;
 
-    const qp = new URLSearchParams({ theme, embedId, variant });
-    if (vertical) qp.set('vertical', vertical);
-    if (background) qp.set('background', background);
-    if (mode) qp.set('mode', mode);
-    if (hideHeader) qp.set('hideHeader', 'true');
-    iframe.src = origin + '/widget.html?' + qp.toString();
+    // Add event listeners
+    setupWidgetEvents(wrapper, embedId, vertical, origin);
 
-    wrapper.appendChild(iframe);
-    
-    // Handle positioning - render where script is placed by default
+    // Handle positioning
     if (position === 'append') {
-      // Legacy behavior - append to body
       document.body.appendChild(wrapper);
     } else {
-      // Default behavior - render inline where script is placed
-      // Use replaceWith to replace the script tag with the widget
       script.replaceWith(wrapper);
     }
+  }
+
+  function setupWidgetEvents(wrapper, embedId, vertical, origin) {
+    const uploadArea = wrapper.querySelector('.image-upload-area');
+    const fileInput = wrapper.querySelector('input[type="file"]');
+    const chooseBtn = wrapper.querySelector('.choose-image-btn');
+    const generateBtn = wrapper.querySelector('.generate-btn');
+    const resultArea = wrapper.querySelector('.result-area');
+    const beforeImage = wrapper.querySelector('.before-image');
+    const afterImage = wrapper.querySelector('.after-image');
+    const afterOverlay = wrapper.querySelector('.after-overlay');
+    const slider = wrapper.querySelector('.slider');
+    const status = wrapper.querySelector('.status');
+    const verticalOptions = wrapper.querySelector('.vertical-options');
+    const optionsButtons = wrapper.querySelector('.options-buttons');
+
+    let selectedFile = null;
+    let selectedOption = null;
+
+    // Setup vertical options
+    if (vertical) {
+      const options = getVerticalOptions(vertical);
+      if (options.length > 0) {
+        verticalOptions.style.display = 'block';
+        options.forEach(option => {
+          const btn = document.createElement('button');
+          btn.textContent = option;
+          btn.style.cssText = `
+            background: transparent;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+          `;
+          btn.addEventListener('click', () => {
+            optionsButtons.querySelectorAll('button').forEach(b => b.style.background = 'transparent');
+            btn.style.background = '#8b5cf6';
+            btn.style.color = 'white';
+            selectedOption = option;
+          });
+          optionsButtons.appendChild(btn);
+        });
+      }
+    }
+
+    // File upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    chooseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        selectedFile = file;
+        generateBtn.disabled = false;
+        status.textContent = 'Ready to generate';
+      }
+    });
+
+    // Generate button
+    generateBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      generateBtn.disabled = true;
+      status.textContent = 'Generating...';
+
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      formData.append('embedId', embedId);
+      if (vertical) formData.append('vertical', vertical);
+      if (selectedOption) formData.append(`opt_${getOptionKey(vertical)}`, selectedOption);
+
+      try {
+        const response = await fetch('/api/edit', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (response.ok && result.outputUrl) {
+          beforeImage.src = URL.createObjectURL(selectedFile);
+          afterImage.src = result.outputUrl;
+          resultArea.style.display = 'block';
+          status.textContent = 'Generation complete!';
+        } else {
+          status.textContent = 'Error: ' + (result.error || 'Generation failed');
+        }
+      } catch (error) {
+        status.textContent = 'Error: ' + error.message;
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+
+    // Slider
+    slider.addEventListener('input', (e) => {
+      const value = e.target.value;
+      afterOverlay.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
+    });
+  }
+
+  function getVerticalOptions(vertical) {
+    const options = {
+      'barber': ['fade', 'buzz', 'undercut', 'pompadour'],
+      'dental': ['whitening', 'alignment', 'veneers'],
+      'detailing': ['exterior', 'interior']
+    };
+    return options[vertical] || [];
+  }
+
+  function getOptionKey(vertical) {
+    const keys = {
+      'barber': 'style',
+      'dental': 'treatment',
+      'detailing': 'focus'
+    };
+    return keys[vertical] || 'option';
   }
 
   if (embedId) {
     fetch(origin + '/api/embed/' + encodeURIComponent(embedId))
       .then(r => r.ok ? r.json() : Promise.reject(new Error('Embed not found')))
-      .then(cfg => renderIframe(cfg))
-      .catch(() => renderIframe({}));
+      .then(cfg => renderWidget(cfg))
+      .catch(() => renderWidget({}));
   } else {
-    renderIframe({});
+    renderWidget({});
   }
 })();
 
