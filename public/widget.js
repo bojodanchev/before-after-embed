@@ -19,6 +19,8 @@
   optionsContainer.id = 'w-vertical-options';
   form.insertBefore(optionsContainer, form.children[1]);
   const choicesEl = document.getElementById('w-choices');
+  const submitBtn = document.getElementById('w-generate');
+  submitBtn.disabled = true;
 
   if (variant === 'compact'){
     const cmp = document.querySelector('.compare');
@@ -32,7 +34,6 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
     statusEl.textContent = 'Uploading...';
     const file = document.getElementById('w-image').files[0];
@@ -112,24 +113,28 @@
         const select = document.createElement('select');
         select.setAttribute('data-opt','focus');
         ['exterior','interior'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
-        optionsContainer.appendChild(select);
+        select.style.display = 'none'; optionsContainer.appendChild(select);
       } else if (v === 'dental'){
         renderChoices('treatment', ['whitening','alignment','veneers']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','treatment');
         ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
-        optionsContainer.appendChild(select);
+        select.style.display = 'none'; optionsContainer.appendChild(select);
       } else if (v === 'barber'){
         renderChoices('style', ['fade','buzz','undercut','pompadour']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','style');
         ['fade','buzz','undercut','pompadour'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
-        optionsContainer.appendChild(select);
+        select.style.display = 'none'; optionsContainer.appendChild(select);
       }
       // override from config verticalOptions defaults if any
       Object.entries(vo).forEach(([k,v])=>{ const el = optionsContainer.querySelector(`[data-opt="${k}"]`); if (el) el.value = v; });
     }catch{}
   })();
+
+  // Toggle submit enabled when a file is selected
+  document.getElementById('w-image').addEventListener('change', ()=>{ submitBtn.disabled = !document.getElementById('w-image').files[0]; });
+  document.getElementById('pick').addEventListener('click', ()=>{ /* handled */ });
 })();
 
 
