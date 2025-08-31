@@ -54,7 +54,6 @@ function App(){
           </div>
           <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
             <a href="/app/index.html" className="hover:text-white">Home</a>
-            <a href="#" className="hover:text-white">Pricing</a>
             <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
           </nav>
           <div className="flex items-center gap-2">
