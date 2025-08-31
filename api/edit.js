@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings, handleCorsPreflight, setCorsHeaders } from "./_shared.js";
 
 export const config = {
   api: {
@@ -8,6 +8,12 @@ export const config = {
 };
 
 export default async function handler(req, res){
+  // Handle CORS preflight
+  if (handleCorsPreflight(req, res)) return;
+
+  // Set CORS headers for all requests
+  setCorsHeaders(res);
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try{
