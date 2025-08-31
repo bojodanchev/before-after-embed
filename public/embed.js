@@ -33,22 +33,22 @@
       max-width: ${maxWidth || '400px'};
       width: 100%;
       margin: 0;
-      background: ${background === 'transparent' ? 'transparent' : background === 'inherit' ? 'inherit' : theme === 'dark' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'};
+      background: transparent;
       border-radius: ${radius};
-      box-shadow: ${shadow};
-      border: ${border};
-      overflow: hidden;
+      box-shadow: none;
+      border: none;
+      overflow: visible;
     `;
 
     // Create the widget HTML structure (compact version)
     wrapper.innerHTML = `
       <div class="widget-content" style="padding: 16px;">
         <div class="image-upload-area" style="
-          border: 2px dashed ${theme === 'dark' ? '#374151' : '#d1d5db'};
+          border: 2px dashed ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'};
           border-radius: 8px;
           padding: 20px 12px;
           text-align: center;
-          background: ${theme === 'dark' ? 'rgba(17,24,39,0.5)' : 'rgba(249,250,251,0.5)'};
+          background: transparent;
           margin-bottom: 12px;
           cursor: pointer;
           transition: all 0.2s;
@@ -94,7 +94,7 @@
             position: relative;
             border-radius: 8px;
             overflow: hidden;
-            background: ${theme === 'dark' ? 'rgba(17,24,39,0.5)' : 'rgba(249,250,251,0.5)'};
+            background: transparent;
           ">
             <div class="before-label" style="
               position: absolute;
@@ -240,8 +240,13 @@
       if (selectedOption) formData.append(`opt_${getOptionKey(vertical)}`, selectedOption);
 
       try {
-        console.log('Sending request to /api/edit with method POST');
-        const response = await fetch('/api/edit', {
+        // Use full URL for external sites
+        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app') 
+          ? '/api/edit' 
+          : 'https://before-after-embed.vercel.app/api/edit';
+        
+        console.log('Sending request to', apiUrl, 'with method POST');
+        const response = await fetch(apiUrl, {
           method: 'POST',
           body: formData
         });
