@@ -365,13 +365,29 @@ function Dashboard({ token, onSignOut }) {
         )}
         <Section title="Embeds">
           <div className="mb-3 flex items-center justify-between rounded-md border border-white/10 bg-black/30 p-3 text-sm">
-            <div>
-              <div className="opacity-70">Current plan</div>
-              <div className="font-medium">{planInfo?.name || planInfo?.id || 'free'}</div>
+            <div className="flex items-center gap-4">
+              <div>
+                <div className="opacity-70">Current plan</div>
+                <div className="font-medium">{planInfo?.name || planInfo?.id || 'free'}</div>
+              </div>
+              <div className="rounded border border-white/10 bg-black/40 px-2 py-1 text-xs opacity-80">
+                {(() => {
+                  const requires = (planInfo?.id || 'free') === 'free';
+                  return `Watermark: ${requires ? 'active' : 'removed'}`;
+                })()}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} gens / mo</div>
               <a href="/app/pricing.html" className="underline">Change plan</a>
+              <button className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20" onClick={async()=>{
+                try{
+                  const resp = await fetch('/api/billing/topup', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ units: 1 }) });
+                  const j = await resp.json();
+                  if (!resp.ok) throw new Error(j?.error || 'Top-up failed');
+                  if (j?.url) window.location.href = j.url;
+                }catch(e){ alert(e.message || 'Top-up failed'); }
+              }}>Buy +100</button>
             </div>
           </div>
           <ul className="space-y-2 text-sm">
