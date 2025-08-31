@@ -166,7 +166,6 @@ export default function BeforeAfterLanding() {
             <a href="#demo" className="hover:text-white">Live demo</a>
             <a href="#features" className="hover:text-white">Features</a>
             <a href="#docs" className="hover:text-white">Docs</a>
-            <a href="/app/pricing.html" className="hover:text-white">Pricing</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
             <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
           </nav>
