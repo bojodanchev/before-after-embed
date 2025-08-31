@@ -212,6 +212,8 @@
           dental: ['whitening', 'alignment', 'veneers'],
           detailing: ['interior', 'exterior']
         }[vertical] || [];
+        // Store current vertical so we can send it with the request
+        root.__ba_vertical = vertical;
         
         if (choices.length > 0) {
           opts.innerHTML = choices.map(o => 
@@ -282,8 +284,13 @@
         const formData = new FormData();
         formData.append('image', file.files[0]);
         formData.append('embedId', cfg.id);
+        // Send vertical and structured option fields expected by API
+        const vertical = root.__ba_vertical || '';
+        if (vertical) formData.append('vertical', vertical);
         if (selectedOpt) {
-          formData.append('option', selectedOpt);
+          if (vertical === 'barber') formData.append('opt_style', selectedOpt);
+          else if (vertical === 'dental') formData.append('opt_treatment', selectedOpt);
+          else if (vertical === 'detailing') formData.append('opt_focus', selectedOpt);
         }
         
         const response = await fetch('https://before-after-embed.vercel.app/api/edit', {
