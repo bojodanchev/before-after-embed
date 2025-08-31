@@ -16,8 +16,6 @@
   const background = dataset.background || 'auto'; // auto | transparent | inherit
   const mode = dataset.mode || 'full'; // full | content-only
   const hideHeader = dataset.hideHeader === 'true'; // true | false
-  const width = dataset.width || 'auto'; // auto | specific width
-  const maxWidth = dataset.maxWidth || ''; // max width constraint
   const responsive = dataset.responsive === 'true'; // true | false
 
   const origin = new URL(script.src).origin;
