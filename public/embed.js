@@ -380,16 +380,16 @@
 
     function token(kind, mode) {
       const light = {
-        surface: 'rgba(255,255,255,.04)', 
-        fg: '#fff', 
-        border: 'rgba(255,255,255,.12)', 
-        muted: 'rgba(255,255,255,.55)'
+        surface: '#ffffff',
+        fg: '#0b0d10',
+        border: 'rgba(2,6,23,0.12)',
+        muted: '#64748b'
       };
       const dark = {
-        surface: 'rgba(0,0,0,.5)', 
-        fg: '#fff', 
-        border: 'rgba(255,255,255,.12)', 
-        muted: 'rgba(255,255,255,.55)'
+        surface: 'rgba(255,255,255,0.06)',
+        fg: '#ffffff',
+        border: 'rgba(255,255,255,0.12)',
+        muted: 'rgba(255,255,255,0.6)'
       };
       
       if (mode === 'light') return light[kind];

@@ -402,6 +402,7 @@ function Dashboard({ token, onSignOut }) {
                   </Select>
                   <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
                   <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Snippet</Button>
+                  <Button variant="outline" onClick={async()=>{ const opposite = e.theme === 'dark' ? 'light' : 'dark'; const nid = `${e.id}-${opposite}`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ ...e, id: nid, theme: opposite, name: e.name ? `${e.name} (${opposite})` : nid }) }); fetchData(); }}>Duplicate to {" "}{e.theme === 'dark' ? 'light' : 'dark'}</Button>
                   <a className="text-xs underline" target="_blank" rel="noreferrer" href={`/widget.html?embedId=${encodeURIComponent(e.id)}&theme=${encodeURIComponent(e.theme)}`}>Open</a>
                   <Button variant="outline" onClick={()=> { setEditModel({ ...e, variant: e.variant || 'card', radius: e.radius || '12px', shadow: e.shadow ?? 'true', border: e.border ?? 'true' }); setEditOpen(true); }}>Edit</Button>
                   <Button variant="outline" onClick={async()=>{ const nid = `${e.id}-copy`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({ ...e, id: nid, name: e.name || nid }) }); fetchData(); }}>Duplicate</Button>
