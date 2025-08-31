@@ -208,6 +208,7 @@ function Dashboard({ token, onSignOut }) {
   // Client settings
   const [settings, setSettings] = useState(null);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [planInfo, setPlanInfo] = useState(null);
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -227,7 +228,7 @@ function Dashboard({ token, onSignOut }) {
       const list = Array.isArray(embData) ? embData : embData?.embeds || [];
       setEmbeds(list);
       // settings
-      try{ const s = await fetch('/api/client/settings', { headers:{ Authorization:`Bearer ${token}` } }); const sj = await s.json(); setSettings(sj?.settings || {}); }catch{}
+      try{ const s = await fetch('/api/client/settings', { headers:{ Authorization:`Bearer ${token}` } }); const sj = await s.json(); setSettings(sj?.settings || {}); setPlanInfo(sj?.plan || null); }catch{}
       if (!embedId && list.length) setEmbedId(list[0].id);
       if (!usageEmbedId && list.length) setUsageEmbedId(list[0].id);
     } catch (err) {
@@ -238,6 +239,26 @@ function Dashboard({ token, onSignOut }) {
   };
 
   useEffect(() => { fetchData(); }, [token]);
+
+  // If redirected from Pricing pre-login, auto-start checkout
+  useEffect(() => {
+    (async () => {
+      try{
+        const sp = new URLSearchParams(window.location.search);
+        const nextPlan = sp.get('nextPlan');
+        if (!nextPlan) return;
+        // Clear param from URL
+        sp.delete('nextPlan');
+        const url = new URL(window.location.href); url.search = sp.toString(); window.history.replaceState({}, '', url.toString());
+        // Initiate checkout
+        const resp = await fetch('/api/billing/checkout', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ planId: nextPlan }) });
+        const j = await resp.json();
+        if (!resp.ok) throw new Error(j?.error || 'Checkout failed');
+        if (j?.url) window.location.href = j.url;
+      }catch(e){ /* show non-blocking error in portal */ }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   // Handle pricing handoff (?choosePlan=planId)
   // (No longer needed with Stripe checkout)
@@ -320,6 +341,16 @@ function Dashboard({ token, onSignOut }) {
 
       <main className="mx-auto max-w-6xl space-y-8 p-4">
         <Section title="Embeds">
+          <div className="mb-3 flex items-center justify-between rounded-md border border-white/10 bg-black/30 p-3 text-sm">
+            <div>
+              <div className="opacity-70">Current plan</div>
+              <div className="font-medium">{planInfo?.name || planInfo?.id || 'free'}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} gens / mo</div>
+              <a href="/app/pricing.html" className="underline">Change plan</a>
+            </div>
+          </div>
           <ul className="space-y-2 text-sm">
             {embeds.map((e) => (
               <li key={e.id} className="flex flex-col gap-2 rounded-md border border-white/10 bg-black/20 p-3 md:flex-row md:items-center md:justify-between">

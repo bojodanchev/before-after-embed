@@ -34,7 +34,9 @@ function App(){
     // If not signed in, send to portal sign-in; otherwise, start Stripe Checkout via backend
     const token = (()=>{ try{return localStorage.getItem('clientToken') || '';}catch{return '';} })();
     if (!token){
-      window.location.href = "/app/client.html";
+      const u = new URL("/app/client.html", window.location.origin);
+      u.searchParams.set("nextPlan", planId);
+      window.location.href = u.toString();
       return;
     }
     (async () => {
