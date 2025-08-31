@@ -55,19 +55,20 @@
         
         <div class="demo-section">
             <h2>Compact Shadow DOM Version</h2>
-            <p>This version uses Shadow DOM for perfect CSS isolation and transparency:</p>
-            <div class="widget-demo">
+            <p>This version uses Shadow DOM for perfect CSS isolation and transparency. Notice how it appears inline with the text:</p>
+            <p>Here's some text before the widget 
                 <script async src="https://before-after-embed.vercel.app/embed.js"
                     data-embed-id="bojo"
                     data-variant="compact"
                     data-theme="auto"
-                    data-max-width="400px"
-                    data-align="center"
+                    data-max-width="300px"
+                    data-align="left"
                     data-radius="14px"
                     data-shadow="true"
                     data-border="true">
                 </script>
-            </div>
+                and here's text after it, showing true inline placement!
+            </p>
             <div class="code">
 &lt;script async src="https://before-after-embed.vercel.app/embed.js"
     data-embed-id="bojo"
@@ -84,7 +85,7 @@
 
         <div class="demo-section">
             <h2>Card Iframe Version</h2>
-            <p>This version uses iframe fallback (useful for CSP restrictions):</p>
+            <p>This version uses iframe fallback (useful for CSP restrictions). Notice the center alignment:</p>
             <div class="widget-demo">
                 <script async src="https://before-after-embed.vercel.app/embed.js"
                     data-embed-id="bojo"

@@ -26,11 +26,12 @@
 
   function mountShadow() {
     const host = document.createElement('div');
-    host.style.display = 'block'; 
+    host.style.display = 'inline-block'; 
     host.style.maxWidth = cfg.maxWidth; 
     host.style.width = cfg.width;
     host.style.margin = cfg.align === 'center' ? '0 auto' : (cfg.align === 'right' ? '0 0 0 auto' : '0');
-    S.parentNode.insertBefore(host, S.nextSibling);
+    host.style.verticalAlign = 'top';
+    S.parentNode.replaceChild(host, S);
     
     const root = host.attachShadow({ mode: 'open' });
 
@@ -390,12 +391,13 @@
     f.style.border = cfg.border ? '1px solid rgba(255,255,255,.12)' : '0';
     f.style.borderRadius = cfg.radius; 
     f.style.boxShadow = cfg.shadow ? '0 6px 24px rgba(0,0,0,.28)' : 'none';
-    f.style.display = 'block'; 
+    f.style.display = 'inline-block'; 
     f.style.width = cfg.width; 
     f.style.height = '10px'; 
     f.style.maxWidth = cfg.maxWidth;
     f.style.margin = cfg.align === 'center' ? '0 auto' : (cfg.align === 'right' ? '0 0 0 auto' : '0');
-    S.parentNode.insertBefore(f, S.nextSibling);
+    f.style.verticalAlign = 'top';
+    S.parentNode.replaceChild(f, S);
     
     // Auto-height
     window.addEventListener('message', e => { 
