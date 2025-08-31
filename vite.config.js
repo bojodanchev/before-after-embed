@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'site/index.html'),
         client: resolve(__dirname, 'site/client.html'),
+        pricing: resolve(__dirname, 'site/pricing.html'),
       },
     },
   },

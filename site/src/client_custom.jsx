@@ -239,6 +239,26 @@ function Dashboard({ token, onSignOut }) {
 
   useEffect(() => { fetchData(); }, [token]);
 
+  // Handle pricing handoff (?choosePlan=planId)
+  useEffect(() => {
+    (async () => {
+      try{
+        const sp = new URLSearchParams(window.location.search);
+        const choosePlan = sp.get('choosePlan');
+        if (!choosePlan) return;
+        await fetch('/api/client/settings?action=setPlan', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ planId: choosePlan }) });
+        // remove the param from URL
+        sp.delete('choosePlan');
+        const url = new URL(window.location.href);
+        url.search = sp.toString();
+        window.history.replaceState({}, '', url.toString());
+        // refresh stats to reflect plan
+        fetchStats();
+      }catch{}
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
