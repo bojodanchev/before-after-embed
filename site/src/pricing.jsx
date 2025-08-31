@@ -31,15 +31,20 @@ const plans = [
 
 function App(){
   const goCheckout = (planId) => {
-    // If not signed in, send to portal sign-in; otherwise, a simple checkout stub.
+    // If not signed in, send to portal sign-in; otherwise, start Stripe Checkout via backend
     const token = (()=>{ try{return localStorage.getItem('clientToken') || '';}catch{return '';} })();
     if (!token){
       window.location.href = "/app/client.html";
       return;
     }
-    const url = new URL("/app/client.html", window.location.origin);
-    url.searchParams.set("choosePlan", planId);
-    window.location.href = url.toString();
+    (async () => {
+      try{
+        const resp = await fetch('/api/billing/checkout', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ planId }) });
+        const j = await resp.json();
+        if (!resp.ok) throw new Error(j?.error || 'Checkout failed');
+        if (j?.url) window.location.href = j.url;
+      }catch(e){ alert(e.message || 'Checkout failed'); }
+    })();
   };
 
   return (
