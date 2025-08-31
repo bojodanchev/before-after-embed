@@ -41,7 +41,7 @@ export default async function handler(req, res){
       const v = (vertical || '').toLowerCase();
       if (v === 'barber'){
         const style = opts.style;
-        if (style === 'fade') return 'Apply a clean skin fade haircut with tapered sides and back; keep natural hairline.';
+        if (style === 'fade') return 'High-contrast skin fade: sides and back tapered down to skin around ears and nape with a clean blend up into longer top; keep natural hairline, expose ears, and avoid altering beard or face.';
         if (style === 'buzz') return 'Buzz cut with even length across the scalp; neat edges and natural texture.';
         if (style === 'undercut') return 'Undercut: short sides and back with longer top; clean contrast between lengths.';
         if (style === 'pompadour') return 'Pompadour hairstyle with volume at the front, smooth sides, and polished finish.';
