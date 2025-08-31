@@ -38,7 +38,14 @@ export default async function handler(req, res){
       if (!client) return res.status(401).json({ error: 'Unauthorized' });
       const { planId } = req.body || {};
       const price = PRICE_MAP[planId];
-      if (!plans[planId] || !price) return res.status(400).json({ error: 'Invalid plan' });
+      if (!plans[planId]) return res.status(400).json({ error: 'Invalid plan' });
+
+      // Free plan: bypass Stripe, set immediately
+      if (planId === 'free' || !price || price === 'free'){
+        try{ await setClientPlan(client.id, 'free'); }catch{}
+        const url = `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`;
+        return res.status(200).json({ url, bypass: true });
+      }
 
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
