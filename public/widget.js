@@ -18,6 +18,7 @@
   const optionsContainer = document.createElement('div');
   optionsContainer.id = 'w-vertical-options';
   form.insertBefore(optionsContainer, form.children[1]);
+  const choicesEl = document.getElementById('w-choices');
 
   if (variant === 'compact'){
     const cmp = document.querySelector('.compare');
@@ -50,6 +51,8 @@
     // collect any vertical-specific inputs
     const extra = {};
     Array.from(optionsContainer.querySelectorAll('[data-opt]')).forEach(el => { extra[el.getAttribute('data-opt')] = el.value; });
+    // pick from choices buttons if present
+    if (choicesEl && choicesEl.dataset.key && choicesEl.dataset.value){ extra[choicesEl.dataset.key] = choicesEl.dataset.value; }
     const prompt = document.getElementById('w-prompt').value;
     if (vertical) formData.append('vertical', vertical);
     if (prompt) formData.append('prompt', prompt);
@@ -83,19 +86,41 @@
       if (!res.ok) return;
       const cfg = await res.json();
       const vo = cfg.verticalOptions || {};
-      const v = (cfg.vertical || '').toLowerCase();
+      const v = (preset || cfg.vertical || '').toLowerCase();
       optionsContainer.innerHTML = '';
+      // Render button choices per-vertical
+      function renderChoices(key, values){
+        choicesEl.innerHTML = '';
+        choicesEl.style.display = 'flex';
+        choicesEl.dataset.key = key;
+        const label = document.createElement('div'); label.className='choices-label'; label.textContent='Choose option'; choicesEl.appendChild(label);
+        values.forEach(val =>{
+          const b = document.createElement('button');
+          b.type = 'button'; b.className = 'btn-choice'; b.textContent = val;
+          b.addEventListener('click', ()=>{
+            Array.from(choicesEl.children).forEach(c=> c.classList.remove('active'));
+            b.classList.add('active'); choicesEl.dataset.value = val;
+          });
+          choicesEl.appendChild(b);
+        });
+        // set default from vo if provided
+        if (vo && vo[key]){ Array.from(choicesEl.children).forEach(c=>{ if (c.textContent === vo[key]) c.classList.add('active'); }); choicesEl.dataset.value = vo[key]; }
+      }
+
       if (v === 'detailing'){
+        renderChoices('focus', ['exterior','interior']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','focus');
         ['exterior','interior'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
         optionsContainer.appendChild(select);
       } else if (v === 'dental'){
+        renderChoices('treatment', ['whitening','alignment','veneers']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','treatment');
         ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
         optionsContainer.appendChild(select);
       } else if (v === 'barber'){
+        renderChoices('style', ['fade','buzz','undercut','pompadour']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','style');
         ['fade','buzz','undercut','pompadour'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });

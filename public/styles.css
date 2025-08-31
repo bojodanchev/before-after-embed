@@ -65,4 +65,13 @@ button:disabled{opacity:.65;cursor:not-allowed}
 .btn-primary:hover{filter:brightness(1.02)}
 .btn-outline{background:transparent;color:var(--fg);border:1px solid var(--border)}
 
+/* Choice buttons inside widget */
+.choices{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.choices-label{font-size:12px;color:var(--muted);margin-top:6px}
+.btn-choice{background:transparent;border:1px solid var(--border);color:var(--fg);padding:8px 12px;border-radius:999px;font-size:12px;cursor:pointer;transition:filter .15s ease, box-shadow .15s ease, background .15s ease}
+.btn-choice:hover{filter:brightness(1.06)}
+.btn-choice:focus-visible{outline:none;box-shadow:var(--ring)}
+.btn-choice.active{background:var(--accent);border-color:transparent;color:#fff}
+[data-theme="light"] .btn-choice.active{background:#0f172a;color:#fff}
+
 
