@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getClientByToken, setClientPlan, plans, incrMonthlyBonusForClient } from '../_shared.js';
+import { getClientByToken, setClientPlan, plans, incrMonthlyBonusForClient, logUsage, listEmbedsForClient } from '../_shared.js';
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -50,7 +50,7 @@ export default async function handler(req, res){
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         line_items: [{ price, quantity: 1 }],
-        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}&success=1&plan=${encodeURIComponent(planId)}`,
         cancel_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
         metadata: { clientId: client.id, planId },
       });
@@ -81,7 +81,7 @@ export default async function handler(req, res){
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [{ price, quantity: n }],
-        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}&success=1&topup=${n*100}`,
         cancel_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
         metadata: { clientId: client.id, topup: String(n * 100) },
       });
@@ -106,16 +106,17 @@ export default async function handler(req, res){
         const planId = session?.metadata?.planId;
         if (clientId && plans[planId]){
           await setClientPlan(clientId, planId);
+          try{ const embeds = await listEmbedsForClient(clientId); for (const e of embeds){ await logUsage('plan_updated', e.id, { planId }); } }catch{}
         }
         // Handle top-up one-time purchases via metadata
         const bonus = Number(session?.metadata?.topup || 0);
-        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); }
+        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); try{ const embeds = await listEmbedsForClient(clientId); for (const e of embeds){ await logUsage('topup_applied', e.id, { credited: bonus }); } }catch{} }
       }
       if (event.type === 'checkout.session.async_payment_succeeded'){
         const session = event.data.object;
         const clientId = session?.metadata?.clientId;
         const bonus = Number(session?.metadata?.topup || 0);
-        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); }
+        if (clientId && bonus > 0){ await incrMonthlyBonusForClient(clientId, bonus); try{ const embeds = await listEmbedsForClient(clientId); for (const e of embeds){ await logUsage('topup_applied', e.id, { credited: bonus }); } }catch{} }
       }
     }catch{}
     return res.status(200).json({ received: true });

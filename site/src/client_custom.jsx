@@ -203,6 +203,7 @@ function Dashboard({ token, onSignOut }) {
   const [usageEmbedId, setUsageEmbedId] = useState("");
   const [usage, setUsage] = useState([]);
   const [usageLoading, setUsageLoading] = useState(false);
+  const [toast, setToast] = useState("");
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   // Client settings
@@ -315,6 +316,23 @@ function Dashboard({ token, onSignOut }) {
     finally{ setStatsLoading(false); }
   };
 
+  // Tiny toast after returning from checkout with success
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get('success') === '1'){
+      const added = sp.get('topup') || sp.get('plan') ? (sp.get('topup') ? `+${sp.get('topup')} generations` : 'Plan updated') : 'Success';
+      setToast(`${added} 🎉`);
+      setTimeout(() => setToast(""), 3000);
+      // Clean URL
+      sp.delete('success'); sp.delete('topup'); sp.delete('plan');
+      const url = new URL(window.location.href); url.search = sp.toString(); window.history.replaceState({}, '', url.toString());
+      // Refresh stats to reflect credit
+      fetchStats();
+      if (usageEmbedId) fetchUsage(usageEmbedId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (loading) return <div className="p-6 text-white">Loading…</div>;
   if (error) return <div className="p-6 text-red-400">{error}</div>;
 
@@ -340,6 +358,11 @@ function Dashboard({ token, onSignOut }) {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-8 p-4">
+        {!!toast && (
+          <div className="fixed right-4 top-16 z-50 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-3 py-2 text-sm text-emerald-300 shadow-lg">
+            {toast}
+          </div>
+        )}
         <Section title="Embeds">
           <div className="mb-3 flex items-center justify-between rounded-md border border-white/10 bg-black/30 p-3 text-sm">
             <div>
@@ -570,6 +593,9 @@ function Dashboard({ token, onSignOut }) {
                       <div className="mt-2 flex flex-wrap items-center justify-between text-xs">
                         <div className="opacity-70">$10 per extra 100 gens after limit</div>
                         <Button className="px-3 py-1" onClick={async()=>{
+                          if ((window.__topupBusy||false)) return;
+                          window.__topupBusy = true;
+                          const btn = event?.currentTarget; if (btn) btn.disabled = true;
                           try{
                             const units = 1; // one block of 100
                             const resp = await fetch('/api/billing/topup', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ units }) });
@@ -577,6 +603,7 @@ function Dashboard({ token, onSignOut }) {
                             if (!resp.ok) throw new Error(j?.error || 'Top-up failed');
                             if (j?.url) window.location.href = j.url;
                           }catch(e){ alert(e.message || 'Top-up failed'); }
+                          finally{ window.__topupBusy = false; if (btn) btn.disabled = false; }
                         }}>Buy top-up</Button>
                       </div>
                     </div>
