@@ -43,6 +43,7 @@ const buildEmbedSnippet = (embedId, preset, theme, opt={}) => {
     `data-embed-id="${embedId || "your-embed-id"}"`,
     `data-theme="${theme}"`,
     `data-variant="${preset}"`,
+    ...(o.vertical ? [`data-vertical="${o.vertical}"`] : []),
     `data-max-width="${o.maxWidth}"`,
     `data-align="${o.align}"`,
     `data-radius="${o.radius}"`,
@@ -484,7 +485,7 @@ function Dashboard({ token, onSignOut }) {
               <div className="mt-4 grid gap-2 md:grid-cols-2">
                 <div>
                   <div className="mb-2 text-xs text-white/70">Live preview</div>
-                  <iframe title="edit-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'360px',border:'0',borderRadius:'10px',background:'#0b0d10'}} ref={(el)=>{ if (!el) return; const code = buildEmbedSnippet(editModel.id, editModel.variant, editModel.theme || 'dark').replace('data-width="100%"','data-width="'+(editModel.width||'100%')+'"').replace('data-height="460px"','data-height="'+(editModel.height||'520px')+'"'); const doc = el.contentDocument || el.contentWindow?.document; if (!doc) return; doc.open(); doc.write(`<!doctype html><html><body style=\"margin:0;background:#0b0d10\">${code}</body></html>`); doc.close(); }} />
+                  <iframe title="edit-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'360px',border:'0',borderRadius:'10px',background:'#0b0d10'}} ref={(el)=>{ if (!el) return; const code = buildEmbedSnippet(editModel.id, editModel.variant, editModel.theme || 'dark', { vertical: editModel.vertical }).replace('data-width="100%"','data-width="'+(editModel.width||'100%')+'"').replace('data-height="460px"','data-height="'+(editModel.height||'520px')+'"'); const doc = el.contentDocument || el.contentWindow?.document; if (!doc) return; doc.open(); doc.write(`<!doctype html><html><body style=\"margin:0;background:#0b0d10\">${code}</body></html>`); doc.close(); }} />
                 </div>
                 <div className="flex flex-col justify-end gap-2">
                   <Button onClick={async()=>{ const payload = { ...editModel }; await fetch('/api/client/embeds', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(payload) }); setEditOpen(false); fetchData(); }}>Save changes</Button>
