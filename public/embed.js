@@ -1,350 +1,407 @@
-(function () {
-  const script = document.currentScript;
-  const dataset = script ? script.dataset : {};
-  const embedId = dataset.embedId || '';
-  const widthOverride = dataset.width || '';
-  const heightOverride = dataset.height || '';
-  const verticalOverride = dataset.vertical || '';
-  const themeOverride = dataset.theme || '';
-  const maxWidth = dataset.maxWidth || '';
-  const align = (dataset.align || 'center').toLowerCase(); // center | left | right
-  const radius = dataset.radius || '12px';
-  const shadow = dataset.shadow === 'false' ? 'none' : '0 8px 24px rgba(0,0,0,.12)';
-  const border = dataset.border === 'false' ? '0' : '1px solid rgba(0,0,0,.08)';
-  const variant = dataset.variant || 'card'; // card | compact
-  const position = dataset.position || 'inline'; // inline | append
-  const background = dataset.background || 'auto'; // auto | transparent | inherit
-  const mode = dataset.mode || 'full'; // full | content-only
-  const hideHeader = dataset.hideHeader === 'true'; // true | false
-  const responsive = dataset.responsive === 'true'; // true | false
+// Before/After Embed Widget - Production Ready
+// Shadow DOM approach with iframe fallback
+(() => {
+  const S = document.currentScript; 
+  if (!S) return;
+  
+  const cfg = {
+    id: S.dataset.embedId, 
+    variant: S.dataset.variant || 'compact', 
+    theme: S.dataset.theme || 'auto',
+    maxWidth: S.dataset.maxWidth || '640px', 
+    align: S.dataset.align || 'center',
+    radius: S.dataset.radius || '14px', 
+    shadow: S.dataset.shadow === 'true',
+    border: S.dataset.border === 'true', 
+    width: S.dataset.width || '100%', 
+    height: S.dataset.height || '460px'
+  };
+  
+  if (!cfg.id) return console.warn('[B/A] missing data-embed-id');
 
-  const origin = new URL(script.src).origin;
+  const supportsShadow = !!HTMLElement.prototype.attachShadow;
+  const preferShadow = cfg.variant === 'compact';
+  
+  (preferShadow && supportsShadow) ? mountShadow() : mountIframe();
 
-  function renderWidget(cfg){
-    const theme = (themeOverride || cfg.theme || 'light').toLowerCase();
-    const vertical = verticalOverride || cfg.vertical || '';
+  function mountShadow() {
+    const host = document.createElement('div');
+    host.style.display = 'block'; 
+    host.style.maxWidth = cfg.maxWidth; 
+    host.style.width = cfg.width;
+    host.style.margin = cfg.align === 'center' ? '0 auto' : (cfg.align === 'right' ? '0 0 0 auto' : '0');
+    S.parentNode.insertBefore(host, S.nextSibling);
+    
+    const root = host.attachShadow({ mode: 'open' });
 
-    // Create the widget container
-    const wrapper = document.createElement('div');
-    wrapper.className = 'before-after-embed-widget';
-    wrapper.style.cssText = `
-      display: inline-block;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: ${maxWidth || '400px'};
-      width: 100%;
-      margin: 0;
-      background: transparent;
-      border-radius: ${radius};
-      box-shadow: none;
-      border: none;
-      overflow: visible;
-    `;
-
-    // Create the widget HTML structure (compact version)
-    wrapper.innerHTML = `
-      <div class="widget-content" style="padding: 16px;">
-        <div class="image-upload-area" style="
-          border: 2px dashed ${theme === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'};
-          border-radius: 8px;
-          padding: 20px 12px;
+    // Transparent by default; only the card gets a surface color via tokens.
+    root.innerHTML = `
+      <style>
+        :host { all: initial; contain: content; }
+        .wrap {
+          border-radius: ${cfg.radius}; 
+          ${cfg.border ? 'border: 1px solid var(--ba-border);' : ''}
+          ${cfg.shadow ? 'box-shadow: 0 6px 24px rgba(0,0,0,.28);' : ''}
+          background: var(--ba-surface); 
+          color: var(--ba-fg); 
+          padding: 12px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .drop {
+          border: 1px dashed var(--ba-border); 
+          border-radius: 12px; 
+          padding: 18px; 
+          background: transparent; 
           text-align: center;
-          background: transparent;
-          margin-bottom: 12px;
           cursor: pointer;
           transition: all 0.2s;
-        ">
-          <div style="font-size: 24px; margin-bottom: 8px;">🖼️</div>
-          <div style="font-size: 12px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 6px;">
-            Drop image or
-          </div>
-          <button type="button" class="choose-image-btn" style="
-            background: ${theme === 'dark' ? '#374151' : '#ffffff'};
-            border: 1px solid ${theme === 'dark' ? '#4b5563' : '#d1d5db'};
-            border-radius: 6px;
-            padding: 4px 12px;
-            color: ${theme === 'dark' ? '#ffffff' : '#374151'};
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-          ">Choose</button>
-          <input type="file" accept="image/*" style="display: none;" />
-        </div>
-        
-        <div class="vertical-options" style="margin-bottom: 12px; display: none;">
-          <div style="font-size: 11px; color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'}; margin-bottom: 6px;">Choose option:</div>
-          <div class="options-buttons" style="display: flex; gap: 4px; flex-wrap: wrap;"></div>
-        </div>
-        
-        <button type="button" class="generate-btn" style="
-          width: 100%;
-          background: linear-gradient(135deg, #8b5cf6, #ec4899, #06b6d4);
-          border: none;
-          border-radius: 6px;
-          padding: 8px 16px;
-          color: white;
-          font-size: 12px;
-          font-weight: 600;
+        }
+        .drop:hover {
+          border-color: var(--ba-accent);
+        }
+        .row {
+          display: flex; 
+          gap: 12px; 
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .btn {
+          background: linear-gradient(90deg, #7c3aed, #ec4899, #22d3ee); 
+          color: #fff; 
+          border: 0; 
+          border-radius: 10px; 
+          padding: 10px 14px; 
           cursor: pointer;
-          transition: all 0.2s;
-          margin-bottom: 12px;
-        " disabled>Generate →</button>
-        
-        <div class="result-area" style="display: none;">
-          <div class="before-after-container" style="
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            background: transparent;
-          ">
-            <div class="before-label" style="
-              position: absolute;
-              top: 8px;
-              right: 8px;
-              background: rgba(0,0,0,0.7);
-              color: white;
-              padding: 2px 6px;
-              border-radius: 3px;
-              font-size: 10px;
-              z-index: 10;
-            ">Before</div>
-            <div class="after-label" style="
-              position: absolute;
-              top: 8px;
-              left: 8px;
-              background: rgba(0,0,0,0.7);
-              color: white;
-              padding: 2px 6px;
-              border-radius: 3px;
-              font-size: 10px;
-              z-index: 10;
-            ">After</div>
-            <div class="slider-container" style="position: relative;">
-              <img class="before-image" style="width: 100%; height: auto; display: block;" />
-              <div class="after-overlay" style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 50%;
-                height: 100%;
-                overflow: hidden;
-                clip-path: inset(0 50% 0 0);
-              ">
-                <img class="after-image" style="width: 200%; height: auto; display: block;" />
-              </div>
-              <input type="range" class="slider" min="0" max="100" value="50" style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0;
-                cursor: ew-resize;
-                z-index: 20;
-              " />
-            </div>
-          </div>
-        </div>
-        
-        <div class="status" style="
-          text-align: center;
           font-size: 14px;
-          color: ${theme === 'dark' ? '#9ca3af' : '#6b7280'};
-          margin-top: 12px;
-        "></div>
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+        .btn:hover {
+          transform: translateY(-1px);
+        }
+        .btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+        }
+        .opt {
+          border: 1px solid var(--ba-border); 
+          background: transparent; 
+          color: var(--ba-fg); 
+          border-radius: 999px; 
+          padding: 6px 10px; 
+          cursor: pointer;
+          font-size: 12px;
+          transition: all 0.2s;
+        }
+        .opt:hover {
+          background: var(--ba-surface);
+        }
+        .opt.selected {
+          background: var(--ba-accent);
+          color: #fff;
+          border-color: var(--ba-accent);
+        }
+        .muted {
+          color: var(--ba-muted); 
+          font-size: 12px;
+        }
+        .slider {
+          margin-top: 12px; 
+          border: 1px solid var(--ba-border); 
+          border-radius: 12px; 
+          overflow: hidden; 
+          background: transparent; 
+          height: ${px(cfg.height)};
+          position: relative;
+        }
+        .slider img {
+          display: block; 
+          max-width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .slider-control {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 8px;
+          width: 100%;
+          height: 4px;
+          background: rgba(255,255,255,0.3);
+          border-radius: 2px;
+        }
+        .slider-thumb {
+          position: absolute;
+          top: -6px;
+          width: 16px;
+          height: 16px;
+          background: #fff;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .status {
+          margin-top: 8px;
+          padding: 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          text-align: center;
+        }
+        .status.error {
+          background: rgba(239, 68, 68, 0.1);
+          color: #ef4444;
+        }
+        .status.success {
+          background: rgba(34, 197, 94, 0.1);
+          color: #22c55e;
+        }
+        /* theme tokens */
+        :host { 
+          --ba-surface: ${token('surface', cfg.theme)}; 
+          --ba-fg: ${token('fg', cfg.theme)};
+          --ba-border: ${token('border', cfg.theme)}; 
+          --ba-muted: ${token('muted', cfg.theme)};
+          --ba-accent: #7c3aed;
+        }
+      </style>
+      <div class="wrap" part="container">
+        <div class="row" style="justify-content: space-between; margin-bottom: 8px">
+          <span class="muted">After</span><span class="muted">Before</span>
+        </div>
+        <div class="row">
+          <div class="drop" id="dropzone">
+            <div style="font-size: 24px; margin-bottom: 8px;">🖼️</div>
+            <div class="muted" style="margin-bottom: 6px;">Drop image or</div>
+            <button type="button" class="btn" style="font-size: 12px; padding: 6px 12px;">Choose</button>
+            <input id="file" type="file" accept="image/*" style="display: none;">
+          </div>
+          <div id="opts" style="flex: 1; min-width: 200px;"></div>
+        </div>
+        <div style="margin-top: 12px">
+          <button id="gen" class="btn" disabled>Generate →</button>
+        </div>
+        <div id="slider" class="slider" style="display: none;"></div>
+        <div id="status" class="status" style="display: none;"></div>
+        <div id="wm" class="muted" style="margin-top: 8px; display: none; text-align: center;">Powered by Before/After</div>
       </div>
     `;
 
-    // Add event listeners
-    setupWidgetEvents(wrapper, embedId, vertical, origin);
+    const file = root.getElementById('file');
+    const dropzone = root.getElementById('dropzone');
+    const slider = root.getElementById('slider');
+    const opts = root.getElementById('opts');
+    const genBtn = root.getElementById('gen');
+    const status = root.getElementById('status');
+    let selectedOpt = null;
+    let beforeUrl = '';
+    let afterUrl = '';
 
-    // Handle positioning
-    if (position === 'append') {
-      document.body.appendChild(wrapper);
-    } else {
-      script.replaceWith(wrapper);
-    }
-  }
-
-  function setupWidgetEvents(wrapper, embedId, vertical, origin) {
-    const uploadArea = wrapper.querySelector('.image-upload-area');
-    const fileInput = wrapper.querySelector('input[type="file"]');
-    const chooseBtn = wrapper.querySelector('.choose-image-btn');
-    const generateBtn = wrapper.querySelector('.generate-btn');
-    const resultArea = wrapper.querySelector('.result-area');
-    const beforeImage = wrapper.querySelector('.before-image');
-    const afterImage = wrapper.querySelector('.after-image');
-    const afterOverlay = wrapper.querySelector('.after-overlay');
-    const slider = wrapper.querySelector('.slider');
-    const status = wrapper.querySelector('.status');
-    const verticalOptions = wrapper.querySelector('.vertical-options');
-    const optionsButtons = wrapper.querySelector('.options-buttons');
-
-    let selectedFile = null;
-    let selectedOption = null;
-
-    // Setup vertical options
-    if (vertical) {
-      const options = getVerticalOptions(vertical);
-      if (options.length > 0) {
-        verticalOptions.style.display = 'block';
-        options.forEach(option => {
-          const btn = document.createElement('button');
-          btn.textContent = option;
-          btn.style.cssText = `
-            background: transparent;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-          `;
-          btn.addEventListener('click', () => {
-            optionsButtons.querySelectorAll('button').forEach(b => b.style.background = 'transparent');
-            btn.style.background = '#8b5cf6';
-            btn.style.color = 'white';
-            selectedOption = option;
+    // Load embed configuration
+    fetch(`https://before-after-embed.vercel.app/api/embed/${encodeURIComponent(cfg.id)}`)
+      .then(r => r.json())
+      .then(conf => {
+        const vertical = conf.vertical || 'barber';
+        if (conf.watermark) {
+          root.getElementById('wm').style.display = 'block';
+        }
+        
+        const choices = {
+          barber: ['fade', 'buzz', 'undercut', 'pompadour'],
+          dental: ['whitening', 'alignment', 'veneers'],
+          detailing: ['interior', 'exterior']
+        }[vertical] || [];
+        
+        if (choices.length > 0) {
+          opts.innerHTML = choices.map(o => 
+            `<button class="opt" data-o="${o}">${o}</button>`
+          ).join('');
+          
+          opts.addEventListener('click', e => {
+            const b = e.target.closest('.opt');
+            if (!b) return;
+            selectedOpt = b.dataset.o;
+            [...opts.children].forEach(n => n.classList.remove('selected'));
+            b.classList.add('selected');
           });
-          optionsButtons.appendChild(btn);
-        });
+        }
+      })
+      .catch(() => {});
+
+    // File handling
+    dropzone.addEventListener('click', () => file.click());
+    
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--ba-accent)';
+    });
+    
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.borderColor = 'var(--ba-border)';
+    });
+    
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--ba-border)';
+      if (e.dataTransfer.files[0]) {
+        file.files = e.dataTransfer.files;
+        handleFileSelect();
+      }
+    });
+
+    file.addEventListener('change', handleFileSelect);
+
+    async function handleFileSelect() {
+      const f = file.files?.[0];
+      if (!f) return;
+      
+      try {
+        showStatus('Uploading image...', 'info');
+        beforeUrl = URL.createObjectURL(f);
+        slider.innerHTML = `<img src="${beforeUrl}" alt="before">`;
+        slider.style.display = 'block';
+        genBtn.disabled = false;
+        hideStatus();
+      } catch (err) {
+        showStatus('Failed to load image', 'error');
       }
     }
-
-    // File upload
-    uploadArea.addEventListener('click', () => fileInput.click());
-    chooseBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        selectedFile = file;
-        generateBtn.disabled = false;
-        status.textContent = 'Ready to generate';
-      }
-    });
 
     // Generate button
-    generateBtn.addEventListener('click', async () => {
-      if (!selectedFile) return;
-
-      generateBtn.disabled = true;
-      status.textContent = 'Generating...';
-
-      const formData = new FormData();
-      formData.append('image', selectedFile);
-      formData.append('embedId', embedId);
-      if (vertical) formData.append('vertical', vertical);
-      if (selectedOption) formData.append(`opt_${getOptionKey(vertical)}`, selectedOption);
-
+    genBtn.addEventListener('click', async () => {
+      if (!beforeUrl) {
+        showStatus('Choose an image first', 'error');
+        return;
+      }
+      
       try {
-        // Use full URL for external sites
-        const apiUrl = window.location.hostname === 'localhost' || window.location.hostname.includes('vercel.app') 
-          ? '/api/edit' 
-          : 'https://before-after-embed.vercel.app/api/edit';
+        genBtn.disabled = true;
+        showStatus('Generating...', 'info');
         
-        console.log('Sending request to', apiUrl, 'with method POST');
-        const response = await fetch(apiUrl, {
+        const formData = new FormData();
+        formData.append('image', file.files[0]);
+        formData.append('embedId', cfg.id);
+        if (selectedOpt) {
+          formData.append('option', selectedOpt);
+        }
+        
+        const response = await fetch('https://before-after-embed.vercel.app/api/edit', {
           method: 'POST',
           body: formData
         });
-        console.log('Response status:', response.status, response.statusText);
-
+        
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-
-        const text = await response.text();
-        if (!text) {
-          throw new Error('Empty response from server');
-        }
-
-        let result;
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          console.error('Invalid JSON response:', text);
-          throw new Error('Invalid response format');
-        }
-
-        if (result.outputUrl) {
-          beforeImage.src = URL.createObjectURL(selectedFile);
-          afterImage.src = result.outputUrl;
-          resultArea.style.display = 'block';
-          status.textContent = 'Generation complete!';
-        } else {
-          status.textContent = 'Error: ' + (result.error || 'Generation failed');
-        }
-      } catch (error) {
-        console.error('Generation error:', error);
-        status.textContent = 'Error: ' + error.message;
+        
+        const result = await response.json();
+        afterUrl = result.outputUrl;
+        renderSlider(slider, beforeUrl, afterUrl);
+        showStatus('Generated successfully!', 'success');
+        
+      } catch (err) {
+        showStatus(`Error: ${err.message}`, 'error');
       } finally {
-        generateBtn.disabled = false;
+        genBtn.disabled = false;
       }
     });
 
-    // Slider
-    slider.addEventListener('input', (e) => {
-      const value = e.target.value;
-      afterOverlay.style.clipPath = `inset(0 ${100 - value}% 0 0)`;
-    });
-  }
+    function renderSlider(root, before, after) {
+      root.innerHTML = `
+        <div style="position: relative; height: 100%">
+          <img src="${after}" alt="after" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <img id="b" src="${before}" alt="before" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0)">
+          <div class="slider-control">
+            <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%);"></div>
+          </div>
+        </div>`;
+      
+      const r = root.querySelector('#r');
+      const b = root.querySelector('#b');
+      let isDragging = false;
+      
+      function updateSlider(x) {
+        const rect = root.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
+        r.style.left = `${percent}%`;
+        b.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      }
+      
+      r.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        e.preventDefault();
+      });
+      
+      root.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          updateSlider(e.clientX);
+        }
+      });
+      
+      root.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+      
+      root.addEventListener('click', (e) => {
+        if (!isDragging) {
+          updateSlider(e.clientX);
+        }
+      });
+    }
 
-  function getVerticalOptions(vertical) {
-    const options = {
-      'barber': ['fade', 'buzz', 'undercut', 'pompadour'],
-      'dental': ['whitening', 'alignment', 'veneers'],
-      'detailing': ['exterior', 'interior']
-    };
-    return options[vertical] || [];
-  }
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = `status ${type}`;
+      status.style.display = 'block';
+    }
 
-  function getOptionKey(vertical) {
-    const keys = {
-      'barber': 'style',
-      'dental': 'treatment',
-      'detailing': 'focus'
-    };
-    return keys[vertical] || 'option';
-  }
+    function hideStatus() {
+      status.style.display = 'none';
+    }
 
-  // Ensure DOM is ready before rendering
-  function initWidget() {
-    if (embedId) {
-      fetch(origin + '/api/embed/' + encodeURIComponent(embedId))
-        .then(async r => {
-          if (!r.ok) {
-            throw new Error(`HTTP ${r.status}: ${r.statusText}`);
-          }
-          const text = await r.text();
-          if (!text) {
-            throw new Error('Empty response');
-          }
-          try {
-            return JSON.parse(text);
-          } catch (e) {
-            console.error('Invalid JSON response:', text);
-            throw new Error('Invalid JSON response');
-          }
-        })
-        .then(cfg => renderWidget(cfg))
-        .catch(err => {
-          console.error('Error loading embed config:', err);
-          renderWidget({});
-        });
-    } else {
-      renderWidget({});
+    function token(kind, mode) {
+      const light = {
+        surface: 'rgba(255,255,255,.04)', 
+        fg: '#fff', 
+        border: 'rgba(255,255,255,.12)', 
+        muted: 'rgba(255,255,255,.55)'
+      };
+      const dark = {
+        surface: 'rgba(0,0,0,.5)', 
+        fg: '#fff', 
+        border: 'rgba(255,255,255,.12)', 
+        muted: 'rgba(255,255,255,.55)'
+      };
+      
+      if (mode === 'light') return light[kind];
+      if (mode === 'dark') return dark[kind];
+      return (matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? dark : light)[kind];
+    }
+    
+    function px(v) { 
+      return /^\d+$/.test(v) ? `${v}px` : v; 
     }
   }
 
-  // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initWidget);
-  } else {
-    initWidget();
+  function mountIframe() {
+    const f = document.createElement('iframe');
+    f.src = `https://before-after-embed.vercel.app/widget.html?embedId=${encodeURIComponent(cfg.id)}&variant=${cfg.variant}&theme=${cfg.theme}`;
+    f.style.background = 'transparent'; 
+    f.style.border = cfg.border ? '1px solid rgba(255,255,255,.12)' : '0';
+    f.style.borderRadius = cfg.radius; 
+    f.style.boxShadow = cfg.shadow ? '0 6px 24px rgba(0,0,0,.28)' : 'none';
+    f.style.display = 'block'; 
+    f.style.width = cfg.width; 
+    f.style.height = '10px'; 
+    f.style.maxWidth = cfg.maxWidth;
+    f.style.margin = cfg.align === 'center' ? '0 auto' : (cfg.align === 'right' ? '0 0 0 auto' : '0');
+    S.parentNode.insertBefore(f, S.nextSibling);
+    
+    // Auto-height
+    window.addEventListener('message', e => { 
+      if (e.source === f.contentWindow && e.data?.type === 'ba:height') { 
+        f.style.height = `${e.data.height}px`; 
+      } 
+    });
   }
 })();
-
-

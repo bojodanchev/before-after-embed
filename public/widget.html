@@ -4,9 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Before/After Widget</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      html, body {
+        background: transparent;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .auto {
+        color-scheme: light dark;
+      }
+      .widget-root {
+        background: transparent;
+        padding: 12px;
+        border-radius: 14px;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+    </style>
   </head>
-  <body class="widget-body">
+  <body class="auto widget-body">
     <div class="widget-root">
       <form id="w-form" class="w-form">
         <div id="dropzone" class="dropzone">
@@ -56,15 +73,32 @@
       })();
     </script>
     <script src="/widget.js"></script>
-    <script>
+        <script>
       (function(){
         const params = new URLSearchParams(location.search);
         const variant = (params.get('variant') || 'card').toLowerCase();
         const cmp = document.getElementById('compare');
         cmp.classList.add(variant === 'compact' ? 'compact' : 'card');
+        
+        // Auto-height for iframe
+        const ro = new ResizeObserver(() => {
+          parent.postMessage({
+            type: 'ba:height', 
+            height: document.body.scrollHeight
+          }, '*');
+        });
+        ro.observe(document.body);
+        
+        // Initial height
+        setTimeout(() => {
+          parent.postMessage({
+            type: 'ba:height', 
+            height: document.body.scrollHeight
+          }, '*');
+        }, 100);
       })();
     </script>
   </body>
-  </html>
+</html>
 
 
