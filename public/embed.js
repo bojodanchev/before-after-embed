@@ -47,6 +47,8 @@
           color: var(--ba-fg); 
           padding: 12px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          backdrop-filter: blur(10px) saturate(140%);
+          -webkit-backdrop-filter: blur(10px) saturate(140%);
         }
         .drop {
           border: 1px dashed var(--ba-border); 
@@ -59,6 +61,7 @@
         }
         .drop:hover {
           border-color: var(--ba-accent);
+          background: rgba(124, 58, 237, 0.1);
         }
         .row {
           display: flex; 
@@ -79,6 +82,7 @@
         }
         .btn:hover {
           transform: translateY(-1px);
+          filter: brightness(1.05);
         }
         .btn:disabled {
           opacity: 0.6;
@@ -94,14 +98,18 @@
           cursor: pointer;
           font-size: 12px;
           transition: all 0.2s;
+          box-shadow: inset 0 -1px 0 rgba(255,255,255,0.04);
+          margin-right: 6px;
         }
         .opt:hover {
-          background: var(--ba-surface);
+          background: rgba(255,255,255,0.04);
+          border-color: rgba(255,255,255,0.18);
         }
         .opt.selected {
-          background: var(--ba-accent);
+          background: linear-gradient(90deg, #7c3aed, #ec4899);
           color: #fff;
           border-color: var(--ba-accent);
+          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
         }
         .muted {
           color: var(--ba-muted); 
@@ -115,6 +123,7 @@
           background: transparent; 
           height: ${px(cfg.height)};
           position: relative;
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
         }
         .slider img {
           display: block; 
@@ -129,7 +138,7 @@
           bottom: 8px;
           width: 100%;
           height: 4px;
-          background: rgba(255,255,255,0.3);
+          background: linear-gradient(90deg, rgba(124,58,237,.35), rgba(34,211,238,.35));
           border-radius: 2px;
         }
         .slider-thumb {
@@ -141,6 +150,7 @@
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          border: 1px solid rgba(0,0,0,0.05);
         }
         .status {
           margin-top: 8px;
@@ -148,6 +158,7 @@
           border-radius: 6px;
           font-size: 12px;
           text-align: center;
+          background: rgba(255,255,255,.04);
         }
         .status.error {
           background: rgba(239, 68, 68, 0.1);

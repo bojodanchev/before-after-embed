@@ -23,11 +23,13 @@
         margin: 0 auto;
         min-height: 100vh;
         box-sizing: border-box;
+        backdrop-filter: blur(10px) saturate(140%);
+        -webkit-backdrop-filter: blur(10px) saturate(140%);
       }
       .card .widget-root {
-        background: var(--surface, #1a1a1a);
-        border: 1px solid var(--border, rgba(255,255,255,0.1));
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background: rgba(26,26,26,.68);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 6px 24px rgba(0,0,0,0.28);
       }
     </style>
   </head>
