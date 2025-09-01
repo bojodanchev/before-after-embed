@@ -291,16 +291,27 @@ export default function BeforeAfterLanding() {
           />
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {[
-              { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/> },
-              { title: "Dental clinics", desc: "Project whitening, veneers, or aligner results from a selfie.", icon: <Shield className="h-5 w-5"/> },
-              { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/> },
+              { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/>, link: null },
+              { title: "Dental clinics", desc: "Project whitening, veneers, or aligner results from a selfie.", icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
+              { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/>, link: null },
             ].map((f, i) => (
-              <Card key={i} className="border-white/10 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
-              </Card>
+              f.link ? (
+                <a key={i} href={f.link} className="block transition hover:scale-[1.01]" target="_top">
+                  <Card className="border-white/10 bg-white/5">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
+                  </Card>
+                </a>
+              ) : (
+                <Card key={i} className="border-white/10 bg-white/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
+                </Card>
+              )
             ))}
           </div>
         </Container>
