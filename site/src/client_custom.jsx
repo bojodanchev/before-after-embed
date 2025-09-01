@@ -475,7 +475,11 @@ function Dashboard({ token, onSignOut }) {
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   <div className="grid gap-1">
                     <div className="flex items-center gap-2"><Label>Powered by</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Show small attribution</span></div>
-                    <Select value={settings.poweredBy || 'false'} onChange={(e)=> setSettings(s=> ({...s, poweredBy:e.target.value}))}><option value="false">hidden</option><option value="true">show</option></Select>
+                    <Select value={settings.poweredBy || 'false'} onChange={(e)=> setSettings(s=> ({...s, poweredBy:e.target.value}))} disabled={(planInfo?.id || 'free') === 'free'}>
+                      <option value="false">hidden</option>
+                      <option value="true">show</option>
+                    </Select>
+                    {(planInfo?.id || 'free') === 'free' && <div className="text-xs text-white/50">Required on Free plan</div>}
                   </div>
                   <div className="grid gap-1 md:col-span-1">
                     <div className="flex items-center gap-2"><Label>Webhook URL</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Receive render events</span></div>
