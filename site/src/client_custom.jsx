@@ -437,11 +437,17 @@ function Dashboard({ token, onSignOut }) {
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
               <div className="grid gap-1">
-                <Label>Display name</Label>
+                <div className="flex items-center gap-2">
+                  <Label>Display name</Label>
+                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Shown only in your portal</span>
+                </div>
                 <Input value={settings.displayName || ''} onChange={(e)=> setSettings(s=> ({...s, displayName:e.target.value}))} />
               </div>
               <div className="grid gap-1">
-                <Label>Brand color</Label>
+                <div className="flex items-center gap-2">
+                  <Label>Brand color</Label>
+                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Tint buttons and active chips</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} disabled={!planInfo || (planInfo.themeCustomization !== 'custom')} />
                   {(!planInfo || planInfo.themeCustomization !== 'custom') && (
@@ -451,21 +457,26 @@ function Dashboard({ token, onSignOut }) {
               </div>
               {/* Vertical-specific options removed: now selected directly in widget */}
               <div className="grid gap-1">
-                <Label>Default theme</Label>
+                <div className="flex items-center gap-2"><Label>Default theme</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Light or dark for new embeds</span></div>
                 <Select value={settings.defaultTheme || 'dark'} onChange={(e)=> setSettings(s=> ({...s, defaultTheme:e.target.value}))}><option value="dark">dark</option><option value="light">light</option></Select>
               </div>
               <div className="grid gap-1">
-                <Label>Default variant</Label>
+                <div className="flex items-center gap-2"><Label>Default variant</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Compact (inline) or Card (iframe)</span></div>
                 <Select value={settings.defaultVariant || 'card'} onChange={(e)=> setSettings(s=> ({...s, defaultVariant:e.target.value}))}><option value="compact">compact</option><option value="card">card</option></Select>
               </div>
-              <div className="grid gap-1">
-                <Label>Powered by</Label>
-                <Select value={settings.poweredBy || 'false'} onChange={(e)=> setSettings(s=> ({...s, poweredBy:e.target.value}))}><option value="false">hidden</option><option value="true">show</option></Select>
-              </div>
-              <div className="grid gap-1 md:col-span-2">
-                <Label>Webhook URL (optional)</Label>
-                <Input placeholder="https://example.com/webhook" value={settings.webhookUrl || ''} onChange={(e)=> setSettings(s=> ({...s, webhookUrl:e.target.value}))} />
-              </div>
+              <details className="md:col-span-2 rounded-md border border-white/10 bg-black/30 p-3">
+                <summary className="cursor-pointer text-sm text-white/80">Advanced</summary>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-1">
+                    <div className="flex items-center gap-2"><Label>Powered by</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Show small attribution</span></div>
+                    <Select value={settings.poweredBy || 'false'} onChange={(e)=> setSettings(s=> ({...s, poweredBy:e.target.value}))}><option value="false">hidden</option><option value="true">show</option></Select>
+                  </div>
+                  <div className="grid gap-1 md:col-span-1">
+                    <div className="flex items-center gap-2"><Label>Webhook URL</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Receive render events</span></div>
+                    <Input placeholder="https://example.com/webhook" value={settings.webhookUrl || ''} onChange={(e)=> setSettings(s=> ({...s, webhookUrl:e.target.value}))} />
+                  </div>
+                </div>
+              </details>
               <div className="md:col-span-2 flex gap-2 justify-end">
                 <Button disabled={savingSettings} onClick={async()=>{ setSavingSettings(true); try{ await fetch('/api/client/settings', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(settings) }); }finally{ setSavingSettings(false);} }}>Save settings</Button>
               </div>
