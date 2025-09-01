@@ -20,6 +20,7 @@ export default defineConfig({
         client: resolve(__dirname, 'site/client.html'),
         pricing: resolve(__dirname, 'site/pricing.html'),
         docs: resolve(__dirname, 'site/docs.html'),
+        dental: resolve(__dirname, 'site/dental.html'),
       },
     },
   },
