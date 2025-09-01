@@ -39,6 +39,8 @@
   const slider = document.getElementById('w-slider');
   const statusEl = document.getElementById('w-status');
   const afterWrapper = document.querySelector('.after-wrapper');
+  // Maintain stable aspect ratio box based on first image dimensions
+  let aspect = 0;
   const verticalSel = document.getElementById('w-vertical');
   if (preset) verticalSel.value = preset;
   const optionsContainer = document.createElement('div');
@@ -73,6 +75,17 @@
       return;
     }
     const localUrl = URL.createObjectURL(file);
+    beforeImg.onload = () => {
+      try {
+        const w = beforeImg.naturalWidth || beforeImg.width;
+        const h = beforeImg.naturalHeight || beforeImg.height;
+        if (w && h) { aspect = h / w; }
+        // Set compare height based on available width to prevent splash during loading
+        const cmp = document.getElementById('compare');
+        const width = cmp.clientWidth || 600;
+        cmp.style.height = aspect ? `${Math.round(width * aspect)}px` : '320px';
+      } catch(_e) {}
+    };
     beforeImg.src = localUrl;
     afterImg.removeAttribute('src');
     // Reset compare state and ensure same-panel overlay
@@ -100,6 +113,13 @@
       if (json.outputUrl) {
         // Load after image, then reveal smoothly
         afterImg.onload = () => {
+          // Match container to after image natural aspect for final render
+          try{
+            const cmp = document.getElementById('compare');
+            const w = afterImg.naturalWidth || beforeImg.naturalWidth || cmp.clientWidth;
+            const h = afterImg.naturalHeight || beforeImg.naturalHeight || 0;
+            if (w && h){ cmp.style.height = `${Math.round((h / w) * (cmp.clientWidth || w))}px`; }
+          }catch(_e){}
           updateClip(Number(slider.value || 50));
         };
         afterImg.src = json.outputUrl;
