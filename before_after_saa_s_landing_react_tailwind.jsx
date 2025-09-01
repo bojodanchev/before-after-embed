@@ -165,7 +165,7 @@ export default function BeforeAfterLanding() {
           <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
             <a href="#demo" className="hover:text-white">Live demo</a>
             <a href="#features" className="hover:text-white">Features</a>
-            <a href="#docs" className="hover:text-white">Docs</a>
+            <a href="/app/docs.html" target="_top" className="hover:text-white">Docs</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
             <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
           </nav>
@@ -423,7 +423,7 @@ export default function BeforeAfterLanding() {
             </div>
             <div className="flex items-center gap-6 text-sm text-white/70">
               <a href="#" className="hover:text-white">Status</a>
-              <a href="#" className="hover:text-white">Docs</a>
+              <a href="/app/docs.html" target="_top" className="hover:text-white">Docs</a>
               <a href="#" className="hover:text-white">Security</a>
               <a href="#" className="hover:text-white">Terms</a>
               <a href="#" className="hover:text-white">Privacy</a>
