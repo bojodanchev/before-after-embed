@@ -61,8 +61,8 @@
 
   // Ensure both images render in the same panel gracefully
   function updateClip(percent){
-    // After should reveal from the right (Before left, After right)
-    afterWrapper.style.clipPath = `inset(0 0 0 ${100 - percent}%)`;
+    // Boundary moves with the slider (left -> right). After is visible to the right.
+    afterWrapper.style.clipPath = `inset(0 0 0 ${percent}%)`;
   }
   slider.addEventListener('input', () => {
     const percent = Number(slider.value);
