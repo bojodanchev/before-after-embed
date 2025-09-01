@@ -53,8 +53,8 @@ function DentalPage(){
             <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Show a Before/After smile before treatment','Покажете усмивката „Преди/След” преди лечението')}</h1>
             <p className="mt-4 text-lg text-white/70">{t('Perfect for whitening, veneers and alignment. Upload, generate, and slide to compare.','Идеално за избелване, фасети и подравняване. Качете снимка, генерирайте резултат и преместете плъзгача, за да сравните.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a href="/client.html" target="_top"><Button>Започнете</Button></a>
-              <a href="/app/docs.html"><Button variant="secondary">Документация</Button></a>
+              <a href="/client.html" target="_top"><Button>{t('Get started','Започнете')}</Button></a>
+              <a href="/app/docs.html"><Button variant="secondary">{t('Docs','Документация')}</Button></a>
             </div>
           </div>
         </Container>
