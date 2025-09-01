@@ -262,30 +262,21 @@ export default function BeforeAfterLanding() {
         </Container>
       </section>
 
-      {/* Snippet */}
+      {/* Snippet (swapped with CTA aesthetic) */}
       <section id="docs" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
-          <SectionTitle
-            eyebrow="Get started in 60 seconds"
-            title="Install the embed"
-            subtitle="Paste the snippet below, replace the embed id, and you’re live. Configure look‑and‑feel with data‑attributes — no extra JS required."
-          />
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="space-y-4">
-              <CodeBlock code={embedSnippet} />
-              <div className="text-xs text-white/60">Example settings: <code>data-theme="dark"</code>, <code>data-variant="compact"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
+          <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-8 sm:grid-cols-2">
+            <div>
+              <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
+              <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
+              <div className="mt-6 flex gap-3">
+                <Button className="gap-2">Create account <ArrowRight className="h-4 w-4" /></Button>
+                <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">Talk to sales</Button>
+              </div>
             </div>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="text-base">What you’ll get</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-3 text-sm text-white/70">
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A polished dropzone with upload + generate</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A responsive before/after slider with badges</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> One‑line install; all styling via attributes</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> Per‑tenant analytics in the Client Portal</div>
-              </CardContent>
-            </Card>
+            <div>
+              <CodeBlock code={embedSnippet} />
+            </div>
           </div>
         </Container>
       </section>
@@ -392,21 +383,30 @@ export default function BeforeAfterLanding() {
         </Container>
       </section>
 
-      {/* CTA */}
+      {/* CTA (now shows detailed install content) */}
       <section id="get-started" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
-          <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-8 sm:grid-cols-2">
-            <div>
-              <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
-              <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
-              <div className="mt-6 flex gap-3">
-                <Button className="gap-2">Create account <ArrowRight className="h-4 w-4" /></Button>
-                <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">Talk to sales</Button>
-              </div>
-            </div>
-            <div>
+          <SectionTitle
+            eyebrow="Get started in 60 seconds"
+            title="Install the embed"
+            subtitle="Paste the snippet below, replace the embed id, and you’re live. Configure look‑and‑feel with data‑attributes — no extra JS required."
+          />
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <div className="space-y-4">
               <CodeBlock code={embedSnippet} />
+              <div className="text-xs text-white/60">Example settings: <code>data-theme=\"dark\"</code>, <code>data-variant=\"compact\"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
             </div>
+            <Card className="border-white/10 bg-white/5">
+              <CardHeader>
+                <CardTitle className="text-base">What you’ll get</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 text-sm text-white/70">
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A polished dropzone with upload + generate</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A responsive before/after slider with badges</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> One‑line install; all styling via attributes</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> Per‑tenant analytics in the Client Portal</div>
+              </CardContent>
+            </Card>
           </div>
         </Container>
       </section>
