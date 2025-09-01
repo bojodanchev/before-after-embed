@@ -5,6 +5,7 @@
   const embedId = params.get('embedId') || '';
   const variant = (params.get('variant') || 'card').toLowerCase();
   const background = params.get('background') || 'auto';
+  const locale = params.get('lang') || 'en';
   const mode = params.get('mode') || 'full';
   const hideHeader = params.get('hideHeader') === 'true';
 
@@ -183,7 +184,7 @@
         const select = document.createElement('select');
         select.setAttribute('data-opt','treatment');
         const map = { whitening:'избелване', alignment:'подравняване', veneers:'фасети' };
-        ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=map[opt] || opt; select.appendChild(o); });
+        ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=(locale==='bg'? (map[opt]||opt) : opt); select.appendChild(o); });
         select.style.display = 'none'; optionsContainer.appendChild(select);
       } else if (v === 'barber'){
         renderChoices('style', ['fade','buzz','undercut','pompadour']);

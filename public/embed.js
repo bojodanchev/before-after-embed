@@ -8,6 +8,7 @@
     id: S.dataset.embedId, 
     variant: S.dataset.variant || 'compact', 
     theme: S.dataset.theme || 'auto',
+    locale: S.dataset.locale || 'en',
     maxWidth: S.dataset.maxWidth || '640px', 
     align: S.dataset.align || 'center',
     radius: S.dataset.radius || '14px', 
@@ -234,7 +235,7 @@
         
         if (choices.length > 0) {
           opts.innerHTML = choices.map(o => 
-            `<button class="opt" data-o="${o}">${vertical==='dental'?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
+            `<button class="opt" data-o="${o}">${(vertical==='dental' && cfg.locale==='bg')?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
           ).join('');
           
           opts.addEventListener('click', e => {

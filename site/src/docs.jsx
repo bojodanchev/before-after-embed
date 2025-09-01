@@ -39,6 +39,15 @@ function Docs() {
           </div>
         </section>
 
+        <section id="onboarding" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Onboarding</h2>
+          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
+            <li>Choose your vertical above (e.g., Dental).</li>
+            <li>Follow the guided one‑pager with the exact snippet and recommended settings.</li>
+            <li>In the portal, create your first embed (or click “Create starter embed” from the one‑pager if available).</li>
+          </ol>
+        </section>
+
         <section id="overview" className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Overview</h2>
           <p className="mt-2 text-sm opacity-80">The Before/After widget lets customers upload a photo and preview an AI‑generated after result (barber, dental, auto detailing, and more). You can embed it on any site with one script tag.</p>
