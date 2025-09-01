@@ -17,6 +17,7 @@ function Docs() {
           {[
             ['#overview','Overview'],
             ['#quickstart','Quick Start'],
+            ['/app/dental.html','Dental Clinics'],
             ['#attributes','Attributes'],
             ['#examples','Examples'],
             ['#portal','Client Portal'],

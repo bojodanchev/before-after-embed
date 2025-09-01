@@ -383,6 +383,14 @@ export async function createClient(client){
     await kvClient.set(`clients:token:${token}`, rec.id);
   }
   memoryClients[rec.id] = rec;
+  // Pre-create a demo dental embed for onboarding
+  try{
+    const demo = { id:'demo-dental', name:'Dental Demo', vertical:'dental', theme:'light', width:'100%', height:'520px', clientId: rec.id };
+    await setEmbedConfig(demo);
+    if (isKvEnabled() && kvClient){ await kvClient.sadd(`clientEmbeds:${rec.id}`, demo.id); }
+    memoryClientEmbeds[rec.id] = memoryClientEmbeds[rec.id] || new Set();
+    memoryClientEmbeds[rec.id].add(demo.id);
+  }catch(_e){}
   return rec;
 }
 
