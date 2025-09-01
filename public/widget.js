@@ -182,7 +182,8 @@
         renderChoices('treatment', ['whitening','alignment','veneers']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','treatment');
-        ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
+        const map = { whitening:'избелване', alignment:'подравняване', veneers:'фасети' };
+        ['whitening','alignment','veneers'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=map[opt] || opt; select.appendChild(o); });
         select.style.display = 'none'; optionsContainer.appendChild(select);
       } else if (v === 'barber'){
         renderChoices('style', ['fade','buzz','undercut','pompadour']);

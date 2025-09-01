@@ -234,7 +234,7 @@
         
         if (choices.length > 0) {
           opts.innerHTML = choices.map(o => 
-            `<button class="opt" data-o="${o}">${o}</button>`
+            `<button class="opt" data-o="${o}">${vertical==='dental'?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
           ).join('');
           
           opts.addEventListener('click', e => {

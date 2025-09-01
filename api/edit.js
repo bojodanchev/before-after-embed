@@ -78,9 +78,9 @@ export default async function handler(req, res){
       }
       if (v === 'dental'){
         const treatment = opts.treatment;
-        if (treatment === 'whitening') return 'Whiten teeth naturally to a brighter but realistic shade; preserve enamel texture.';
-        if (treatment === 'alignment') return 'Subtly align teeth for a straighter smile without altering facial identity.';
-        if (treatment === 'veneers') return 'Simulate natural-looking veneers with improved shape and shade; avoid over-whitening.';
+        if (treatment === 'whitening') return 'Избелване на зъбите до естествено, но по-светло ниво; запазете текстурата на емайла и реалистичния вид.';
+        if (treatment === 'alignment') return 'Деликатно подравняване за по-равна усмивка без промяна на лицевата идентичност; запазете естествените контури.';
+        if (treatment === 'veneers') return 'Фасети с естествен вид: подобрена форма и нюанс, без прекомерно избелване; поддържайте реалистичен блясък.';
       }
       if (v === 'detailing'){
         const focus = opts.focus;
@@ -135,7 +135,7 @@ export default async function handler(req, res){
     // Also log a client_render to drive analytics without requiring a separate endpoint
     try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
     // optional webhook
-    try { await deliverWebhook(embedId, { type:'render', embedId, outputUrl, ts: Date.now() }); } catch {}
+    try { await deliverWebhook(embedId, { type:'render', embedId, outputUrl, ts: Date.now(), vertical: chosenVertical, treatment: options?.treatment }); } catch {}
 
     // Watermark: required by plan or opted-in via settings (poweredBy)
     let watermark = false;
