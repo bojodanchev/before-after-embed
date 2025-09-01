@@ -436,8 +436,8 @@ export default function BeforeAfterLanding() {
               <a href="#" className="hover:text-white">Status</a>
               <a href="/app/docs.html" target="_top" className="hover:text-white">Docs</a>
               <a href="#" className="hover:text-white">Security</a>
-              <a href="#" className="hover:text-white">Terms</a>
-              <a href="#" className="hover:text-white">Privacy</a>
+              <a href="/app/terms.html" className="hover:text-white">Terms</a>
+              <a href="/app/privacy.html" className="hover:text-white">Privacy</a>
             </div>
           </div>
         </Container>
