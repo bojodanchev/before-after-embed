@@ -94,7 +94,9 @@
       .btn-choice.active { background: linear-gradient(90deg,#7c3aed,#ec4899,#22d3ee); color: #fff; border: none; }
 
       /* Compare area + badges */
-      #compare { position: relative; }
+      #compare { position: relative; border: 1px solid var(--ba-border); border-radius: 12px; overflow: hidden; background: var(--ba-muted-bg); }
+      #compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+      .after-wrapper { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); transition: clip-path .2s ease; }
       .tag { position: absolute; top: 8px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 8px; background: var(--ba-muted-bg); color: var(--ba-fg); }
       .tag-before { left: 8px; }
       .tag-after { right: 8px; }

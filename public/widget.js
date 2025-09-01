@@ -53,9 +53,13 @@
     cmp.classList.add('compact');
   }
 
+  // Ensure both images render in the same panel gracefully
+  function updateClip(percent){
+    afterWrapper.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+  }
   slider.addEventListener('input', () => {
     const percent = Number(slider.value);
-    afterWrapper.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+    updateClip(percent);
   });
 
   form.addEventListener('submit', async (e) => {
@@ -68,9 +72,11 @@
       statusEl.textContent = 'Please choose an image.';
       return;
     }
-    beforeImg.src = URL.createObjectURL(file);
+    const localUrl = URL.createObjectURL(file);
+    beforeImg.src = localUrl;
     afterImg.removeAttribute('src');
-    afterWrapper.style.clipPath = 'inset(0 50% 0 0)';
+    // Reset compare state and ensure same-panel overlay
+    updateClip(50);
 
     const formData = new FormData();
     formData.append('image', file);
@@ -92,6 +98,10 @@
       if (!resp.ok) throw new Error(json.error || 'Failed');
       statusEl.textContent = 'Rendering complete';
       if (json.outputUrl) {
+        // Load after image, then reveal smoothly
+        afterImg.onload = () => {
+          updateClip(Number(slider.value || 50));
+        };
         afterImg.src = json.outputUrl;
         // Server logs both edit_success and a client_render; no client call needed
       } else {
