@@ -14,6 +14,8 @@ const Button = ({ children, className = "", variant = "primary", ...props }) => 
 };
 
 function DentalPage(){
+  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
+  const t = (en, bg) => (locale === 'bg' ? bg : en);
   const snippet = `<script async src=\"https://before-after-embed.vercel.app/embed.js\"
   data-embed-id=\"your-embed-id\"
   data-theme=\"light\"
@@ -35,6 +37,7 @@ function DentalPage(){
             <a href="/app/index.html" className="hover:text-white">Main site</a>
             <a href="/app/docs.html" className="hover:text-white">Docs</a>
             <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
+            <a href={location.pathname + '?lang=' + (locale==='bg'?'en':'bg')} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
           </nav>
         </Container>
       </header>
@@ -43,8 +46,8 @@ function DentalPage(){
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(34,211,238,0.15),_transparent_60%)]" />
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">Покажете усмивката „Преди/След” преди лечението</h1>
-            <p className="mt-4 text-lg text-white/70">Идеално за избелване, фасети и подравняване. Качете снимка, генерирайте резултат и преместете плъзгача, за да сравните.</p>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Show a Before/After smile before treatment','Покажете усмивката „Преди/След” преди лечението')}</h1>
+            <p className="mt-4 text-lg text-white/70">{t('Perfect for whitening, veneers and alignment. Upload, generate, and slide to compare.','Идеално за избелване, фасети и подравняване. Качете снимка, генерирайте резултат и преместете плъзгача, за да сравните.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a href="/client.html" target="_top"><Button size="lg" className="bg-white/10">Започнете</Button></a>
               <a href="/app/docs.html"><Button variant="secondary">Документация</Button></a>
@@ -57,8 +60,8 @@ function DentalPage(){
         <Container>
           <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-8 sm:grid-cols-2">
             <div>
-              <h3 className="text-2xl font-semibold">Инсталирайте за 60 секунди</h3>
-              <p className="mt-2 text-white/80">Поставете скрипта и използвайте <code>data-variant</code> и <code>data-theme</code> за визия.</p>
+              <h3 className="text-2xl font-semibold">{t('Install in 60 seconds','Инсталирайте за 60 секунди')}</h3>
+              <p className="mt-2 text-white/80">{t('Paste the script and use data-variant / data-theme to style.','Поставете скрипта и използвайте data-variant и data-theme за визия.')}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-black/60 p-4 font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap break-words text-white/90">{snippet}</pre>
@@ -69,11 +72,11 @@ function DentalPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">Препоръчителни опции</h2>
+          <h2 className="text-2xl font-semibold">{t('Recommended options','Препоръчителни опции')}</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/80">
-            <li>Избелване — естествено по-светли зъби без изгаряне на емайла</li>
-            <li>Подравняване — дискретно изправяне на усмивката</li>
-            <li>Фасети — естествен вид, подобрена форма и нюанс</li>
+            <li>{t('Whitening — natural brighter shade without harming enamel','Избелване — естествено по-светли зъби без изгаряне на емайла')}</li>
+            <li>{t('Alignment — subtle straightening of the smile','Подравняване — дискретно изправяне на усмивката')}</li>
+            <li>{t('Veneers — natural look with improved shape and tone','Фасети — естествен вид, подобрена форма и нюанс')}</li>
           </ul>
         </Container>
       </section>
