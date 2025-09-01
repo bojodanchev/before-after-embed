@@ -178,24 +178,24 @@
           --ba-accent: var(--ba-accent-internal, #7c3aed);
         }
       </style>
-      <div class="wrap" part="container">
+      <div class="wrap" part="container" role="group" aria-label="Before After editor">
         <div class="row" style="justify-content: space-between; margin-bottom: 8px">
-          <span class="muted">Before</span><span class="muted">After</span>
+          <span class="muted" aria-hidden="true">Before</span><span class="muted" aria-hidden="true">After</span>
         </div>
         <div class="row">
-          <div class="drop" id="dropzone">
+          <div class="drop" id="dropzone" role="button" tabindex="0" aria-label="Drop image or choose file">
             <div style="font-size: 24px; margin-bottom: 8px;">🖼️</div>
             <div class="muted" style="margin-bottom: 6px;">Drop image or</div>
-            <button type="button" class="btn" style="font-size: 12px; padding: 6px 12px;">Choose</button>
-            <input id="file" type="file" accept="image/*" style="display: none;">
+            <button type="button" class="btn" style="font-size: 12px; padding: 6px 12px;" aria-label="Choose image">Choose</button>
+            <input id="file" type="file" accept="image/*" style="display: none;" aria-hidden="true">
           </div>
           <div id="opts" style="flex: 1; min-width: 200px;"></div>
         </div>
         <div style="margin-top: 12px">
-          <button id="gen" class="btn" disabled>Generate →</button>
+          <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
-        <div id="slider" class="slider" style="display: none;"></div>
-        <div id="status" class="status" style="display: none;"></div>
+        <div id="slider" class="slider" style="display: none;" role="region" aria-live="polite"></div>
+        <div id="status" class="status" style="display: none;" role="status" aria-live="polite"></div>
         <div id="wm" class="muted" style="margin-top: 8px; display: none; text-align: center;">Powered by Before/After</div>
       </div>
     `;
@@ -251,6 +251,7 @@
 
     // File handling
     dropzone.addEventListener('click', () => file.click());
+    dropzone.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' '){ e.preventDefault(); file.click(); }});
     
     dropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -335,9 +336,9 @@
     function renderSlider(root, before, after) {
       root.innerHTML = `
         <div style="position: relative; height: 100%">
-          <img src="${after}" alt="after" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
-          <img id="b" src="${before}" alt="before" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0)">
-          <div class="slider-control">
+          <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <img id="b" src="${before}" alt="Before image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0)">
+          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider">
             <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%);"></div>
           </div>
         </div>`;
@@ -372,6 +373,14 @@
         if (!isDragging) {
           updateSlider(e.clientX);
         }
+      });
+
+      const sliderCtl = root.querySelector('.slider-control');
+      sliderCtl.addEventListener('keydown', (e)=>{
+        const rect = root.getBoundingClientRect();
+        const current = parseFloat(r.style.left) || 50;
+        if (e.key === 'ArrowLeft'){ updateSlider(rect.left + (rect.width * Math.max(0,current-5)/100)); e.preventDefault(); }
+        if (e.key === 'ArrowRight'){ updateSlider(rect.left + (rect.width * Math.min(100,current+5)/100)); e.preventDefault(); }
       });
     }
 
