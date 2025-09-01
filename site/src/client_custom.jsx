@@ -401,15 +401,21 @@ function Dashboard({ token, onSignOut }) {
                     <option value="dark">dark</option>
                     <option value="light">light</option>
                   </Select>
-                  <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
-                  <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Current</Button>
-                  <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'light'))}>Copy Light</Button>
-                  <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'dark'))}>Copy Dark</Button>
-                  <Button variant="outline" onClick={async()=>{ const opposite = e.theme === 'dark' ? 'light' : 'dark'; const nid = `${e.id}-${opposite}`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ ...e, id: nid, theme: opposite, name: e.name ? `${e.name} (${opposite})` : nid }) }); fetchData(); }}>Duplicate to {" "}{e.theme === 'dark' ? 'light' : 'dark'}</Button>
-                  <a className="text-xs underline" target="_blank" rel="noreferrer" href={`/widget.html?embedId=${encodeURIComponent(e.id)}&theme=${encodeURIComponent(e.theme)}`}>Open</a>
+                  {/* Primary actions */}
                   <Button variant="outline" onClick={()=> { setEditModel({ ...e, variant: e.variant || 'card', radius: e.radius || '12px', shadow: e.shadow ?? 'true', border: e.border ?? 'true' }); setEditOpen(true); }}>Edit</Button>
                   <Button variant="outline" onClick={async()=>{ const nid = `${e.id}-copy`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({ ...e, id: nid, name: e.name || nid }) }); fetchData(); }}>Duplicate</Button>
                   <Button variant="outline" onClick={async()=>{ if (!confirm(`Delete embed ${e.id}?`)) return; const u = new URL('/api/client/embeds', location.origin); u.searchParams.set('id', e.id); await fetch(u.toString(), { method:'DELETE', headers:{ Authorization:`Bearer ${token}` } }); fetchData(); }}>Delete</Button>
+                  {/* Secondary actions collapsed in More */}
+                  <details className="ml-2">
+                    <summary className="cursor-pointer rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs text-white/80">More</summary>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
+                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Current</Button>
+                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'light'))}>Copy Light</Button>
+                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'dark'))}>Copy Dark</Button>
+                      <Button variant="outline" onClick={async()=>{ const opposite = e.theme === 'dark' ? 'light' : 'dark'; const nid = `${e.id}-${opposite}`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ ...e, id: nid, theme: opposite, name: e.name ? `${e.name} (${opposite})` : nid }) }); fetchData(); }}>Duplicate to {" "}{e.theme === 'dark' ? 'light' : 'dark'}</Button>
+                    </div>
+                  </details>
                 </div>
               </li>
             ))}
