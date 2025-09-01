@@ -17,7 +17,7 @@ function Docs() {
           {[
             ['#overview','Overview'],
             ['#quickstart','Quick Start'],
-            ['/app/dental.html','Dental Clinics'],
+            ['#choose-vertical','Choose your vertical'],
             ['#attributes','Attributes'],
             ['#examples','Examples'],
             ['#portal','Client Portal'],
@@ -29,6 +29,15 @@ function Docs() {
             <a key={href} href={href} className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-white hover:bg-white/20">{label}</a>
           ))}
         </nav>
+        <section id="choose-vertical" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Choose your vertical</h2>
+          <p className="mt-2 text-sm opacity-80">Pick a tailored onboarding:</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <a href="/app/dental.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Dental clinics</a>
+            <a href="#" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10 cursor-not-allowed opacity-60">Barbers (coming soon)</a>
+            <a href="#" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10 cursor-not-allowed opacity-60">Car detailing (coming soon)</a>
+          </div>
+        </section>
 
         <section id="overview" className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Overview</h2>
