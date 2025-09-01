@@ -48,6 +48,44 @@ function Docs() {
           </ol>
         </section>
 
+        <section id="dental-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Dental — Quick Setup (staff‑friendly)</h2>
+          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
+            <li>Open your website editor (e.g., WordPress) and navigate to the page where you want the demo.</li>
+            <li>Paste this snippet where the widget should appear:
+              <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
+  data-embed-id="your-embed-id"
+  data-theme="light"
+  data-max-width="640px"
+  data-align="center">
+</script>`}</Code>
+            </li>
+            <li>Save/publish the page and test: upload a selfie → Generate → move the slider.</li>
+          </ol>
+          <p className="mt-2 text-xs opacity-70">Tip: For strict security settings (CSP), add <code>data-variant="card"</code>.</p>
+        </section>
+
+        <section id="troubleshooting-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Dental — Troubleshooting</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
+            <li><b>Widget doesn’t show</b>: Ensure the script is pasted in the page content (not blocked by theme). Try the card variant for CSP pages.</li>
+            <li><b>Can’t upload</b>: Check image type (JPG/PNG) and size (&lt; 10MB).</li>
+            <li><b>“Cross‑origin/CORS” errors</b>: Use the card variant which isolates with iframe.</li>
+            <li><b>Style conflicts</b>: Shadow DOM version prevents theme styles leaking in. If conflicts persist, switch to card variant.</li>
+            <li><b>Not centered</b>: Set <code>data-align="center"</code> and a <code>data-max-width</code> like <code>640px</code>.</li>
+          </ul>
+        </section>
+
+        <section id="best-practices-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Dental — Best Practices</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
+            <li>Place the widget near a clear call‑to‑action (e.g., “Book whitening consult”).</li>
+            <li>Use supportive copy: “This preview is illustrative and not a medical guarantee.”</li>
+            <li>Offer a private demo page for staff to test without affecting your homepage.</li>
+            <li>Encourage patients to use a well‑lit selfie facing the camera for best results.</li>
+          </ul>
+        </section>
+
         <section id="overview" className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Overview</h2>
           <p className="mt-2 text-sm opacity-80">The Before/After widget lets customers upload a photo and preview an AI‑generated after result (barber, dental, auto detailing, and more). You can embed it on any site with one script tag.</p>
