@@ -14,9 +14,13 @@
   if (background === 'transparent') {
     document.body.style.background = 'transparent';
     document.documentElement.style.background = 'transparent';
+    const root = document.querySelector('.widget-root');
+    if (root) { root.style.background = 'transparent'; root.style.border = '0'; root.style.boxShadow = 'none'; }
   } else if (background === 'inherit') {
     document.body.style.background = 'inherit';
     document.documentElement.style.background = 'inherit';
+    const root = document.querySelector('.widget-root');
+    if (root) { root.style.background = 'inherit'; }
   }
 
   // Handle content-only mode and header hiding
@@ -57,7 +61,8 @@
 
   // Ensure both images render in the same panel gracefully
   function updateClip(percent){
-    afterWrapper.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+    // After should reveal from the right (Before left, After right)
+    afterWrapper.style.clipPath = `inset(0 0 0 ${100 - percent}%)`;
   }
   slider.addEventListener('input', () => {
     const percent = Number(slider.value);
