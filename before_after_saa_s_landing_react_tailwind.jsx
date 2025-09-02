@@ -293,7 +293,7 @@ export default function BeforeAfterLanding() {
             {[
               { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/>, link: null },
               { title: "Dental clinics", desc: "Project whitening, veneers, or aligner results from a selfie.", icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
-              { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/>, link: null },
+              { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
             ].map((f, i) => (
               f.link ? (
                 <a key={i} href={f.link} className="block transition hover:scale-[1.01]" target="_top">

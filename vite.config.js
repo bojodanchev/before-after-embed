@@ -21,6 +21,7 @@ export default defineConfig({
         pricing: resolve(__dirname, 'site/pricing.html'),
         docs: resolve(__dirname, 'site/docs.html'),
         dental: resolve(__dirname, 'site/dental.html'),
+        detailing: resolve(__dirname, 'site/detailing.html'),
         terms: resolve(__dirname, 'site/terms.html'),
         privacy: resolve(__dirname, 'site/privacy.html'),
       },
