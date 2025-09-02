@@ -86,6 +86,19 @@ function Docs() {
           </ul>
         </section>
 
+        <section id="best-practices-detailing" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Auto Detailing — Best Practices</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
+            <li>Place the widget near your service CTA (e.g., “Book paint correction”).</li>
+            <li>Add a short note: “Preview is illustrative; final results depend on vehicle condition.”</li>
+            <li>Use clean, well‑lit exterior photos; avoid extreme angles or heavy shadows.</li>
+            <li>Highlight problem areas (swirls, light scratches) in the before photo for a clearer preview.</li>
+            <li>For strict security policies, use the card variant: <code>data-variant="card"</code>.</li>
+            <li>Center the widget with <code>data-align="center</code> and set <code>data-max-width</code> (e.g., <code>720px</code>).</li>
+            <li>Prefer the dark theme for contrast on automotive sites: <code>data-theme="dark"</code>.</li>
+          </ul>
+        </section>
+
         <section id="overview" className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Overview</h2>
           <p className="mt-2 text-sm opacity-80">The Before/After widget lets customers upload a photo and preview an AI‑generated after result (barber, dental, auto detailing, and more). You can embed it on any site with one script tag.</p>
