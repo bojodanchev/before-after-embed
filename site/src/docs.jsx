@@ -35,7 +35,7 @@ function Docs() {
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <a href="/app/dental.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Dental clinics</a>
             <a href="#" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10 cursor-not-allowed opacity-60">Barbers (coming soon)</a>
-            <a href="#" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10 cursor-not-allowed opacity-60">Car detailing (coming soon)</a>
+            <a href="/app/detailing.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Car detailing</a>
           </div>
         </section>
 
@@ -63,6 +63,23 @@ function Docs() {
             <li>Save/publish the page and test: upload a selfie → Generate → move the slider.</li>
           </ol>
           <p className="mt-2 text-xs opacity-70">Tip: For strict security settings (CSP), add <code>data-variant="card"</code>.</p>
+        </section>
+
+        <section id="detailing-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Auto Detailing — Quick Setup (staff‑friendly)</h2>
+          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
+            <li>Open your website editor (e.g., WordPress) and navigate to the page where you want the visualizer.</li>
+            <li>Paste this snippet where the widget should appear:
+              <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
+  data-embed-id="your-embed-id"
+  data-theme="dark"
+  data-max-width="720px"
+  data-align="center">
+</script>`}</Code>
+            </li>
+            <li>Save/publish the page and test: upload a car photo → Generate → move the slider.</li>
+          </ol>
+          <p className="mt-2 text-xs opacity-70">Tip: For strict security policies (CSP), use the card variant: <code>data-variant="card"</code>.</p>
         </section>
 
         <section id="troubleshooting-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
