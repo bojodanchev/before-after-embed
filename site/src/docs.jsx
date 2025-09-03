@@ -34,7 +34,7 @@ function Docs() {
           <p className="mt-2 text-sm opacity-80">Pick a tailored onboarding:</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
             <a href="/app/dental.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Dental clinics</a>
-            <a href="#" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10 cursor-not-allowed opacity-60">Barbers (coming soon)</a>
+            <a href="/app/barber.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Barbers</a>
             <a href="/app/detailing.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Car detailing</a>
           </div>
         </section>
@@ -82,6 +82,23 @@ function Docs() {
           <p className="mt-2 text-xs opacity-70">Tip: For strict security policies (CSP), use the card variant: <code>data-variant="card"</code>.</p>
         </section>
 
+        <section id="barber-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Barbers — Quick Setup (staff‑friendly)</h2>
+          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
+            <li>Open your website editor and go to the page where you want the preview.</li>
+            <li>Paste this snippet where the widget should appear:
+              <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
+  data-embed-id="your-embed-id"
+  data-theme="light"
+  data-max-width="640px"
+  data-align="center">
+</script>`}</Code>
+            </li>
+            <li>Save/publish the page and test: upload a selfie → Generate → move the slider.</li>
+          </ol>
+          <p className="mt-2 text-xs opacity-70">Tip: If your site has strict security (CSP), use the card variant: <code>data-variant="card"</code>.</p>
+        </section>
+
         <section id="troubleshooting-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Dental — Troubleshooting</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
@@ -113,6 +130,18 @@ function Docs() {
             <li>For strict security policies, use the card variant: <code>data-variant="card"</code>.</li>
             <li>Center the widget with <code>data-align="center</code> and set <code>data-max-width</code> (e.g., <code>720px</code>).</li>
             <li>Prefer the dark theme for contrast on automotive sites: <code>data-theme="dark"</code>.</li>
+          </ul>
+        </section>
+
+        <section id="best-practices-barber" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Barbers — Best Practices</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
+            <li>Place the widget near the booking CTA (e.g., “Book haircut”).</li>
+            <li>Add a short note: “Preview is illustrative; the final cut depends on hair type.”</li>
+            <li>Use front‑facing, well‑lit selfies; avoid hats and heavy shadows.</li>
+            <li>Offer quick presets: fade levels (low/mid/high), beard length/outline, and fringe options.</li>
+            <li>Center with <code>data-align="center"</code> and set <code>data-max-width</code> (e.g., <code>640px</code>).</li>
+            <li>Use light or dark theme to match your site; start with <code>data-theme="light"</code>.</li>
           </ul>
         </section>
 
