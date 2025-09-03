@@ -22,6 +22,7 @@ export default defineConfig({
         docs: resolve(__dirname, 'site/docs.html'),
         dental: resolve(__dirname, 'site/dental.html'),
         detailing: resolve(__dirname, 'site/detailing.html'),
+        barber: resolve(__dirname, 'site/barber.html'),
         terms: resolve(__dirname, 'site/terms.html'),
         privacy: resolve(__dirname, 'site/privacy.html'),
       },

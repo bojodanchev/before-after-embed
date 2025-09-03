@@ -291,7 +291,7 @@ export default function BeforeAfterLanding() {
           />
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {[
-              { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/>, link: null },
+              { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/>, link: "/app/barber.html" },
               { title: "Dental clinics", desc: "Project whitening, veneers, or aligner results from a selfie.", icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
               { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
             ].map((f, i) => (
