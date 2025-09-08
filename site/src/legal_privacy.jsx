@@ -23,8 +23,10 @@ function Privacy(){
           </ul>
           <h2>How we use data</h2>
           <p>To provide the service, troubleshoot, protect against abuse, and measure usage. We do not sell personal data.</p>
+          <h2>Image processing</h2>
+          <p>Images are transmitted to our model provider (fal.ai) for processing. The provider returns a URL for the edited image which may be hosted on provider infrastructure or a CDN. We do not use uploaded images to train models.</p>
           <h2>Storage & retention</h2>
-          <p>Operational data may be stored in third‑party infrastructure (e.g., Vercel, storage/CDN). Images are retained only as needed for the preview experience.</p>
+          <p>Operational data may be stored in third‑party infrastructure (e.g., Vercel, Redis/KV, storage/CDN). Uploaded images and outputs are retained only as needed to render previews and are not persisted by us beyond short‑term caching. Links may remain accessible while cached by the provider/CDN.</p>
           <h2>Security</h2>
           <p>We use access controls, least‑privilege credentials, and audit logs. Nevertheless, no system is 100% secure; use at your own risk.</p>
           <h2>Your rights</h2>
@@ -38,5 +40,4 @@ function Privacy(){
 }
 
 createRoot(document.getElementById('root')).render(<Privacy />);
-
 

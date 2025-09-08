@@ -26,6 +26,7 @@ async function safeError(res) {
   try { const j = await res.json(); return j?.error || j?.message || `${res.status}`; } catch { return `${res.status} ${res.statusText}`; }
 }
 
+const EMBED_SCRIPT_URL = import.meta.env.VITE_EMBED_SCRIPT_URL || 'https://before-after-embed.vercel.app/embed.js';
 const buildEmbedSnippet = (embedId, preset, theme, opt={}) => {
   const defaults = {
     maxWidth: '640px',
@@ -39,7 +40,7 @@ const buildEmbedSnippet = (embedId, preset, theme, opt={}) => {
   const o = Object.assign({}, defaults, opt);
   const attrs = [
     `async`,
-    `src="https://before-after-embed.vercel.app/embed.js"`,
+    `src="${EMBED_SCRIPT_URL}"`,
     `data-embed-id="${embedId || "your-embed-id"}"`,
     `data-theme="${theme}"`,
     `data-variant="${preset}"`,
@@ -604,14 +605,22 @@ function Dashboard({ token, onSignOut }) {
             <div className="text-sm text-white/70">No stats yet.</div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
                 <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
                   <div className="text-2xl font-semibold">{stats?.totals?.overall ?? 0}</div>
-                  <div className="text-xs opacity-70">Total events</div>
+                  <div className="text-xs opacity-70">Generations</div>
                 </div>
                 <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
                   <div className="text-2xl font-semibold">{stats?.last24h?.overall ?? 0}</div>
-                  <div className="text-xs opacity-70">Events (24h)</div>
+                  <div className="text-xs opacity-70">Generations (24h)</div>
+                </div>
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.clientTotals?.overall ?? 0}</div>
+                  <div className="text-xs opacity-70">Client renders</div>
+                </div>
+                <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
+                  <div className="text-2xl font-semibold">{stats?.clientLast24h?.overall ?? 0}</div>
+                  <div className="text-xs opacity-70">Client renders (24h)</div>
                 </div>
                 <div className="rounded-md border border-white/10 bg-black/20 p-3 text-center">
                   <div className="text-2xl font-semibold">{stats?.plan?.monthlyGenerations ?? 0}</div>

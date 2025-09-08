@@ -18,7 +18,7 @@ function Terms(){
           <h2>2. Acceptable use</h2>
           <p>No unlawful content; no images of minors; no infringement of third-party rights. You must have the consent of individuals whose images you upload.</p>
           <h2>3. Your data</h2>
-          <p>Images you upload are processed to produce an edited output. We store minimal metadata for analytics and billing. See the Privacy Policy for details.</p>
+          <p>Images you upload are processed to produce an edited output. We store minimal metadata for analytics and billing. See the Privacy Policy for details. You grant us and our subprocessors (including fal.ai) a limited license to process uploads for the sole purpose of providing the service.</p>
           <h2>4. Plans & billing</h2>
           <p>Usage limits and entitlements are defined per plan. Exceeding limits may require a top‑up or plan upgrade.</p>
           <h2>5. Warranties & liability</h2>
@@ -36,5 +36,4 @@ function Terms(){
 }
 
 createRoot(document.getElementById('root')).render(<Terms />);
-
 

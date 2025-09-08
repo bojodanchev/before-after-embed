@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings, handleCorsPreflight, setCorsHeaders } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings, handleCorsPreflight, setCorsHeaders, bumpCounter } from "./_shared.js";
 
 export const config = {
   api: {
@@ -12,7 +12,7 @@ export default async function handler(req, res){
   if (handleCorsPreflight(req, res)) return;
 
   // Set CORS headers for all requests
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   if (req.method !== 'POST') {
     console.log('Method not allowed:', req.method);
@@ -45,8 +45,28 @@ export default async function handler(req, res){
     const file = Array.isArray(fileObj) ? fileObj[0] : fileObj;
     if (!file) return res.status(400).json({ error: "Missing image file under field 'image'" });
 
+    // Basic file type validation
+    const allowed = ['image/jpeg','image/png','image/webp','image/heic','image/heif'];
+    const mime = (file.mimetype || '').toLowerCase();
+    if (!allowed.includes(mime)){
+      return res.status(415).json({ error: 'Unsupported media type. Please upload JPG, PNG, WEBP, or HEIC images.' });
+    }
+
+    // Lightweight rate limiting per IP + embed (per minute window via rolling key)
+    try{
+      const ip = ((req.headers['x-forwarded-for'] || '') + '').split(',')[0].trim() || 'unknown';
+      const now = new Date();
+      const minute = now.toISOString().slice(0,16).replace(':',''); // YYYY-MM-DDTHHMM
+      const rlKey = `rl:edit:${embedId}:${ip}:${minute}`;
+      const limit = Number(process.env.RATE_LIMIT_PER_MINUTE || 30);
+      const count = await bumpCounter(rlKey, 1);
+      if (Number.isFinite(limit) && count > limit){
+        try{ await logUsage('rate_limited', embedId, { ip }); }catch{}
+        return res.status(429).json({ error: 'Too many requests. Please slow down.' });
+      }
+    }catch(_e){}
+
     const buffer = await fsReadFile(file.filepath);
-    const mime = file.mimetype || 'image/png';
     const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
 
     const chosenVertical = verticalField || embedConfig?.vertical || 'barber';

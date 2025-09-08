@@ -5,7 +5,7 @@ export default async function handler(req, res){
   if (handleCorsPreflight(req, res)) return;
 
   // Set CORS headers for all requests
-  setCorsHeaders(res);
+  setCorsHeaders(req, res);
 
   // Allow both GET and POST methods
   if (req.method !== 'GET' && req.method !== 'POST') {

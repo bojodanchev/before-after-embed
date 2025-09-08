@@ -96,6 +96,7 @@ function currentMonth(){
 
 export function buildSnippet(embedId, opts){
   const o = Object.assign({ theme:'light', variant:'compact', maxWidth:'640px', align:'center', radius:'14px', shadow:'true', border:'true', width:'100%', height:'460px' }, opts||{});
+  const scriptUrl = (process.env.EMBED_SCRIPT_URL || 'https://before-after-embed.vercel.app/embed.js').trim();
   const attrs = Object.entries({
     'data-embed-id': embedId,
     'data-theme': o.theme,
@@ -108,7 +109,7 @@ export function buildSnippet(embedId, opts){
     'data-width': o.width,
     'data-height': o.height,
   }).map(([k,v])=> `${k}="${v}"`).join(' ');
-  return `<script async src="https://before-after-embed.vercel.app/embed.js" ${attrs}></script>`;
+  return `<script async src="${scriptUrl}" ${attrs}></script>`;
 }
 
 export async function setEmbedConfig(config){
@@ -454,18 +455,60 @@ export async function listEmbedsForClient(clientId){
 }
 
 // CORS utility functions
-export function setCorsHeaders(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+function parseAllowedOrigins(){
+  const raw = (process.env.ALLOWED_ORIGINS || '*').toString().trim();
+  if (!raw || raw === '*') return '*';
+  return raw.split(',').map(s=> s.trim()).filter(Boolean);
+}
+
+function requestOrigin(req){
+  const o = (req.headers?.origin || '').toString();
+  if (o) return o;
+  const ref = (req.headers?.referer || '').toString();
+  try{ if (ref){ const u = new URL(ref); return `${u.protocol}//${u.host}`; } }catch{}
+  return '';
+}
+
+export function setCorsHeaders(req, res) {
+  const allow = parseAllowedOrigins();
+  const origin = requestOrigin(req);
+  const allowedOrigin = (allow === '*') ? '*' : (allow.includes(origin) ? origin : '');
+  if (allowedOrigin) res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
 
 export function handleCorsPreflight(req, res) {
   if (req.method === 'OPTIONS') {
-    setCorsHeaders(res);
+    setCorsHeaders(req, res);
+    const allow = parseAllowedOrigins();
+    const origin = requestOrigin(req);
+    if (allow !== '*' && !allow.includes(origin)){
+      return res.status(403).end();
+    }
     return res.status(200).end();
   }
   return false;
+}
+
+// Simple counters for rate limiting / metrics
+const memoryCounters = new Map();
+export async function bumpCounter(key, by){
+  try{
+    if (USE_REST){
+      const r = await kvRestIncr(key, by || 1);
+      const v = (r && r.result) != null ? Number(r.result) : 0;
+      return Number.isFinite(v) ? v : 0;
+    }
+    if (kvClient){
+      const v = await kvClient.incrby(key, by || 1);
+      return Number(v || 0);
+    }
+  }catch{}
+  const v = (memoryCounters.get(key) || 0) + (by || 1);
+  memoryCounters.set(key, v);
+  return v;
 }
 
 export { fal };
