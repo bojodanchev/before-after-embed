@@ -1,4 +1,4 @@
-import { getClientByToken, getClientByEmail, createClient, createLoginToken } from "../_shared.js";
+import { getClientByToken, getClientByEmail, createClient, createLoginToken, consumeLoginToken, getClientById } from "../_shared.js";
 import nodemailer from 'nodemailer';
 
 function extractToken(req){
@@ -9,7 +9,38 @@ function extractToken(req){
 }
 
 export default async function handler(req, res){
+  // GET with one-time login token ?t=... performs redirect
+  if (req.method === 'GET'){
+    const t = (req.query?.t || '').toString().trim();
+    if (t){
+      try{
+        const clientId = await consumeLoginToken(t);
+        if (!clientId) return res.status(400).send('Invalid or expired token');
+        const client = await getClientById(clientId);
+        if (!client || !client.token) return res.status(500).send('Client not found');
+        const origin = req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']
+          ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+          : '';
+        const url = `${origin}/client.html?token=${encodeURIComponent(client.token)}`;
+        res.writeHead(302, { Location: url });
+        return res.end();
+      }catch(e){ return res.status(500).send('Server error'); }
+    }
+    // Fallback: GET /api/client/me returns current client when authenticated
+    const token = extractToken(req);
+    const client = await getClientByToken(token);
+    if (!client) return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(200).json({ client });
+  }
+
   if (req.method === 'POST'){
+    if ((req.query?.action || '').toString() === 'logout'){
+      // Client holds the token; server acknowledges logout. (Optional server-side revocation in future.)
+      const token = extractToken(req);
+      const client = await getClientByToken(token);
+      if (!client) return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(200).json({ ok: true });
+    }
     const email = (req.body?.email || '').toString().trim();
     if (!email) return res.status(400).json({ error: 'email required' });
     let client = await getClientByEmail(email);
@@ -26,7 +57,7 @@ export default async function handler(req, res){
       : '';
     // Create one-time login token and email a redirect link that exchanges it for the session token
     const oneTime = await createLoginToken(client.id, Number(process.env.LOGIN_TOKEN_TTL || 900));
-    const link = `${origin}/api/client/login?t=${encodeURIComponent(oneTime)}`;
+    const link = `${origin}/api/client/me?t=${encodeURIComponent(oneTime)}`;
     try{
       const transport = makeTransport();
       if (transport){
@@ -40,10 +71,7 @@ export default async function handler(req, res){
     }catch(e){ console.error('Email send failed:', e?.message || e); }
     return res.status(200).json({ ok: true });
   }
-  const token = extractToken(req);
-  const client = await getClientByToken(token);
-  if (!client) return res.status(401).json({ error: 'Unauthorized' });
-  res.status(200).json({ client });
+  res.status(405).json({ error: 'Method not allowed' });
 }
 
 function makeTransport(){

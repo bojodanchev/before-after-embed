@@ -679,7 +679,7 @@ function AppWrapper() {
   const [token, setToken] = useToken();
   if (!token) return <SignIn />;
   const onSignOut = async () => {
-    try{ await fetch('/api/client/logout', { method:'POST', headers:{ Authorization: `Bearer ${token}` } }); }catch{}
+    try{ await fetch('/api/client/me?action=logout', { method:'POST', headers:{ Authorization: `Bearer ${token}` } }); }catch{}
     setToken("");
     window.location.href = "/app/client.html";
   };
