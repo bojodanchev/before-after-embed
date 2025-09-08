@@ -24,6 +24,14 @@ const PRICE_MAP = {
 export default async function handler(req, res){
   const stripe = getStripe();
   if (!stripe) return res.status(500).json({ error: 'Stripe not configured' });
+  // Guard: prevent test keys in production
+  try{
+    const env = (process.env.VERCEL_ENV || process.env.NODE_ENV || '').toString();
+    const rawKey = (process.env.STRIPE_SECRET_KEY || '').trim();
+    if ((env === 'production' || env === 'prod') && rawKey.startsWith('sk_test_')){
+      return res.status(500).json({ error: 'Stripe test key detected in production. Configure live keys.' });
+    }
+  }catch{}
 
   // Parse path after /api/billing
   let pathname = '';
@@ -141,4 +149,3 @@ async function getRawBody(req){
     }catch(e){ reject(e); }
   });
 }
-

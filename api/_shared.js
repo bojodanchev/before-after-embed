@@ -51,6 +51,7 @@ const memoryEmbeds = {
 const memoryUsage = [];
 const memoryClients = {};
 const memoryClientEmbeds = {}; // clientId -> Set<embedId>
+const memoryLoginTokens = new Map(); // loginToken -> { clientId, exp, used }
 
 function isKvEnabled(){
   return Boolean(USE_REST || process.env.KV_URL || kvClient);
@@ -82,6 +83,19 @@ async function kvRestLrange(key, start, stop){
 
 async function kvRestIncr(key, by){
   return kvRest(`/incrby/${encodeURIComponent(key)}/${by}`);
+}
+
+async function kvRestSetex(key, value, seconds){
+  const encoded = encodeURIComponent(value);
+  return kvRest(`/setex/${encodeURIComponent(key)}/${seconds}/${encoded}`);
+}
+
+async function kvRestGet(key){
+  return kvRest(`/get/${encodeURIComponent(key)}`);
+}
+
+async function kvRestDel(key){
+  return kvRest(`/del/${encodeURIComponent(key)}`);
 }
 
 function today(){
@@ -426,6 +440,38 @@ export async function getClientByToken(token){
     }
   }
   for (const c of Object.values(memoryClients)) if (c.token === token) return c;
+  return null;
+}
+
+// ===== One-time login tokens =====
+export async function createLoginToken(clientId, ttlSeconds = 900){
+  const t = `lt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,10)}`;
+  const key = `clients:login:${t}`;
+  try{
+    if (USE_REST){ await kvRestSetex(key, clientId, ttlSeconds); return t; }
+    if (kvClient){ await kvClient.set(key, clientId, { ex: ttlSeconds }); return t; }
+  }catch{}
+  memoryLoginTokens.set(t, { clientId, exp: Date.now() + ttlSeconds*1000, used: false });
+  return t;
+}
+
+export async function consumeLoginToken(loginToken){
+  if (!loginToken) return null;
+  const key = `clients:login:${loginToken}`;
+  // KV paths
+  try{
+    if (USE_REST){
+      const r = await kvRestGet(key);
+      const clientId = r && r.result ? String(r.result) : '';
+      if (clientId){ try{ await kvRestDel(key); }catch{} return clientId; }
+    } else if (kvClient){
+      const clientId = await kvClient.get(key);
+      if (clientId){ try{ await kvClient.del(key); }catch{} return String(clientId); }
+    }
+  }catch{}
+  // Memory path
+  const rec = memoryLoginTokens.get(loginToken);
+  if (rec && !rec.used && Date.now() < rec.exp){ rec.used = true; return rec.clientId; }
   return null;
 }
 

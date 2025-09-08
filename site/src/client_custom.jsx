@@ -678,9 +678,12 @@ function Dashboard({ token, onSignOut }) {
 function AppWrapper() {
   const [token, setToken] = useToken();
   if (!token) return <SignIn />;
-  return (
-    <Dashboard token={token} onSignOut={() => { setToken(""); window.location.href = "/app/client.html"; }} />
-  );
+  const onSignOut = async () => {
+    try{ await fetch('/api/client/logout', { method:'POST', headers:{ Authorization: `Bearer ${token}` } }); }catch{}
+    setToken("");
+    window.location.href = "/app/client.html";
+  };
+  return (<Dashboard token={token} onSignOut={onSignOut} />);
 }
 
 /* ===============================================================

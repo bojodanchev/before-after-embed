@@ -1,4 +1,4 @@
-import { getClientByToken, getClientByEmail, createClient } from "../_shared.js";
+import { getClientByToken, getClientByEmail, createClient, createLoginToken } from "../_shared.js";
 import nodemailer from 'nodemailer';
 
 function extractToken(req){
@@ -24,7 +24,9 @@ export default async function handler(req, res){
     const origin = req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']
       ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
       : '';
-    const link = `${origin}/client.html?token=${encodeURIComponent(client.token)}`;
+    // Create one-time login token and email a redirect link that exchanges it for the session token
+    const oneTime = await createLoginToken(client.id, Number(process.env.LOGIN_TOKEN_TTL || 900));
+    const link = `${origin}/api/client/login?t=${encodeURIComponent(oneTime)}`;
     try{
       const transport = makeTransport();
       if (transport){
