@@ -13,10 +13,9 @@ export default async function handler(req, res){
   if (!client) return res.status(401).json({ error: 'Unauthorized' });
   const embedId = (req.query?.embedId || '').toString().trim();
   if (!embedId) return res.status(400).json({ error: 'embedId required' });
-  // Do not block reads strictly by ownership to avoid confusion during setup.
-  // If you need strict tenancy, re-enable the check below.
-  // const allowed = (await listEmbedsForClient(client.id)).some(e=> e.id === embedId);
-  // if (!allowed) return res.status(403).json({ error: 'Forbidden' });
+  // Enforce strict tenancy: client may only read usage for owned embeds
+  const allowed = (await listEmbedsForClient(client.id)).some(e=> e.id === embedId);
+  if (!allowed) return res.status(403).json({ error: 'Forbidden' });
   res.setHeader('Cache-Control', 'no-store');
   let events = await listUsage(embedId, 100);
   if (!events || events.length === 0){

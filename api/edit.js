@@ -26,8 +26,9 @@ export default async function handler(req, res){
       form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
     });
     
-    console.log('Parsed fields:', Object.keys(fields));
-    console.log('Parsed files:', Object.keys(files));
+    // Parsed field/file keys available for debugging; avoid verbose logs in production
+    // console.debug('Parsed fields:', Object.keys(fields));
+    // console.debug('Parsed files:', Object.keys(files));
 
     let embedId = (fields.embedId?.toString() || '').trim();
     if (!embedId) embedId = 'anonymous';
@@ -134,8 +135,8 @@ export default async function handler(req, res){
     }
     // Also log a client_render to drive analytics without requiring a separate endpoint
     try { await logUsage('client_render', embedId, { from: 'server_after_success' }); } catch {}
-    // optional webhook
-    try { await deliverWebhook(embedId, { type:'render', embedId, outputUrl, ts: Date.now(), vertical: chosenVertical, treatment: options?.treatment }); } catch {}
+    // optional webhook (deliver to clientId, not embedId)
+    try { if (embedClientId) { await deliverWebhook(embedClientId, { type:'render', embedId, outputUrl, ts: Date.now(), vertical: chosenVertical, treatment: options?.treatment }); } } catch {}
 
     // Watermark: required by plan or opted-in via settings (poweredBy)
     let watermark = false;

@@ -11,8 +11,8 @@ function extractToken(req){
 
 function requireAdmin(req, res){
   const token = extractToken(req);
-  const candidates = [ (process.env.ADMIN_TOKEN || '').trim(), 'super-admin-token-please-change' ].filter(Boolean);
-  if (!token || !candidates.includes(token)){
+  const admin = (process.env.ADMIN_TOKEN || '').trim();
+  if (!token || !admin || token !== admin){
     res.status(401).json({ error: 'Unauthorized' });
     return false;
   }
@@ -89,7 +89,7 @@ export default async function handler(req, res){
       const totals = { overall: 0, byEmbed: {} };
       const last24h = { overall: 0, byEmbed: {} };
       for (const evt of events){
-        if (evt.event === 'edit_success' || evt.event === 'client_render'){
+        if (evt.event === 'edit_success'){
           totals.overall += 1; totals.byEmbed[evt.embedId] = (totals.byEmbed[evt.embedId] || 0) + 1;
           if (evt.ts && (now - evt.ts) <= 24*60*60*1000){ last24h.overall += 1; last24h.byEmbed[evt.embedId] = (last24h.byEmbed[evt.embedId] || 0) + 1; }
         }
@@ -129,5 +129,4 @@ export default async function handler(req, res){
     res.status(500).json({ error: 'Server error', message: err?.message || '' });
   }
 }
-
 

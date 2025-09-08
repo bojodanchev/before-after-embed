@@ -19,7 +19,7 @@ export default async function handler(req, res){
   for (const id of ids){
     const events = await listUsage(id, 500);
     for (const evt of events){
-      if (evt.event === 'edit_success' || evt.event === 'client_render'){
+      if (evt.event === 'edit_success'){
         totals.overall += 1; totals.byEmbed[id] = (totals.byEmbed[id] || 0) + 1;
         if (evt.ts && (now - evt.ts) <= 24*60*60*1000){ last24h.overall += 1; last24h.byEmbed[id] = (last24h.byEmbed[id] || 0) + 1; }
       }

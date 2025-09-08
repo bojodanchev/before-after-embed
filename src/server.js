@@ -118,13 +118,43 @@ app.post("/api/edit", upload.single("image"), async (req, res) => {
 
     const vertical = (req.body.vertical?.toString().trim().toLowerCase() || embedConfig.vertical || "");
 
+    // Collect vertical-specific options from form fields (opt_*)
+    const options = Object.fromEntries(
+      Object.entries(req.body || {})
+        .filter(([k]) => k && k.toString().startsWith('opt_'))
+        .map(([k, v]) => [k.slice(4), (v?.toString() || '').trim().toLowerCase()])
+    );
+
     if (!req.file) {
       return res.status(400).json({ error: "Missing image file under field 'image'" });
     }
 
     const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-    const effectivePrompt = [verticalPromptPresets[vertical] || null, prompt || null]
+    function optionPromptFor(v, opts){
+      const vv = (v || '').toLowerCase();
+      if (vv === 'barber'){
+        const style = opts.style;
+        if (style === 'fade') return 'High-contrast skin fade: sides and back tapered down to skin around ears and nape with a clean blend up into longer top; keep natural hairline, expose ears, and avoid altering beard or face.';
+        if (style === 'buzz') return 'Buzz cut with even length across the scalp; neat edges and natural texture.';
+        if (style === 'undercut') return 'Undercut: short sides and back with longer top; clean contrast between lengths.';
+        if (style === 'pompadour') return 'Pompadour hairstyle with volume at the front, smooth sides, and polished finish.';
+      }
+      if (vv === 'dental'){
+        const treatment = opts.treatment;
+        if (treatment === 'whitening') return 'Избелване на зъбите до естествено, но по-светло ниво; запазете текстурата на емайла и реалистичния вид.';
+        if (treatment === 'alignment') return 'Деликатно подравняване за по-равна усмивка без промяна на лицевата идентичност; запазете естествените контури.';
+        if (treatment === 'veneers') return 'Фасети с естествен вид: подобрена форма и нюанс, без прекомерно избелване; поддържайте реалистичен блясък.';
+      }
+      if (vv === 'detailing'){
+        const focus = opts.focus;
+        if (focus === 'interior') return 'Focus on car interior: deep-clean upholstery, remove stains, crisp textures, subtle matte finish.';
+        if (focus === 'exterior') return 'Focus on car exterior: glossy paint, remove swirls and minor scratches, sharp reflections.';
+      }
+      return '';
+    }
+
+    const effectivePrompt = [verticalPromptPresets[vertical] || null, optionPromptFor(vertical, options) || null, prompt || null]
       .filter(Boolean)
       .join(" ");
 
@@ -186,5 +216,4 @@ app.post("/api/usage", (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);
 });
-
 

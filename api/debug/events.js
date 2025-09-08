@@ -12,8 +12,8 @@ function extractToken(req){
 export default async function handler(req, res){
   // Gate behind ADMIN_TOKEN to avoid exposing raw events publicly
   const token = extractToken(req);
-  const candidates = [ (process.env.ADMIN_TOKEN || '').trim(), 'super-admin-token-please-change' ].filter(Boolean);
-  if (!token || !candidates.includes(token)){
+  const admin = (process.env.ADMIN_TOKEN || '').trim();
+  if (!token || !admin || token !== admin){
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -25,5 +25,4 @@ export default async function handler(req, res){
   res.setHeader('Cache-Control','no-store');
   res.status(200).json({ events: sorted, storage: getStorageMode() });
 }
-
 

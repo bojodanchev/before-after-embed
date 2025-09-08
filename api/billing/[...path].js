@@ -43,15 +43,18 @@ export default async function handler(req, res){
       // Free plan: bypass Stripe, set immediately
       if (planId === 'free' || !price || price === 'free'){
         try{ await setClientPlan(client.id, 'free'); }catch{}
-        const url = `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`;
+        const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
+          ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+          : (req.headers.origin || '');
+        const url = `${origin}/app/client.html?token=${encodeURIComponent(token)}`;
         return res.status(200).json({ url, bypass: true });
       }
 
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         line_items: [{ price, quantity: 1 }],
-        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}&success=1&plan=${encodeURIComponent(planId)}`,
-        cancel_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        success_url: `${(req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']) ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : (req.headers.origin || '')}/app/client.html?token=${encodeURIComponent(token)}&success=1&plan=${encodeURIComponent(planId)}`,
+        cancel_url: `${(req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']) ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : (req.headers.origin || '')}/app/client.html?token=${encodeURIComponent(token)}`,
         metadata: { clientId: client.id, planId },
       });
       return res.status(200).json({ url: session.url });
@@ -64,7 +67,10 @@ export default async function handler(req, res){
       const client = await getClientByToken(token);
       if (!client) return res.status(401).json({ error: 'Unauthorized' });
       const { customerId } = req.body || {};
-      const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}` });
+      const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
+        ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+        : (req.headers.origin || '');
+      const session = await stripe.billingPortal.sessions.create({ customer: customerId, return_url: `${origin}/app/client.html?token=${encodeURIComponent(token)}` });
       return res.status(200).json({ url: session.url });
     }catch(e){ return res.status(500).json({ error: e?.message || 'Portal failed' }); }
   }
@@ -81,8 +87,8 @@ export default async function handler(req, res){
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [{ price, quantity: n }],
-        success_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}&success=1&topup=${n*100}`,
-        cancel_url: `${req.headers.origin || ''}/app/client.html?token=${encodeURIComponent(token)}`,
+        success_url: `${(req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']) ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : (req.headers.origin || '')}/app/client.html?token=${encodeURIComponent(token)}&success=1&topup=${n*100}`,
+        cancel_url: `${(req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host']) ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : (req.headers.origin || '')}/app/client.html?token=${encodeURIComponent(token)}`,
         metadata: { clientId: client.id, topup: String(n * 100) },
       });
       return res.status(200).json({ url: session.url });
@@ -135,5 +141,4 @@ async function getRawBody(req){
     }catch(e){ reject(e); }
   });
 }
-
 
