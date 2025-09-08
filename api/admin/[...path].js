@@ -88,13 +88,19 @@ export default async function handler(req, res){
       const events = await listUsage(undefined, 1000);
       const totals = { overall: 0, byEmbed: {} };
       const last24h = { overall: 0, byEmbed: {} };
+      const clientTotals = { overall: 0, byEmbed: {} };
+      const clientLast24h = { overall: 0, byEmbed: {} };
       for (const evt of events){
         if (evt.event === 'edit_success'){
           totals.overall += 1; totals.byEmbed[evt.embedId] = (totals.byEmbed[evt.embedId] || 0) + 1;
           if (evt.ts && (now - evt.ts) <= 24*60*60*1000){ last24h.overall += 1; last24h.byEmbed[evt.embedId] = (last24h.byEmbed[evt.embedId] || 0) + 1; }
         }
+        if (evt.event === 'client_render'){
+          clientTotals.overall += 1; clientTotals.byEmbed[evt.embedId] = (clientTotals.byEmbed[evt.embedId] || 0) + 1;
+          if (evt.ts && (now - evt.ts) <= 24*60*60*1000){ clientLast24h.overall += 1; clientLast24h.byEmbed[evt.embedId] = (clientLast24h.byEmbed[evt.embedId] || 0) + 1; }
+        }
       }
-      return res.status(200).json({ totals, last24h, sampleSize: events.length });
+      return res.status(200).json({ totals, last24h, clientTotals, clientLast24h, sampleSize: events.length });
     }
 
     if (resource === 'plans'){
@@ -129,4 +135,3 @@ export default async function handler(req, res){
     res.status(500).json({ error: 'Server error', message: err?.message || '' });
   }
 }
-
