@@ -48,6 +48,67 @@ function Docs() {
           </ol>
         </section>
 
+        <section id="pilot-flow" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Pilot Flow (Repeatable)</h2>
+          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
+            <li><b>Create client</b>: Enter the pilot’s email in the portal sign‑in; they’ll receive a magic link.</li>
+            <li><b>Login</b>: Click the magic link; it logs directly into their account.</li>
+            <li><b>Create first embed</b>: In “Embeds”, click Create, set ID/vertical/theme.</li>
+            <li><b>Choose variant</b>: Use <Code>data-variant="compact"</Code> (Shadow DOM) or <Code>data-variant="card"</Code> (iframe) for strict CSP sites.</li>
+            <li><b>Paste snippet</b>: Copy the script tag into their site (see CMS notes below).</li>
+            <li><b>Test</b>: Upload a test image → Generate → confirm before/after. Stats should reflect the render.</li>
+          </ol>
+          <div className="mt-3 text-xs opacity-70">Tip: If the widget doesn’t appear or network calls are blocked, use the <b>card</b> variant which isolates via iframe.</div>
+        </section>
+
+        <section id="cms-csp" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">CSP + CMS Minis (WordPress / Shopify / Wix)</h2>
+          <div className="mt-2 grid gap-3 text-sm opacity-90">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium">WordPress</h3>
+              <ul className="mt-1 list-disc pl-5">
+                <li>Use a Custom HTML block and paste the snippet.</li>
+                <li>If theme/CSP strips scripts, switch to <Code>data-variant="card"</Code>.</li>
+                <li>Place near a CTA; set <Code>data-max-width</Code> (e.g., 640px) and <Code>data-align</Code>.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium">Shopify</h3>
+              <ul className="mt-1 list-disc pl-5">
+                <li>In the editor, add a “Custom liquid” block and paste the snippet.</li>
+                <li>For strict CSP themes, use <Code>data-variant="card"</Code> (iframe).</li>
+                <li>Consider <Code>data-background="transparent"</Code> for the iframe card to blend in.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium">Wix</h3>
+              <ul className="mt-1 list-disc pl-5">
+                <li>Use the “Embed Code” widget and paste the snippet.</li>
+                <li>Prefer <Code>data-variant="card"</Code> to avoid builder restrictions.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium">Common Pitfalls</h3>
+              <ul className="mt-1 list-disc pl-5">
+                <li><b>CSP blocks</b>: Switch to <Code>data-variant="card"</Code>.</li>
+                <li><b>Image too large</b>: Upload JPG/PNG/WEBP/HEIC under 10 MB.</li>
+                <li><b>Style conflicts</b>: Shadow DOM variant isolates styles; otherwise use card.</li>
+                <li><b>Cross‑origin</b>: Our API allows all origins during pilots; we can restrict later.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="brand-color" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
+          <h2 className="text-lg font-semibold">Brand Color (Growth / Pro)</h2>
+          <p className="mt-2 text-sm opacity-80">On Growth/Pro plans you can set a brand accent color in the portal Settings. The embed will adopt it automatically where theme customization is allowed.</p>
+          <ul className="mt-2 list-disc pl-5 text-sm opacity-90">
+            <li>Set the color in <b>Settings → Brand color</b>.</li>
+            <li>The public config exposes an accent when customization is <Code>custom</Code>.</li>
+            <li>The embed reads that and sets the internal accent token for buttons/badges.</li>
+          </ul>
+        </section>
+
         <section id="dental-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Dental — Quick Setup (staff‑friendly)</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
@@ -248,5 +309,4 @@ function Docs() {
 
 const rootEl = document.getElementById("root");
 ReactDOMClient.createRoot(rootEl).render(<Docs />);
-
 
