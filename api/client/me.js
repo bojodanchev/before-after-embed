@@ -1,4 +1,4 @@
-import { getClientByToken, getClientByEmail, createClient, createLoginToken, consumeLoginToken, getClientById } from "../_shared.js";
+import { getClientByToken, getClientByEmail, createClient, createLoginToken, consumeLoginToken, getClientById, bumpCounter } from "../_shared.js";
 import nodemailer from 'nodemailer';
 
 function extractToken(req){
@@ -43,6 +43,17 @@ export default async function handler(req, res){
     }
     const email = (req.body?.email || '').toString().trim();
     if (!email) return res.status(400).json({ error: 'email required' });
+    // Rate limit: 3/min per email + IP
+    try{
+      const ip = ((req.headers['x-forwarded-for'] || '') + '').split(',')[0].trim() || 'unknown';
+      const minute = new Date().toISOString().slice(0,16).replace(':','');
+      const rlKey = `rl:login:${email}:${ip}:${minute}`;
+      const limit = Number(process.env.RATE_LIMIT_LOGIN_PER_MIN || 3);
+      const count = await bumpCounter(rlKey, 1);
+      if (Number.isFinite(limit) && count > limit){
+        return res.status(429).json({ error: 'Too many requests. Please wait a minute and try again.' });
+      }
+    }catch(_e){}
     let client = await getClientByEmail(email);
     if (!client){
       // Stable id derived from email (prefix + short hash)
@@ -60,16 +71,11 @@ export default async function handler(req, res){
     const link = `${origin}/api/client/me?t=${encodeURIComponent(oneTime)}`;
     try{
       const transport = makeTransport();
-      // Always log the link server-side for debugging during setup
-      try { console.log('[client/me] magic link for', email, link); } catch {}
       if (transport){
         const from = process.env.EMAIL_FROM || 'no-reply@before-after-embed.com';
         const subject = 'Your Before/After Client Portal Link';
         const html = `<p>Click the link to sign in:</p><p><a href="${link}">${link}</a></p><p>If you didn't request this, you can ignore this email.</p>`;
-        const info = await transport.sendMail({ from, to: email, subject, html });
-        try { console.log('[client/me] email sent', { to: email, messageId: info?.messageId, response: info?.response }); } catch {}
-      } else {
-        console.log('[client/me] SMTP not configured; magic link:', link);
+        await transport.sendMail({ from, to: email, subject, html });
       }
     }catch(e){ console.error('Email send failed:', e?.message || e); }
     return res.status(200).json({ ok: true });

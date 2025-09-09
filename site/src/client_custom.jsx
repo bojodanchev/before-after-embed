@@ -131,41 +131,28 @@ function SignIn() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const sendLink = async () => {
     setLoading(true); setError(""); setInfo("");
-    try {
-      const res = await fetch("/api/client/me", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+    try{
+      const res = await fetch('/api/client/me', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ email }) });
       if (!res.ok) throw new Error(await safeError(res));
-      const data = await res.json();
-      if (data?.link) {
-        // magic link flow
-        window.location.href = data.link;
-      } else if (data?.token) {
-        // direct token flow (fallback)
-        const url = new URL(window.location.href);
-        url.searchParams.set("token", data.token);
-        window.location.replace(url.toString());
-      } else {
-        setInfo("Sign-in link sent. Check your email.");
-      }
-    } catch (err) {
-      setError(typeof err?.message === "string" ? err.message : "Failed to send sign-in link");
-    } finally {
-      setLoading(false);
-    }
+      await res.json();
+      setInfo('Sign-in link sent. Check your email.');
+    }catch(err){ setError(typeof err?.message === 'string' ? err.message : 'Failed to send sign-in link'); }
+    finally{ setLoading(false); }
   };
+
+  const handleSubmit = async (e) => { e.preventDefault(); if (!loading) sendLink(); };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-white">
       <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-xl border border-white/10 bg-white/5 p-6">
         <h1 className="text-xl font-semibold">Client Portal Sign In</h1>
         <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <Button type="submit" className="mt-4 w-full" disabled={loading}>{loading ? "Sending…" : "Send sign-in link"}</Button>
+        <div className="mt-4 flex items-center gap-2">
+          <Button type="submit" className="flex-1" disabled={loading}>{loading ? 'Sending…' : 'Send link'}</Button>
+          <Button type="button" variant="subtle" disabled={loading || !email} onClick={sendLink}>Resend</Button>
+        </div>
         {!!error && <p className="mt-2 text-sm text-red-400">{error}</p>}
         {!!info && <p className="mt-2 text-sm text-white/70">{info}</p>}
       </form>
