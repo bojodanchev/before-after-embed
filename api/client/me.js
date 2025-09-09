@@ -60,11 +60,14 @@ export default async function handler(req, res){
     const link = `${origin}/api/client/me?t=${encodeURIComponent(oneTime)}`;
     try{
       const transport = makeTransport();
+      // Always log the link server-side for debugging during setup
+      try { console.log('[client/me] magic link for', email, link); } catch {}
       if (transport){
         const from = process.env.EMAIL_FROM || 'no-reply@before-after-embed.com';
         const subject = 'Your Before/After Client Portal Link';
         const html = `<p>Click the link to sign in:</p><p><a href="${link}">${link}</a></p><p>If you didn't request this, you can ignore this email.</p>`;
-        await transport.sendMail({ from, to: email, subject, html });
+        const info = await transport.sendMail({ from, to: email, subject, html });
+        try { console.log('[client/me] email sent', { to: email, messageId: info?.messageId, response: info?.response }); } catch {}
       } else {
         console.log('[client/me] SMTP not configured; magic link:', link);
       }
@@ -81,5 +84,12 @@ function makeTransport(){
   const pass = (process.env.SMTP_PASS || '').trim();
   if (!host || !user || !pass) return null;
   const secure = (process.env.SMTP_SECURE || 'false').toString() === 'true';
+  // Special-case Gmail for reliability
+  if ((host.includes('gmail.com') || user.endsWith('@gmail.com')) && pass){
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
+  }
   return nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
 }
