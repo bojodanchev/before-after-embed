@@ -37,10 +37,10 @@ function BarberPage(){
             <a href="/app/index.html" className="hover:text-white">{t('Main site','Основен сайт')}</a>
             <a href="/app/docs.html" className="hover:text-white">{t('Docs','Документация')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
-            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
-              <option value="en">EN</option>
-              <option value="bg">BG</option>
-            </select>
+            <div className="inline-flex items-center rounded-md border border-white/20 bg-white/5 p-0.5">
+              <button onClick={()=> setLang('en')} className={`${lang==='en' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>EN</button>
+              <button onClick={()=> setLang('bg')} className={`${lang==='bg' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>BG</button>
+            </div>
           </nav>
         </Container>
       </header>

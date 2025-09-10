@@ -15,10 +15,10 @@ function Docs() {
       <div className="mx-auto w-full max-w-5xl">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">{t('Before/After Embed — Documentation','Before/After Embed — Документация')}</h1>
-          <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
-            <option value="en">EN</option>
-            <option value="bg">BG</option>
-          </select>
+          <div className="inline-flex items-center rounded-md border border-white/20 bg-white/5 p-0.5">
+            <button onClick={()=> setLang('en')} className={`${lang==='en' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>EN</button>
+            <button onClick={()=> setLang('bg')} className={`${lang==='bg' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>BG</button>
+          </div>
         </div>
         <p className="mt-2 text-sm opacity-80">{t('Everything you need to integrate the widget, manage embeds, and go live.','Всичко необходимо за интеграция, управление и пускане на живо.')}</p>
 
