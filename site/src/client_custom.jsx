@@ -681,6 +681,14 @@ function AppWrapper() {
   return (<Dashboard token={token} onSignOut={onSignOut} />);
 }
 
+// Basic error boundary to avoid white-screen on runtime errors
+class ErrorBoundary extends React.Component {
+  constructor(props){ super(props); this.state = { hasError:false, message:"" }; }
+  static getDerivedStateFromError(err){ return { hasError:true, message: err?.message || "" }; }
+  componentDidCatch(err, info){ try{ console.error('Client portal error', err, info); }catch(_){} }
+  render(){ if (this.state.hasError){ return <div className="p-6 text-red-400">Failed to load portal. Please hard refresh. {this.state.message ? `(${this.state.message})` : ''}</div>; } return this.props.children; }
+}
+
 /* ===============================================================
    Safe mount for real HTML + export default for Canvas preview
 ================================================================*/
@@ -688,14 +696,16 @@ const maybeMount = () => {
   const rootEl = document.getElementById("root");
   if (!rootEl) return; // No root in Canvas; Canvas uses exported component
   if (ReactDOMClient && typeof ReactDOMClient.createRoot === "function") {
-    ReactDOMClient.createRoot(rootEl).render(<AppWrapper />);
+    ReactDOMClient.createRoot(rootEl).render(<ErrorBoundary><AppWrapper /></ErrorBoundary>);
   } else if (ReactDOMLegacy && typeof ReactDOMLegacy.render === "function") {
-    ReactDOMLegacy.render(<AppWrapper />, rootEl);
+    ReactDOMLegacy.render(<ErrorBoundary><AppWrapper /></ErrorBoundary>, rootEl);
   }
 };
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", maybeMount, { once: true });
+  // Fallback in case DOMContentLoaded listener is missed by early execution
+  setTimeout(maybeMount, 1500);
 } else {
   maybeMount();
 }
