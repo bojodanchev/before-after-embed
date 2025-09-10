@@ -166,6 +166,10 @@ function Dashboard({ token, onSignOut }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState({ id: "", vertical: "barber", theme: "dark" });
+  // Language state MUST be declared before any early returns to keep hook order stable
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
 
   const [embedId, setEmbedId] = useState("");
   const [preset, setPreset] = useState("compact");
@@ -325,10 +329,6 @@ function Dashboard({ token, onSignOut }) {
 
   if (loading) return <div className="p-6 text-white">Loading…</div>;
   if (error) return <div className="p-6 text-red-400">{error}</div>;
-
-  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
-  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
-  const t = (en, bg) => (lang === 'bg' ? bg : en);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
