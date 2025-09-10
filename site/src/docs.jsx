@@ -119,10 +119,10 @@ function Docs() {
         </section>
 
         <section id="dental-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Dental — Quick Setup (staff‑friendly)</h2>
+          <h2 className="text-lg font-semibold">{t('Dental — Quick Setup (staff‑friendly)','Дентал — Бърза настройка (удобно за екипа)')}</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
-            <li>Open your website editor (e.g., WordPress) and navigate to the page where you want the demo.</li>
-            <li>Paste this snippet where the widget should appear:
+            <li>{t('Open your website editor (e.g., WordPress) and navigate to the page where you want the demo.','Отворете редактора на сайта (напр. WordPress) и отидете на страницата, където искате демото.')}</li>
+            <li>{t('Paste this snippet where the widget should appear:','Поставете този снипет, където трябва да се появи widget‑ът:')}
               <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="light"
@@ -130,16 +130,16 @@ function Docs() {
   data-align="center">
 </script>`}</Code>
             </li>
-            <li>Save/publish the page and test: upload a selfie → Generate → move the slider.</li>
+            <li>{t('Save/publish the page and test: upload a selfie → Generate → move the slider.','Запазете/публикувайте страницата и тествайте: качете селфи → Generate → преместете плъзгача.')}</li>
           </ol>
-          <p className="mt-2 text-xs opacity-70">Tip: For strict security settings (CSP), add <code>data-variant="card"</code>.</p>
+          <p className="mt-2 text-xs opacity-70">{t('Tip: For strict security settings (CSP), add','Съвет: За строги настройки за сигурност (CSP), добавете')} <code>data-variant="card"</code>.</p>
         </section>
 
         <section id="detailing-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Auto Detailing — Quick Setup (staff‑friendly)</h2>
+          <h2 className="text-lg font-semibold">{t('Auto Detailing — Quick Setup (staff‑friendly)','Авто детайлинг — Бърза настройка (удобно за екипа)')}</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
-            <li>Open your website editor (e.g., WordPress) and navigate to the page where you want the visualizer.</li>
-            <li>Paste this snippet where the widget should appear:
+            <li>{t('Open your website editor (e.g., WordPress) and navigate to the page where you want the visualizer.','Отворете редактора на сайта (напр. WordPress) и отидете на страницата, където искате визуализатора.')}</li>
+            <li>{t('Paste this snippet where the widget should appear:','Поставете този снипет, където трябва да се появи widget‑ът:')}
               <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="dark"
@@ -147,16 +147,16 @@ function Docs() {
   data-align="center">
 </script>`}</Code>
             </li>
-            <li>Save/publish the page and test: upload a car photo → Generate → move the slider.</li>
+            <li>{t('Save/publish the page and test: upload a car photo → Generate → move the slider.','Запазете/публикувайте страницата и тествайте: качете снимка на автомобил → Generate → преместете плъзгача.')}</li>
           </ol>
-          <p className="mt-2 text-xs opacity-70">Tip: For strict security policies (CSP), use the card variant: <code>data-variant="card"</code>.</p>
+          <p className="mt-2 text-xs opacity-70">{t('Tip: For strict security policies (CSP), use the card variant:','Съвет: При строги политики за сигурност (CSP) използвайте варианта card:')} <code>data-variant="card"</code>.</p>
         </section>
 
         <section id="barber-setup" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Barbers — Quick Setup (staff‑friendly)</h2>
+          <h2 className="text-lg font-semibold">{t('Barbers — Quick Setup (staff‑friendly)','Барбери — Бърза настройка (удобно за екипа)')}</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
-            <li>Open your website editor and go to the page where you want the preview.</li>
-            <li>Paste this snippet where the widget should appear:
+            <li>{t('Open your website editor and go to the page where you want the preview.','Отворете редактора и отидете на страницата, където искате прегледа.')}</li>
+            <li>{t('Paste this snippet where the widget should appear:','Поставете този снипет, където трябва да се появи widget‑ът:')}
               <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="light"
@@ -164,42 +164,42 @@ function Docs() {
   data-align="center">
 </script>`}</Code>
             </li>
-            <li>Save/publish the page and test: upload a selfie → Generate → move the slider.</li>
+            <li>{t('Save/publish the page and test: upload a selfie → Generate → move the slider.','Запазете/публикувайте страницата и тествайте: качете селфи → Generate → преместете плъзгача.')}</li>
           </ol>
-          <p className="mt-2 text-xs opacity-70">Tip: If your site has strict security (CSP), use the card variant: <code>data-variant="card"</code>.</p>
+          <p className="mt-2 text-xs opacity-70">{t('Tip: If your site has strict security (CSP), use the card variant:','Съвет: Ако сайтът е със строг CSP, използвайте варианта card:')} <code>data-variant="card"</code>.</p>
         </section>
 
         <section id="troubleshooting-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Dental — Troubleshooting</h2>
+          <h2 className="text-lg font-semibold">{t('Dental — Troubleshooting','Дентал — Отстраняване на проблеми')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li><b>Widget doesn’t show</b>: Ensure the script is pasted in the page content (not blocked by theme). Try the card variant for CSP pages.</li>
-            <li><b>Can’t upload</b>: Check image type (JPG/PNG) and size (&lt; 10MB).</li>
-            <li><b>“Cross‑origin/CORS” errors</b>: Use the card variant which isolates with iframe.</li>
-            <li><b>Style conflicts</b>: Shadow DOM version prevents theme styles leaking in. If conflicts persist, switch to card variant.</li>
-            <li><b>Not centered</b>: Set <code>data-align="center"</code> and a <code>data-max-width</code> like <code>640px</code>.</li>
+            <li><b>{t('Widget doesn’t show','Widget не се вижда')}</b>: {t('Ensure the script is pasted in the page content (not blocked by theme). Try the card variant for CSP pages.','Уверете се, че скриптът е поставен в съдържанието (не е блокиран от тема). За CSP страници — ползвайте варианта card.')}</li>
+            <li><b>{t('Can’t upload','Не може да се качи')}</b>: {t('Check image type (JPG/PNG) and size (< 10MB).','Проверете типа (JPG/PNG) и размера (< 10MB).')}</li>
+            <li><b>"Cross‑origin/CORS"</b>: {t('Use the card variant which isolates with iframe.','Използвайте варианта card, който изолира с iframe.')}</li>
+            <li><b>{t('Style conflicts','Конфликт на стилове')}</b>: {t('Shadow DOM version prevents theme styles leaking in. If conflicts persist, switch to card variant.','Версията със Shadow DOM предотвратява изтичане на стилове. Ако продължи, преминете към варианта card.')}</li>
+            <li><b>{t('Not centered','Не е центрирано')}</b>: {t('Set','Задайте')} <code>data-align="center"</code> {t('and a','и')} <code>data-max-width</code> {t('like','например')} <code>640px</code>.</li>
           </ul>
         </section>
 
         <section id="best-practices-dental" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Dental — Best Practices</h2>
+          <h2 className="text-lg font-semibold">{t('Dental — Best Practices','Дентал — Добри практики')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>Place the widget near a clear call‑to‑action (e.g., “Book whitening consult”).</li>
-            <li>Use supportive copy: “This preview is illustrative and not a medical guarantee.”</li>
-            <li>Offer a private demo page for staff to test without affecting your homepage.</li>
-            <li>Encourage patients to use a well‑lit selfie facing the camera for best results.</li>
+            <li>{t('Place the widget near a clear call‑to‑action (e.g., “Book whitening consult”).','Поставете widget‑а близо до ясен CTA (напр. „Book whitening consult“).')}</li>
+            <li>{t('Use supportive copy: “This preview is illustrative and not a medical guarantee.”','Добавете пояснение: „Прегледът е илюстративен и не е медицинска гаранция.“')}</li>
+            <li>{t('Offer a private demo page for staff to test without affecting your homepage.','Осигурете частна демо страница за екипа, за да не влияе на началната страница.')}</li>
+            <li>{t('Encourage patients to use a well‑lit selfie facing the camera for best results.','Насърчете пациентите да използват добре осветено селфи, гледащо към камерата, за най‑добри резултати.')}</li>
           </ul>
         </section>
 
         <section id="best-practices-detailing" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Auto Detailing — Best Practices</h2>
+          <h2 className="text-lg font-semibold">{t('Auto Detailing — Best Practices','Авто детайлинг — Добри практики')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>Place the widget near your service CTA (e.g., “Book paint correction”).</li>
-            <li>Add a short note: “Preview is illustrative; final results depend on vehicle condition.”</li>
-            <li>Use clean, well‑lit exterior photos; avoid extreme angles or heavy shadows.</li>
-            <li>Highlight problem areas (swirls, light scratches) in the before photo for a clearer preview.</li>
-            <li>For strict security policies, use the card variant: <code>data-variant="card"</code>.</li>
-            <li>Center the widget with <code>data-align="center</code> and set <code>data-max-width</code> (e.g., <code>720px</code>).</li>
-            <li>Prefer the dark theme for contrast on automotive sites: <code>data-theme="dark"</code>.</li>
+            <li>{t('Place the widget near your service CTA (e.g., “Book paint correction”).','Поставете widget‑а близо до CTA за услуга (напр. „Book paint correction“).')}</li>
+            <li>{t('Add a short note: “Preview is illustrative; final results depend on vehicle condition.”','Добавете бележка: „Прегледът е илюстративен; финалният резултат зависи от състоянието на автомобила.“')}</li>
+            <li>{t('Use clean, well‑lit exterior photos; avoid extreme angles or heavy shadows.','Използвайте чисти, добре осветени външни снимки; избягвайте крайни ъгли или тежки сенки.')}</li>
+            <li>{t('Highlight problem areas (swirls, light scratches) in the before photo for a clearer preview.','Подчертайте проблемните зони (въртележки, леки драскотини) на снимката „преди“ за по‑ясен преглед.')}</li>
+            <li>{t('For strict security policies, use the card variant:','При строги политики за сигурност използвайте варианта card:')} <code>data-variant="card"</code>.</li>
+            <li>{t('Center the widget with','Центрирайте widget‑а с')} <code>data-align="center</code> {t('and set','и задайте')} <code>data-max-width</code> (e.g., <code>720px</code>).</li>
+            <li>{t('Prefer the dark theme for contrast on automotive sites:','За по‑добър контраст в авто сайтове предпочетете тъмна тема:')} <code>data-theme="dark"</code>.</li>
           </ul>
         </section>
 
