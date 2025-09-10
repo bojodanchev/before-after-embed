@@ -204,25 +204,25 @@ function Docs() {
         </section>
 
         <section id="best-practices-barber" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Barbers — Best Practices</h2>
+          <h2 className="text-lg font-semibold">{t('Barbers — Best Practices','Барбери — Добри практики')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>Place the widget near the booking CTA (e.g., “Book haircut”).</li>
-            <li>Add a short note: “Preview is illustrative; the final cut depends on hair type.”</li>
-            <li>Use front‑facing, well‑lit selfies; avoid hats and heavy shadows.</li>
-            <li>Offer quick presets: fade levels (low/mid/high), beard length/outline, and fringe options.</li>
-            <li>Center with <code>data-align="center"</code> and set <code>data-max-width</code> (e.g., <code>640px</code>).</li>
-            <li>Use light or dark theme to match your site; start with <code>data-theme="light"</code>.</li>
+            <li>{t('Place the widget near the booking CTA (e.g., “Book haircut”).','Поставете widget‑а близо до CTA за записване (напр. „Book haircut“).')}</li>
+            <li>{t('Add a short note: “Preview is illustrative; the final cut depends on hair type.”','Добавете бележка: „Прегледът е илюстративен; крайният резултат зависи от типа коса.“')}</li>
+            <li>{t('Use front‑facing, well‑lit selfies; avoid hats and heavy shadows.','Използвайте фронтални, добре осветени селфита; избягвайте шапки и силни сенки.')}</li>
+            <li>{t('Offer quick presets: fade levels (low/mid/high), beard length/outline, and fringe options.','Добавете бързи опции: нива на fade (low/mid/high), брада (дължина/контур) и бретон.')}</li>
+            <li>{t('Center with','Центрирайте с')} <code>data-align="center"</code> {t('and set','и задайте')} <code>data-max-width</code> (e.g., <code>640px</code>).</li>
+            <li>{t('Use light or dark theme to match your site; start with','Изберете светла или тъмна тема според сайта; започнете със')} <code>data-theme="light"</code>.</li>
           </ul>
         </section>
 
         <section id="overview" className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Overview</h2>
-          <p className="mt-2 text-sm opacity-80">The Before/After widget lets customers upload a photo and preview an AI‑generated after result (barber, dental, auto detailing, and more). You can embed it on any site with one script tag.</p>
+          <h2 className="text-lg font-semibold">{t('Overview','Общ преглед')}</h2>
+          <p className="mt-2 text-sm opacity-80">{t('The Before/After widget lets customers upload a photo and preview an AI‑generated after result (barber, dental, auto detailing, and more). You can embed it on any site with one script tag.','Widget‑ът Before/After позволява на клиентите да качат снимка и да видят AI резултат „след“ (барбери, дентал, авто детайлинг и др.). Може да го вградите на всеки сайт с един script таг.')}</p>
         </section>
 
         <section id="quickstart" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Quick Start</h2>
-          <p className="mt-2 text-sm opacity-80">Paste the script snippet where you want the widget to appear.</p>
+          <h2 className="text-lg font-semibold">{t('Quick Start','Бърз старт')}</h2>
+          <p className="mt-2 text-sm opacity-80">{t('Paste the script snippet where you want the widget to appear.','Поставете снипета там, където искате да се появи widget‑ът.')}</p>
           <Code>{`<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="light"
@@ -232,7 +232,7 @@ function Docs() {
         </section>
 
         <section id="attributes" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Attributes</h2>
+          <h2 className="text-lg font-semibold">{t('Attributes','Атрибути')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
             <li><b>data-embed-id</b>: The id of the embed configured in your portal.</li>
             <li><b>data-theme</b>: <code>light</code> | <code>dark</code>.</li>
@@ -263,24 +263,24 @@ function Docs() {
         </section>
 
         <section id="portal" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Client Portal</h2>
+          <h2 className="text-lg font-semibold">{t('Client Portal','Портал за клиенти')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>Sign in with your email (magic link).</li>
-            <li>Create an embed → choose vertical + theme (Light/Dark).</li>
-            <li>Use quick actions: Copy Light/Dark snippet, Duplicate to opposite theme, Edit, Delete.</li>
-            <li>Brand color (accent) is available on Growth/Pro plans.</li>
-            <li>Preview parity ensures what you copy is what renders on your site.</li>
+            <li>{t('Sign in with your email (magic link).','Влезте с имейл (magic link).')}</li>
+            <li>{t('Create an embed → choose vertical + theme (Light/Dark).','Създайте embed → изберете вертикал + тема (Light/Dark).')}</li>
+            <li>{t('Use quick actions: Copy Light/Dark snippet, Duplicate to opposite theme, Edit, Delete.','Бързи действия: копиране на Light/Dark снипет, дубликат към противоположна тема, редакция, изтриване.')}</li>
+            <li>{t('Brand color (accent) is available on Growth/Pro plans.','Бранд цвят (accent) е достъпен в планове Growth/Pro.')}</li>
+            <li>{t('Preview parity ensures what you copy is what renders on your site.','Preview parity гарантира, че копираното е това, което се рендерира на сайта.')}</li>
           </ul>
         </section>
 
         <section id="billing" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Billing & Plans</h2>
-          <p className="mt-2 text-sm opacity-80">Free, Starter, Growth, Pro. Growth/Pro unlock custom brand color and higher limits. Stripe Checkout is used for subscriptions and top‑ups.</p>
+          <h2 className="text-lg font-semibold">{t('Billing & Plans','Плащане и планове')}</h2>
+          <p className="mt-2 text-sm opacity-80">{t('Free, Starter, Growth, Pro. Growth/Pro unlock custom brand color and higher limits. Stripe Checkout is used for subscriptions and top‑ups.','Free, Starter, Growth, Pro. Growth/Pro отключват бранд цвят и по‑високи лимити. Stripe Checkout се използва за абонаменти и топ‑ъпи.')}</p>
         </section>
 
         <section id="webhooks" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">Webhooks</h2>
-          <p className="mt-2 text-sm opacity-80">Set a webhook URL in the portal (Growth/Pro). You’ll receive events like <code>render</code>.</p>
+          <p className="mt-2 text-sm opacity-80">{t('Set a webhook URL in the portal (Growth/Pro). You’ll receive events like','Задайте Webhook URL в портала (Growth/Pro). Ще получавате събития като')} <code>render</code>.</p>
           <Code>{`POST https://your-server/webhook
 {
   "type": "render",
@@ -291,24 +291,24 @@ function Docs() {
         </section>
 
         <section id="api" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">API Endpoints</h2>
+          <h2 className="text-lg font-semibold">{t('API Endpoints','API крайни точки')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li><code>POST /api/client/me</code> — request magic link.</li>
-            <li><code>GET/POST/PATCH/DELETE /api/client/embeds</code> — manage embeds (token required).</li>
-            <li><code>GET /api/client/stats</code> — usage and quota.</li>
-            <li><code>GET /api/client/usage?embedId=...</code> — recent render events.</li>
-            <li><code>GET /api/embed/:id</code> — public config for an embed.</li>
-            <li><code>POST /api/edit</code> — upload + generate (multipart/form-data).</li>
+            <li><code>POST /api/client/me</code> — {t('request magic link.','заявка за magic link.')}</li>
+            <li><code>GET/POST/PATCH/DELETE /api/client/embeds</code> — {t('manage embeds (token required).','управление на embeds (изисква token).')}</li>
+            <li><code>GET /api/client/stats</code> — {t('usage and quota.','използване и квота.')}</li>
+            <li><code>GET /api/client/usage?embedId=...</code> — {t('recent render events.','скорошни render събития.')}</li>
+            <li><code>GET /api/embed/:id</code> — {t('public config for an embed.','публична конфигурация за embed.')}</li>
+            <li><code>POST /api/edit</code> — {t('upload + generate (multipart/form-data).','качване + генериране (multipart/form-data).')}</li>
           </ul>
         </section>
 
         <section id="troubleshooting" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Troubleshooting</h2>
+          <h2 className="text-lg font-semibold">{t('Troubleshooting','Отстраняване на проблеми')}</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>CSP blocks script? Use <code>data-variant="card"</code> (iframe).</li>
-            <li>Want transparent card? Add <code>data-background="transparent"</code>.</li>
-            <li>Slider reversed? Hard refresh to load the latest assets.</li>
-            <li>Quota reached? Upgrade plan or buy top‑ups from the portal.</li>
+            <li>{t('CSP blocks script? Use','CSP блокира скрипта? Използвайте')} <code>data-variant="card"</code> (iframe).</li>
+            <li>{t('Want transparent card? Add','Искате прозрачен фон? Добавете')} <code>data-background="transparent"</code>.</li>
+            <li>{t('Slider reversed? Hard refresh to load the latest assets.','Плъзгачът е обърнат? Направете hard refresh, за да се заредят новите assets.')}</li>
+            <li>{t('Quota reached? Upgrade plan or buy top‑ups from the portal.','Достигнат лимит? Ъпгрейднете плана или купете топ‑ъпи от портала.')}</li>
           </ul>
         </section>
       </div>
