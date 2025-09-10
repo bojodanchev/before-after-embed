@@ -49,51 +49,51 @@ function Docs() {
         </section>
 
         <section id="onboarding" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Onboarding</h2>
+          <h2 className="text-lg font-semibold">{t('Onboarding','Онбординг')}</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
-            <li>Choose your vertical above (e.g., Dental).</li>
-            <li>Follow the guided one‑pager with the exact snippet and recommended settings.</li>
-            <li>In the portal, create your first embed (or click “Create starter embed” from the one‑pager if available).</li>
+            <li>{t('Choose your vertical above (e.g., Dental).','Изберете вертикал по-горе (напр. Дентал).')}</li>
+            <li>{t('Follow the guided one‑pager with the exact snippet and recommended settings.','Следвайте едностраничното ръководство със снипета и препоръчаните настройки.')}</li>
+            <li>{t('In the portal, create your first embed (or click “Create starter embed” from the one‑pager if available).','В портала създайте първия си embed (или натиснете „Create starter embed“, ако е налично).')}</li>
           </ol>
         </section>
 
         <section id="pilot-flow" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Pilot Flow (Repeatable)</h2>
+          <h2 className="text-lg font-semibold">{t('Pilot Flow (Repeatable)','Пилотен поток (повторяем)')}</h2>
           <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm opacity-90">
-            <li><b>Create client</b>: Enter the pilot’s email in the portal sign‑in; they’ll receive a magic link.</li>
-            <li><b>Login</b>: Click the magic link; it logs directly into their account.</li>
-            <li><b>Create first embed</b>: In “Embeds”, click Create, set ID/vertical/theme.</li>
-            <li><b>Choose variant</b>: Use <Code>data-variant="compact"</Code> (Shadow DOM) or <Code>data-variant="card"</Code> (iframe) for strict CSP sites.</li>
-            <li><b>Paste snippet</b>: Copy the script tag into their site (see CMS notes below).</li>
-            <li><b>Test</b>: Upload a test image → Generate → confirm before/after. Stats should reflect the render.</li>
+            <li><b>{t('Create client','Създайте клиент')}</b>: {t('Enter the pilot’s email in the portal sign‑in; they’ll receive a magic link.','Въведете имейла в портала; ще получат magic link.')}</li>
+            <li><b>{t('Login','Вход')}</b>: {t('Click the magic link; it logs directly into their account.','Кликнете линка; влиза директно в акаунта.')}</li>
+            <li><b>{t('Create first embed','Създайте първи embed')}</b>: {t('In “Embeds”, click Create, set ID/vertical/theme.','В „Embeds“ натиснете Create и задайте ID/вертикал/тема.')}</li>
+            <li><b>{t('Choose variant','Изберете вариант')}</b>: {t('Use','Използвайте')} <Code>data-variant="compact"</Code> {t('(Shadow DOM) or','(Shadow DOM) или')} <Code>data-variant="card"</Code> {t('(iframe) for strict CSP sites.','(iframe) за сайтове със строг CSP.')}</li>
+            <li><b>{t('Paste snippet','Поставете снипета')}</b>: {t('Copy the script tag into their site (see CMS notes below).','Копирайте script тага в сайта (вижте бележките за CMS по‑долу).')}</li>
+            <li><b>{t('Test','Тест')}</b>: {t('Upload a test image → Generate → confirm before/after. Stats should reflect the render.','Качете тестово изображение → Generate → потвърдете Преди/След. Статистиката трябва да отчете рендера.')}</li>
           </ol>
-          <div className="mt-3 text-xs opacity-70">Tip: If the widget doesn’t appear or network calls are blocked, use the <b>card</b> variant which isolates via iframe.</div>
+          <div className="mt-3 text-xs opacity-70">{t('Tip: If the widget doesn’t appear or network calls are blocked, use the','Съвет: Ако widget‑ът не се вижда или заявките са блокирани, използвайте')} <b>card</b> {t('variant which isolates via iframe.','варианта, който изолира чрез iframe.')}</div>
         </section>
 
         <section id="cms-csp" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">CSP + CMS Minis (WordPress / Shopify / Wix)</h2>
+          <h2 className="text-lg font-semibold">{t('CSP + CMS Minis (WordPress / Shopify / Wix)','CSP + CMS мини (WordPress / Shopify / Wix)')}</h2>
           <div className="mt-2 grid gap-3 text-sm opacity-90">
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
               <h3 className="font-medium">WordPress</h3>
               <ul className="mt-1 list-disc pl-5">
-                <li>Use a Custom HTML block and paste the snippet.</li>
-                <li>If theme/CSP strips scripts, switch to <Code>data-variant="card"</Code>.</li>
-                <li>Place near a CTA; set <Code>data-max-width</Code> (e.g., 640px) and <Code>data-align</Code>.</li>
+                <li>{t('Use a Custom HTML block and paste the snippet.','Използвайте Custom HTML блок и поставете снипета.')}</li>
+                <li>{t('If theme/CSP strips scripts, switch to','Ако темата/CSP премахва скриптове, превключете на')} <Code>data-variant="card"</Code>.</li>
+                <li>{t('Place near a CTA; set','Поставете близо до CTA; задайте')} <Code>data-max-width</Code> {t('(e.g., 640px) and','(напр. 640px) и')} <Code>data-align</Code>.</li>
               </ul>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
               <h3 className="font-medium">Shopify</h3>
               <ul className="mt-1 list-disc pl-5">
-                <li>In the editor, add a “Custom liquid” block and paste the snippet.</li>
-                <li>For strict CSP themes, use <Code>data-variant="card"</Code> (iframe).</li>
-                <li>Consider <Code>data-background="transparent"</Code> for the iframe card to blend in.</li>
+                <li>{t('In the editor, add a “Custom liquid” block and paste the snippet.','В редактора добавете „Custom liquid“ блок и поставете снипета.')}</li>
+                <li>{t('For strict CSP themes, use','За строги CSP теми ползвайте')} <Code>data-variant="card"</Code> (iframe).</li>
+                <li>{t('Consider','Помислете за')} <Code>data-background="transparent"</Code> {t('for the iframe card to blend in.','за да се слее картата с фона.')}</li>
               </ul>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
               <h3 className="font-medium">Wix</h3>
               <ul className="mt-1 list-disc pl-5">
-                <li>Use the “Embed Code” widget and paste the snippet.</li>
-                <li>Prefer <Code>data-variant="card"</Code> to avoid builder restrictions.</li>
+                <li>{t('Use the “Embed Code” widget and paste the snippet.','Използвайте „Embed Code“ widget и поставете снипета.')}</li>
+                <li>{t('Prefer','Предпочетете')} <Code>data-variant="card"</Code> {t('to avoid builder restrictions.','за да избегнете ограничения на билдъра.')}</li>
               </ul>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">

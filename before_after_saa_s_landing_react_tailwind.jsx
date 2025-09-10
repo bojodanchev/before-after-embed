@@ -90,16 +90,16 @@ const LiveDemo = () => {
   };
 
   return (
-    <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="bg-white/10 text-white">Live Demo</Badge>
-          <span className="text-xs text-white/60">Interactive preview</span>
-        </div>
-        <div className="text-xs text-white/50">Before/After slider</div>
+  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <Badge variant="secondary" className="bg-white/10 text-white">Live Demo</Badge>
+        <span className="text-xs text-white/60">Interactive preview</span>
       </div>
+      <div className="text-xs text-white/50">Before/After slider</div>
+    </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
         <div className="relative aspect-[4/3]">
           {/* Labels */}
           <div className="absolute left-4 top-4 rounded-full bg-black/60 px-2 py-1 text-xs text-white/80 z-10">After</div>
@@ -118,14 +118,14 @@ const LiveDemo = () => {
             </>
           ) : (
             <div className="grid h-full w-full place-items-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/20 via-white/5 to-transparent">
-              <ImageIcon className="h-10 w-10 text-white/30" />
-            </div>
+            <ImageIcon className="h-10 w-10 text-white/30" />
+          </div>
           )}
           {/* Slider */}
           <input type="range" min="0" max="100" value={slider} onChange={(e)=>setSlider(Number(e.target.value))} className="absolute left-3 right-3 bottom-3" />
         </div>
         <div className="border-t border-white/10 bg-black/40 p-3 text-center text-sm text-white/70">Upload a photo, click Generate, slide to compare</div>
-      </div>
+          </div>
 
       <div className="grid gap-2 sm:flex sm:items-center sm:justify-between">
         <div className="text-xs text-white/60">{status || 'Powered by fal.ai image edit model'}</div>
@@ -133,10 +133,10 @@ const LiveDemo = () => {
           <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
           <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20" onClick={onPick}>Choose image</Button>
           <Button className="gap-2" onClick={onGenerate}>Generate <ArrowRight className="h-4 w-4" /></Button>
-        </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default function BeforeAfterLanding() {
@@ -171,10 +171,6 @@ export default function BeforeAfterLanding() {
             <a href="/app/docs.html" target="_top" className="hover:text-white">{t('Docs','Документация')}</a>
             <a href="#pricing" className="hover:text-white">{t('Pricing','Цени')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
-            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
-              <option value="en">EN</option>
-              <option value="bg">BG</option>
-            </select>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>
@@ -216,57 +212,57 @@ export default function BeforeAfterLanding() {
         <Container>
           <SectionTitle
             eyebrow={t('Product','Продукт')}
-            title={t('Drop‑in embed. Modern UI. Multi‑tenant by design.','Вграден виджет. Модерен UI. Мултитенант по дизайн.')}
+            title={t('Drop‑in embed. Modern UI. Multi‑tenant by design.','Вграден widget. Модерен UI. Мултитенант по дизайн.')}
             subtitle={t('Paste one script tag. Configure layout with data‑attributes. Provision embeds per client, manage themes and verticals, and track usage — all with a clean, conversion‑ready UI.','Поставете един скрипт. Настройвайте чрез data‑атрибути. Създавайте ембедове за всеки клиент, управлявайте теми и вертикали и следете употребата — с чист, модерен интерфейс.')}
           />
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Code2 className="h-5 w-5 text-white/60" /> Drop‑in embed</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Drop‑in embed','Бърз embed')}<Code2 className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Paste one script tag. Configure layout (max width, alignment, theme) with data‑attributes.
+                {t('Paste one script tag. Configure layout (max width, alignment, theme) with data‑attributes.','Поставете един скрипт. Настройте ширина, подравняване и тема чрез data‑атрибути.')}
               </CardContent>
             </Card>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Layers className="h-5 w-5 text-white/60" /> Multi‑tenant</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Multi‑tenant','Мултитенант')}<Layers className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Provision embeds per client, manage themes/verticals, and track usage.
+                {t('Provision embeds per client, manage themes/verticals, and track usage.','Създавайте ембедове за клиенти, управлявайте теми/вертикали и следете употребата.')}
               </CardContent>
             </Card>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Paintbrush className="h-5 w-5 text-white/60" /> Modern UI</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Modern UI','Модерен UI')}<Paintbrush className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Clean dropzone, compact or card variants, “Before/After” badges and slider.
+                {t('Clean dropzone, compact or card variants, “Before/After” badges and slider.','Чиста зона за качване, компактна или card версия, етикети „Before/After“ и плъзгач.')}
               </CardContent>
             </Card>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Gauge className="h-5 w-5 text-white/60" /> Fast integration</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Fast integration','Бърза интеграция')}<Gauge className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Get started in 60 seconds. Works anywhere you can paste a script tag.
+                {t('Get started in 60 seconds. Works anywhere you can paste a script tag.','Старт за 60 секунди. Работи навсякъде, където може да поставите скрипт.')}
               </CardContent>
             </Card>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Shield className="h-5 w-5 text-white/60" /> Safe by default</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Safe by default','Сигурен по подразбиране')}<Shield className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Client‑scoped API keys, signed uploads, and per‑tenant quotas.
+                {t('Client‑scoped API keys, signed uploads, and per‑tenant quotas.','Клиентски API ключове, подписани качвания и квоти на тenant.')}
               </CardContent>
             </Card>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Terminal className="h-5 w-5 text-white/60" /> Developer‑friendly</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base">{t('Developer‑friendly','Удобен за разработчици')}<Terminal className="h-5 w-5 text-white/60" /></CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-white/70">
-                Webhooks for generations, admin API, and audit logs.
+                {t('Webhooks for generations, admin API, and audit logs.','Webhooks за генерирания, admin API и логове.')}
               </CardContent>
             </Card>
           </div>
@@ -316,12 +312,12 @@ export default function BeforeAfterLanding() {
                   </Card>
                 </a>
               ) : (
-                <Card key={i} className="border-white/10 bg-white/5">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
-                </Card>
+              <Card key={i} className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
+              </Card>
               )
             ))}
           </div>
@@ -362,7 +358,7 @@ export default function BeforeAfterLanding() {
               <Card key={i} className={`relative border-white/10 ${p.popular ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{p.name}</CardTitle>
+                  <CardTitle className="text-base">{p.name}</CardTitle>
                     {p.badge && <Badge className="border-amber-300/40 text-amber-300">{p.badge}</Badge>}
                   </div>
                 </CardHeader>
@@ -386,13 +382,13 @@ export default function BeforeAfterLanding() {
       {/* FAQ */}
       <section className="border-t border-white/10 py-16 sm:py-24">
         <Container>
-          <SectionTitle eyebrow="FAQ" title="Answers to common questions" />
+          <SectionTitle eyebrow={t('FAQ','ЧЗВ')} title={t('Answers to common questions','Отговори на често задавани въпроси')} />
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {[
-              { q: "How does the embed work?", a: "You paste a single script tag. We render an upload, generation, and before/after slider UI that calls your tenant‑scoped backend via signed URLs." },
-              { q: "Is my data secure?", a: "Yes. Each tenant has isolated credentials and quotas. Images are processed with temporary signed URLs and never shared across tenants." },
-              { q: "Can I customize the UI?", a: "Use data‑attributes for quick theming (width, radius, theme, variant). For full control, use our Admin API or CSS variables." },
-              { q: "What model powers this?", a: "We use Gemini Nano Banana image edit model for fast, on‑device‑style edits delivered from managed infra." },
+              { q: t('How does the embed work?','Как работи embed‑ът?'), a: t('You paste a single script tag. We render an upload, generation, and before/after slider UI that calls your tenant‑scoped backend via signed URLs.','Поставяте един script таг. Рендираме качване, генериране и плъзгач Преди/След, който извиква вашия бекенд с подписани URL‑и.') },
+              { q: t('Is my data secure?','Сигурни ли са данните ми?'), a: t('Yes. Each tenant has isolated credentials and quotas. Images are processed with temporary signed URLs and never shared across tenants.','Да. Всеки клиент има изолирани креденшъли и квоти. Изображенията се обработват чрез временни подписани URL‑и и не се споделят между клиенти.') },
+              { q: t('Can I customize the UI?','Мога ли да персонализирам UI‑я?'), a: t('Use data‑attributes for quick theming (width, radius, theme, variant). For full control, use our Admin API or CSS variables.','Използвайте data‑атрибути за бърза тема (ширина, радиус, тема, вариант). За пълен контрол — Admin API или CSS променливи.') },
+              { q: t('What model powers this?','Кой модел използвате?'), a: t('We use Gemini Nano Banana image edit model for fast, on‑device‑style edits delivered from managed infra.','Използваме модела Gemini Nano Banana за бързи редакции в стил „on‑device“, доставени от управлявана инфраструктура.') },
             ].map((item, i) => (
               <Card key={i} className="border-white/10 bg-white/5">
                 <CardHeader>
