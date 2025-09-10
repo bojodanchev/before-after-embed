@@ -334,7 +334,7 @@ function Dashboard({ token, onSignOut }) {
             <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-violet-500 via-pink-500 to-cyan-400 shadow">
               <span className="text-xs font-bold">B/A</span>
             </div>
-            <div className="text-sm font-semibold">Before/After Portal</div>
+            <div className="text-sm font-semibold">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Портал Before/After' : 'Before/After Portal'}</div>
           </div>
           <div className="flex items-center gap-4 text-sm">
             {client && (
@@ -342,7 +342,8 @@ function Dashboard({ token, onSignOut }) {
                 {client.name} (<Code>{client.id}</Code>)
               </span>
             )}
-            <Button variant="outline" onClick={onSignOut}>Sign out</Button>
+            <Button variant="outline" onClick={onSignOut}>{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Изход' : 'Sign out'}</Button>
+            <a href={`${location.pathname}?lang=${new URLSearchParams(location.search).get('lang')==='bg'?'en':'bg'}`} className="underline">{new URLSearchParams(location.search).get('lang')==='bg'?'English':'Български'}</a>
           </div>
         </Container>
       </header>
@@ -353,23 +354,23 @@ function Dashboard({ token, onSignOut }) {
             {toast}
           </div>
         )}
-        <Section title="Embeds">
+        <Section title={(new URLSearchParams(location.search).get('lang')==='bg') ? 'Ембедове' : 'Embeds'}>
           <div className="mb-3 flex items-center justify-between rounded-md border border-white/10 bg-black/30 p-3 text-sm">
             <div className="flex items-center gap-4">
               <div>
-                <div className="opacity-70">Current plan</div>
+                <div className="opacity-70">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Текущ план' : 'Current plan'}</div>
                 <div className="font-medium">{planInfo?.name || planInfo?.id || 'free'}</div>
               </div>
               <div className="rounded border border-white/10 bg-black/40 px-2 py-1 text-xs opacity-80">
                 {(() => {
                   const requires = (planInfo?.id || 'free') === 'free';
-                  return `Watermark: ${requires ? 'active' : 'removed'}`;
+                  return `${(new URLSearchParams(location.search).get('lang')==='bg') ? 'Воден знак' : 'Watermark'}: ${requires ? ((new URLSearchParams(location.search).get('lang')==='bg') ? 'активен' : 'active') : ((new URLSearchParams(location.search).get('lang')==='bg') ? 'премахнат' : 'removed')}`;
                 })()}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} gens / mo</div>
-              <a href="/app/pricing.html" className="underline">Change plan</a>
+              <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} {(new URLSearchParams(location.search).get('lang')==='bg') ? 'ген./месец' : 'gens / mo'}</div>
+              <a href="/app/pricing.html" className="underline">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Промяна на план' : 'Change plan'}</a>
               <button className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20" onClick={async()=>{
                 try{
                   const resp = await fetch('/api/billing/topup', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ units: 1 }) });
@@ -377,7 +378,7 @@ function Dashboard({ token, onSignOut }) {
                   if (!resp.ok) throw new Error(j?.error || 'Top-up failed');
                   if (j?.url) window.location.href = j.url;
                 }catch(e){ alert(e.message || 'Top-up failed'); }
-              }}>Buy +100</button>
+              }}>{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Купи +100' : 'Buy +100'}</button>
             </div>
           </div>
           <ul className="space-y-2 text-sm">

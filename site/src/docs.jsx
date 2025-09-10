@@ -7,35 +7,37 @@ const Code = ({ children }) => (
 );
 
 function Docs() {
+  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
+  const t = (en, bg) => (locale === 'bg' ? bg : en);
   return (
     <div className="min-h-screen bg-neutral-950 px-4 py-8 text-white">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-3xl font-bold">Before/After Embed — Documentation</h1>
-        <p className="mt-2 text-sm opacity-80">Everything you need to integrate the widget, manage embeds, and go live.</p>
+        <h1 className="text-3xl font-bold">{t('Before/After Embed — Documentation','Before/After Embed — Документация')}</h1>
+        <p className="mt-2 text-sm opacity-80">{t('Everything you need to integrate the widget, manage embeds, and go live.','Всичко необходимо за интеграция, управление и пускане на живо.')}</p>
 
         <nav className="mt-6 flex flex-wrap gap-3 text-sm">
-          {[
-            ['#overview','Overview'],
-            ['#quickstart','Quick Start'],
-            ['#choose-vertical','Choose your vertical'],
-            ['#attributes','Attributes'],
-            ['#examples','Examples'],
-            ['#portal','Client Portal'],
-            ['#billing','Billing & Plans'],
-            ['#webhooks','Webhooks'],
-            ['#api','API Endpoints'],
-            ['#troubleshooting','Troubleshooting'],
+          {[ 
+            ['#overview', t('Overview','Общ преглед')],
+            ['#quickstart', t('Quick Start','Бърз старт')],
+            ['#choose-vertical', t('Choose your vertical','Изберете вертикал')],
+            ['#attributes', t('Attributes','Атрибути')],
+            ['#examples', t('Examples','Примери')],
+            ['#portal', t('Client Portal','Портал за клиенти')],
+            ['#billing', t('Billing & Plans','Плащане и планове')],
+            ['#webhooks', t('Webhooks','Уебкукове')],
+            ['#api', t('API Endpoints','API крайни точки')],
+            ['#troubleshooting', t('Troubleshooting','Отстраняване на проблеми')],
           ].map(([href,label]) => (
             <a key={href} href={href} className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-white hover:bg-white/20">{label}</a>
           ))}
         </nav>
         <section id="choose-vertical" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-lg font-semibold">Choose your vertical</h2>
-          <p className="mt-2 text-sm opacity-80">Pick a tailored onboarding:</p>
+          <h2 className="text-lg font-semibold">{t('Choose your vertical','Изберете вертикал')}</h2>
+          <p className="mt-2 text-sm opacity-80">{t('Pick a tailored onboarding:','Изберете подходящо въведение:')}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <a href="/app/dental.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Dental clinics</a>
-            <a href="/app/barber.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Barbers</a>
-            <a href="/app/detailing.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">Car detailing</a>
+            <a href="/app/dental.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">{t('Dental clinics','Дентални клиники')}</a>
+            <a href="/app/barber.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">{t('Barbers','Барбери')}</a>
+            <a href="/app/detailing.html" className="rounded-lg border border-white/10 bg-white/5 p-3 hover:bg-white/10">{t('Car detailing','Авто детайлинг')}</a>
           </div>
         </section>
 

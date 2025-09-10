@@ -30,6 +30,8 @@ const plans = [
 ];
 
 function App(){
+  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
+  const t = (en, bg) => (locale === 'bg' ? bg : en);
   const goCheckout = (planId) => {
     // If not signed in, send to portal sign-in; otherwise, start Stripe Checkout via backend
     const token = (()=>{ try{return localStorage.getItem('clientToken') || '';}catch{return '';} })();
@@ -60,12 +62,13 @@ function App(){
             <span className="text-sm font-semibold tracking-wide">Before/After</span>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
-            <a href="/app/index.html" className="hover:text-white">Home</a>
-            <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
+            <a href="/app/index.html" className="hover:text-white">{t('Home','Начало')}</a>
+            <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
+            <a href={`${location.pathname}?lang=${locale==='bg'?'en':'bg'}`} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Client Portal</Button></a>
-            <a href="/app/index.html"><Button>Back to Home</Button></a>
+            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>
+            <a href="/app/index.html"><Button>{t('Back to Home','Назад към началото')}</Button></a>
           </div>
         </Container>
       </header>
@@ -73,9 +76,9 @@ function App(){
       <section className="py-16 sm:py-24">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-wide text-white/70">Pricing</div>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Clear, adoption‑first plans</h2>
-            <p className="mt-3 text-base text-white/70">All paid tiers include overage: $10 per extra 100 generations.</p>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-wide text-white/70">{t('Pricing','Цени')}</div>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{t('Clear, adoption‑first plans','Ясни планове с фокус върху приемането')}</h2>
+            <p className="mt-3 text-base text-white/70">{t('All paid tiers include overage: $10 per extra 100 generations.','Всички платени планове включват надвишаване: $10 за всеки допълнителни 100 генерирания.')}</p>
           </div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-4">
@@ -89,14 +92,14 @@ function App(){
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-semibold">{p.price}<span className="text-sm text-white/60">/mo</span></div>
-                  <div className="mt-1 text-sm text-emerald-300">Includes {p.includes}</div>
+                  <div className="mt-1 text-sm text-emerald-300">{t('Includes','Вкл.')} {p.includes}</div>
                   <ul className="mt-4 space-y-2 text-sm text-white/80">
                     {p.bullets.map((b,idx)=> (
                       <li key={idx} className="flex items-start gap-2"><span className="mt-0.5 inline-block h-4 w-4 rounded-full bg-emerald-400/30"/> {b}</li>
                     ))}
                   </ul>
                   <div className="mt-4 text-xs text-white/60">{p.note}</div>
-                  <Button className="mt-6 w-full" onClick={()=> goCheckout(p.id)}>Choose {p.name}</Button>
+                  <Button className="mt-6 w-full" onClick={()=> goCheckout(p.id)}>{t('Choose','Изберете')} {p.name}</Button>
                 </CardContent>
               </Card>
             ))}
@@ -114,9 +117,9 @@ function App(){
               <div className="text-sm text-white/70">© 2025 Before/After Embed</div>
             </div>
             <div className="flex items-center gap-6 text-sm text-white/70">
-              <a href="/app/index.html" className="hover:text-white">Home</a>
-              <a href="#" className="hover:text-white">Pricing</a>
-              <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
+              <a href="/app/index.html" className="hover:text-white">{t('Home','Начало')}</a>
+              <a href="#" className="hover:text-white">{t('Pricing','Цени')}</a>
+              <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
             </div>
           </div>
         </Container>

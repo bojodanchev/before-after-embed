@@ -140,6 +140,8 @@ const LiveDemo = () => {
 };
 
 export default function BeforeAfterLanding() {
+  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
+  const t = (en, bg) => (locale === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="dark"
@@ -163,15 +165,16 @@ export default function BeforeAfterLanding() {
             <span className="text-sm font-semibold tracking-wide">Before/After</span>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
-            <a href="#demo" className="hover:text-white">Live demo</a>
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="/app/docs.html" target="_top" className="hover:text-white">Docs</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="/client.html" target="_top" className="hover:text-white">Client Portal</a>
+            <a href="#demo" className="hover:text-white">{t('Live demo','Демо на живо')}</a>
+            <a href="#features" className="hover:text-white">{t('Features','Функции')}</a>
+            <a href="/app/docs.html" target="_top" className="hover:text-white">{t('Docs','Документация')}</a>
+            <a href="#pricing" className="hover:text-white">{t('Pricing','Цени')}</a>
+            <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
+            <a href={`${location.pathname}?lang=${locale==='bg'?'en':'bg'}`} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">Client Portal</Button></a>
-            <a href="#demo"><Button className="gap-2">Try the demo <ArrowRight className="h-4 w-4"/></Button></a>
+            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>
+            <a href="#demo"><Button className="gap-2">{t('Try the demo','Пробвайте демото')} <ArrowRight className="h-4 w-4"/></Button></a>
           </div>
         </Container>
       </header>
@@ -181,14 +184,14 @@ export default function BeforeAfterLanding() {
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(34,211,238,0.15),_transparent_60%)]" />
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">Let customers visualize results before they buy</h1>
-            <p className="mt-4 text-lg text-white/70">Embed a beautiful, one‑click AI visualizer on any website. Perfect for barbers, dental clinics, car detailing and more. Upload a photo, click Generate, slide to compare.</p>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Let customers visualize results before they buy','Нека клиентите видят резултата преди да купят')}</h1>
+            <p className="mt-4 text-lg text-white/70">{t('Embed a beautiful, one‑click AI visualizer on any website. Perfect for barbers, dental clinics, car detailing and more. Upload a photo, click Generate, slide to compare.','Вградете красив AI визуализатор с едно кликване на всеки сайт. Перфектен за барбери, дентални клиники, авто детайлинг и др. Качете снимка, натиснете Генерирай и плъзнете за сравнение.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a href="#demo"><Button size="lg" className="gap-2">
-                Try the Live Demo <ArrowRight className="h-5 w-5" />
+                {t('Try the Live Demo','Опитайте демото на живо')} <ArrowRight className="h-5 w-5" />
               </Button></a>
               <a href="/client.html" target="_top"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                Client Portal
+                {t('Client Portal','Портал за клиенти')}
               </Button></a>
             </div>
           </div>
@@ -204,9 +207,9 @@ export default function BeforeAfterLanding() {
       <section id="features" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
           <SectionTitle
-            eyebrow="Product"
-            title="Drop‑in embed. Modern UI. Multi‑tenant by design."
-            subtitle="Paste one script tag. Configure layout with data‑attributes. Provision embeds per client, manage themes and verticals, and track usage — all with a clean, conversion‑ready UI."
+            eyebrow={t('Product','Продукт')}
+            title={t('Drop‑in embed. Modern UI. Multi‑tenant by design.','Вграден виджет. Модерен UI. Мултитенант по дизайн.')}
+            subtitle={t('Paste one script tag. Configure layout with data‑attributes. Provision embeds per client, manage themes and verticals, and track usage — all with a clean, conversion‑ready UI.','Поставете един скрипт. Настройвайте чрез data‑атрибути. Създавайте ембедове за всеки клиент, управлявайте теми и вертикали и следете употребата — с чист, модерен интерфейс.')}
           />
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -285,15 +288,15 @@ export default function BeforeAfterLanding() {
       <section className="border-t border-white/10 py-16 sm:py-24">
         <Container>
           <SectionTitle
-            eyebrow="Use cases"
-            title="Built for barbers, dental clinics, car detailing and more"
-            subtitle="Show the transformation. Remove buyer hesitation. Convert with proof in one click."
+            eyebrow={t('Use cases','Приложения')}
+            title={t('Built for barbers, dental clinics, car detailing and more','Създаден за барбери, дентални клиники, авто детайлинг и др.')}
+            subtitle={t('Show the transformation. Remove buyer hesitation. Convert with proof in one click.','Покажете трансформацията. Премахнете колебанието. Конвертирайте с доказателство в едно кликване.')}
           />
           <div className="mt-10 grid gap-6 md:grid-cols-3">
             {[
-              { title: "Barbers & salons", desc: "Preview haircuts, color, or beard styling before the chair.", icon: <Paintbrush className="h-5 w-5"/>, link: "/app/barber.html" },
-              { title: "Dental clinics", desc: "Project whitening, veneers, or aligner results from a selfie.", icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
-              { title: "Car detailing", desc: "Visualize paint correction, wrap colors, and ceramic coatings.", icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
+              { title: t('Barbers & salons','Барбери и салони'), desc: t('Preview haircuts, color, or beard styling before the chair.','Прегледайте прически, цвят и брада преди стола.'), icon: <Paintbrush className="h-5 w-5"/>, link: "/app/barber.html" },
+              { title: t('Dental clinics','Дентални клиники'), desc: t('Project whitening, veneers, or aligner results from a selfie.','Покажете избелване, фасети или алайнери от селфи.'), icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
+              { title: t('Car detailing','Авто детайлинг'), desc: t('Visualize paint correction, wrap colors, and ceramic coatings.','Визуализирайте корекция на боя, фолио и керамични покрития.'), icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
             ].map((f, i) => (
               f.link ? (
                 <a key={i} href={f.link} className="block transition hover:scale-[1.01]" target="_top">
@@ -320,32 +323,32 @@ export default function BeforeAfterLanding() {
       {/* Pricing */}
       <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
-          <SectionTitle eyebrow="Pricing" title="Clear, adoption‑first plans" subtitle="All paid tiers include overage: $10 per extra 100 generations." />
+          <SectionTitle eyebrow={t('Pricing','Цени')} title={t('Clear, adoption‑first plans','Ясни планове с фокус върху приемането')} subtitle={t('All paid tiers include overage: $10 per extra 100 generations.','Всички платени планове включват надвишаване: $10 за всеки допълнителни 100 генерирания.')} />
           <div className="mt-10 grid gap-6 md:grid-cols-4">
             {[
               {
-                name: "Free", price: "$0", badge: "Test Drive", popular:false,
-                includes: "10 generations / mo",
-                bullets: ["1 embed", "Watermark required", "Basic light/dark theme"],
-                footnote: "For trials; limited usage"
+                name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
+                includes: t("10 generations / mo","10 генерирания / месец"),
+                bullets: [t("1 embed","1 ембед"), t("Watermark required","С воден знак"), t("Basic light/dark theme","Базова светла/тъмна тема")],
+                footnote: t("For trials; limited usage","За тестове; ограничена употреба")
               },
               {
-                name: "Starter", price: "$24", badge: null, popular:false,
-                includes: "300 generations / mo",
-                bullets: ["1 embed", "Basic light/dark theme", "Watermark removed"],
-                footnote: "+ $10 per 100 extra gens"
+                name: t("Starter","Стартер"), price: "$24", badge: null, popular:false,
+                includes: t("300 generations / mo","300 генерирания / месец"),
+                bullets: [t("1 embed","1 ембед"), t("Basic light/dark theme","Базова светла/тъмна тема"), t("Watermark removed","Без воден знак")],
+                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
               },
               {
-                name: "Growth", price: "$49", badge: "Most Popular", popular:true,
-                includes: "600 generations / mo",
-                bullets: ["Up to 3 embeds", "Customizable theme", "Remove watermark", "Basic analytics"],
-                footnote: "+ $10 per 100 extra gens"
+                name: t("Growth","Гроус"), price: "$49", badge: t("Most Popular","Най‑популярен"), popular:true,
+                includes: t("600 generations / mo","600 генерирания / месец"),
+                bullets: [t("Up to 3 embeds","До 3 ембеда"), t("Customizable theme","Персонализируема тема"), t("Remove watermark","Без воден знак"), t("Basic analytics","Базова аналитика")],
+                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
               },
               {
-                name: "Pro", price: "$99", badge: null, popular:false,
-                includes: "1,500 generations / mo",
-                bullets: ["Up to 10 embeds", "Advanced analytics", "API + Webhooks", "Priority support"],
-                footnote: "+ $10 per 100 extra gens"
+                name: t("Pro","Про"), price: "$99", badge: null, popular:false,
+                includes: t("1,500 generations / mo","1,500 генерирания / месец"),
+                bullets: [t("Up to 10 embeds","До 10 ембеда"), t("Advanced analytics","Разширена аналитика"), t("API + Webhooks","API + Уебкукове"), t("Priority support","Приоритетна поддръжка")],
+                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
               }
             ].map((p, i) => (
               <Card key={i} className={`relative border-white/10 ${p.popular ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
@@ -357,14 +360,14 @@ export default function BeforeAfterLanding() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-semibold">{p.price}<span className="text-sm text-white/60">/mo</span></div>
-                  <div className="mt-1 text-sm text-emerald-300">Includes {p.includes}</div>
+                  <div className="mt-1 text-sm text-emerald-300">{t('Includes','Вкл.')} {p.includes}</div>
                   <ul className="mt-4 space-y-2 text-sm text-white/80">
                     {p.bullets.map((f, idx) => (
                       <li key={idx} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {f}</li>
                     ))}
                   </ul>
                   <div className="mt-4 text-xs text-white/60">{p.footnote}</div>
-                  <a href="/client.html" target="_top"><Button className="mt-6 w-full">Choose {p.name}</Button></a>
+                  <a href="/client.html" target="_top"><Button className="mt-6 w-full">{t('Choose','Изберете')} {p.name}</Button></a>
                 </CardContent>
               </Card>
             ))}
@@ -398,24 +401,24 @@ export default function BeforeAfterLanding() {
       <section id="get-started" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
           <SectionTitle
-            eyebrow="Get started in 60 seconds"
-            title="Install the embed"
-            subtitle="Paste the snippet below, replace the embed id, and you’re live. Configure look‑and‑feel with data‑attributes — no extra JS required."
+            eyebrow={t('Get started in 60 seconds','Старт за 60 секунди')}
+            title={t('Install the embed','Инсталирайте виджета')}
+            subtitle={t('Paste the snippet below, replace the embed id, and you’re live. Configure look‑and‑feel with data‑attributes — no extra JS required.','Поставете снипета по‑долу, заменете embed id и сте готови. Настройте визията чрез data‑атрибути — без допълнителен JS.')}
           />
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <div className="space-y-4">
               <CodeBlock code={embedSnippet} />
-              <div className="text-xs text-white/60">Example settings: <code>data-theme=\"dark\"</code>, <code>data-variant=\"compact\"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
+              <div className="text-xs text-white/60">{t('Example settings:','Примерни настройки:')} <code>data-theme=\"dark\"</code>, <code>data-variant=\"compact\"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
             </div>
             <Card className="border-white/10 bg-white/5">
               <CardHeader>
-                <CardTitle className="text-base">What you’ll get</CardTitle>
+                <CardTitle className="text-base">{t('What you’ll get','Какво получавате')}</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 text-sm text-white/70">
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A polished dropzone with upload + generate</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> A responsive before/after slider with badges</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> One‑line install; all styling via attributes</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> Per‑tenant analytics in the Client Portal</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A polished dropzone with upload + generate','Изчистена зона за качване и генериране')}</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A responsive before/after slider with badges','Адаптивен плъзгач Преди/След с етикети')}</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('One‑line install; all styling via attributes','Инсталация с един ред; стилове чрез атрибути')}</div>
+                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('Per‑tenant analytics in the Client Portal','Аналитика по клиент в портала')}</div>
               </CardContent>
             </Card>
           </div>
