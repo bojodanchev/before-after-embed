@@ -326,6 +326,10 @@ function Dashboard({ token, onSignOut }) {
   if (loading) return <div className="p-6 text-white">Loading…</div>;
   if (error) return <div className="p-6 text-red-400">{error}</div>;
 
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
       <header className="sticky top-0 z-10 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
@@ -334,7 +338,7 @@ function Dashboard({ token, onSignOut }) {
             <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-violet-500 via-pink-500 to-cyan-400 shadow">
               <span className="text-xs font-bold">B/A</span>
             </div>
-            <div className="text-sm font-semibold">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Портал Before/After' : 'Before/After Portal'}</div>
+            <div className="text-sm font-semibold">{t('Before/After Portal','Портал Before/After')}</div>
           </div>
           <div className="flex items-center gap-4 text-sm">
             {client && (
@@ -342,8 +346,11 @@ function Dashboard({ token, onSignOut }) {
                 {client.name} (<Code>{client.id}</Code>)
               </span>
             )}
-            <Button variant="outline" onClick={onSignOut}>{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Изход' : 'Sign out'}</Button>
-            <a href={`${location.pathname}?lang=${new URLSearchParams(location.search).get('lang')==='bg'?'en':'bg'}`} className="underline">{new URLSearchParams(location.search).get('lang')==='bg'?'English':'Български'}</a>
+            <Button variant="outline" onClick={onSignOut}>{t('Sign out','Изход')}</Button>
+            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
+              <option value="en">EN</option>
+              <option value="bg">BG</option>
+            </select>
           </div>
         </Container>
       </header>
@@ -354,23 +361,23 @@ function Dashboard({ token, onSignOut }) {
             {toast}
           </div>
         )}
-        <Section title={(new URLSearchParams(location.search).get('lang')==='bg') ? 'Ембедове' : 'Embeds'}>
+        <Section title={t('Embeds','Ембедове')}>
           <div className="mb-3 flex items-center justify-between rounded-md border border-white/10 bg-black/30 p-3 text-sm">
             <div className="flex items-center gap-4">
               <div>
-                <div className="opacity-70">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Текущ план' : 'Current plan'}</div>
+                <div className="opacity-70">{t('Current plan','Текущ план')}</div>
                 <div className="font-medium">{planInfo?.name || planInfo?.id || 'free'}</div>
               </div>
               <div className="rounded border border-white/10 bg-black/40 px-2 py-1 text-xs opacity-80">
                 {(() => {
                   const requires = (planInfo?.id || 'free') === 'free';
-                  return `${(new URLSearchParams(location.search).get('lang')==='bg') ? 'Воден знак' : 'Watermark'}: ${requires ? ((new URLSearchParams(location.search).get('lang')==='bg') ? 'активен' : 'active') : ((new URLSearchParams(location.search).get('lang')==='bg') ? 'премахнат' : 'removed')}`;
+                  return `${t('Watermark','Воден знак')}: ${requires ? t('active','активен') : t('removed','премахнат')}`;
                 })()}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} {(new URLSearchParams(location.search).get('lang')==='bg') ? 'ген./месец' : 'gens / mo'}</div>
-              <a href="/app/pricing.html" className="underline">{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Промяна на план' : 'Change plan'}</a>
+              <div className="text-xs opacity-70">{(planInfo?.monthlyGenerations ?? 0)} {t('gens / mo','ген./месец')}</div>
+              <a href="/app/pricing.html" className="underline">{t('Change plan','Промяна на план')}</a>
               <button className="rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20" onClick={async()=>{
                 try{
                   const resp = await fetch('/api/billing/topup', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ units: 1 }) });
@@ -378,7 +385,7 @@ function Dashboard({ token, onSignOut }) {
                   if (!resp.ok) throw new Error(j?.error || 'Top-up failed');
                   if (j?.url) window.location.href = j.url;
                 }catch(e){ alert(e.message || 'Top-up failed'); }
-              }}>{(new URLSearchParams(location.search).get('lang')==='bg') ? 'Купи +100' : 'Buy +100'}</button>
+              }}>{t('Buy +100','Купи +100')}</button>
             </div>
           </div>
           <ul className="space-y-2 text-sm">

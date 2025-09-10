@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./index.css";
 import { createRoot } from "react-dom/client";
 
@@ -30,8 +30,9 @@ const plans = [
 ];
 
 function App(){
-  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
-  const t = (en, bg) => (locale === 'bg' ? bg : en);
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
   const goCheckout = (planId) => {
     // If not signed in, send to portal sign-in; otherwise, start Stripe Checkout via backend
     const token = (()=>{ try{return localStorage.getItem('clientToken') || '';}catch{return '';} })();
@@ -64,7 +65,10 @@ function App(){
           <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
             <a href="/app/index.html" className="hover:text-white">{t('Home','Начало')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
-            <a href={`${location.pathname}?lang=${locale==='bg'?'en':'bg'}`} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
+            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
+              <option value="en">EN</option>
+              <option value="bg">BG</option>
+            </select>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>

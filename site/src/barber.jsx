@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
@@ -18,8 +18,9 @@ const Button = ({ children, className = "", variant = "primary", ...props }) => 
 };
 
 function BarberPage(){
-  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
-  const t = (en, bg) => (locale === 'bg' ? bg : en);
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
   const snippet = `<script async src=\"https://before-after-embed.vercel.app/embed.js\"\n  data-embed-id=\"your-embed-id\"\n  data-theme=\"light\"\n  data-variant=\"compact\"\n  data-max-width=\"640px\"\n  data-align=\"center\">\n<\/script>`;
 
   return (
@@ -36,7 +37,10 @@ function BarberPage(){
             <a href="/app/index.html" className="hover:text-white">{t('Main site','Основен сайт')}</a>
             <a href="/app/docs.html" className="hover:text-white">{t('Docs','Документация')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
-            <a href={`${location.pathname}?lang=${locale==='bg'?'en':'bg'}`} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
+            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
+              <option value="en">EN</option>
+              <option value="bg">BG</option>
+            </select>
           </nav>
         </Container>
       </header>

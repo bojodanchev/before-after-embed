@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 // Minimal Tailwind-like stand-ins (no external UI lib). We keep classNames from your design.
 const Button = ({ children, className = "", variant = "primary", size = "md", ...props }) => {
   const base = "inline-flex items-center justify-center rounded-md border border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20";
@@ -140,8 +140,9 @@ const LiveDemo = () => {
 };
 
 export default function BeforeAfterLanding() {
-  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
-  const t = (en, bg) => (locale === 'bg' ? bg : en);
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try { localStorage.setItem('lang', lang); } catch {} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
   data-theme="dark"
@@ -170,7 +171,10 @@ export default function BeforeAfterLanding() {
             <a href="/app/docs.html" target="_top" className="hover:text-white">{t('Docs','Документация')}</a>
             <a href="#pricing" className="hover:text-white">{t('Pricing','Цени')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
-            <a href={`${location.pathname}?lang=${locale==='bg'?'en':'bg'}`} className="hover:text-white">{locale==='bg' ? 'English' : 'Български'}</a>
+            <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
+              <option value="en">EN</option>
+              <option value="bg">BG</option>
+            </select>
           </nav>
           <div className="flex items-center gap-2">
             <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as ReactDOMClient from "react-dom/client";
 import "./index.css";
 
@@ -7,12 +7,19 @@ const Code = ({ children }) => (
 );
 
 function Docs() {
-  const locale = new URLSearchParams(location.search).get('lang') === 'bg' ? 'bg' : 'en';
-  const t = (en, bg) => (locale === 'bg' ? bg : en);
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
+  useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
+  const t = (en, bg) => (lang === 'bg' ? bg : en);
   return (
     <div className="min-h-screen bg-neutral-950 px-4 py-8 text-white">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-3xl font-bold">{t('Before/After Embed — Documentation','Before/After Embed — Документация')}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">{t('Before/After Embed — Documentation','Before/After Embed — Документация')}</h1>
+          <select value={lang} onChange={(e)=> setLang(e.target.value)} className="rounded-md border border-white/20 bg-white/5 px-2 py-1 text-white/80 hover:bg-white/10">
+            <option value="en">EN</option>
+            <option value="bg">BG</option>
+          </select>
+        </div>
         <p className="mt-2 text-sm opacity-80">{t('Everything you need to integrate the widget, manage embeds, and go live.','Всичко необходимо за интеграция, управление и пускане на живо.')}</p>
 
         <nav className="mt-6 flex flex-wrap gap-3 text-sm">
