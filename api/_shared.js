@@ -6,7 +6,8 @@ fal.config({ credentials: process.env.FAL_KEY || "" });
 export const verticalPromptPresets = {
   barber: "Apply a modern, realistic men's fade haircut; maintain identity and face shape; natural lighting; high fidelity.",
   dental: "Whiten teeth naturally, improve alignment subtly without changing face identity; realistic results; no overexposure.",
-  detailing: "Make the car paint glossy like just detailed, remove minor scratches and swirl marks; realistic reflections; do not change car model or color drastically.",
+  // Keep base prompt neutral for detailing; per-focus text is appended below
+  detailing: "Professional auto detailing enhancement. Produce a realistic, clearly visible improvement while preserving the original car model and color.",
 };
 
 // ===== SaaS plans =====

@@ -106,9 +106,9 @@ export default async function handler(req, res){
       }
       if (v === 'detailing'){
         const focus = opts.focus;
-        if (focus === 'interior') return 'Focus on car interior: deep-clean upholstery, remove stains, crisp textures, subtle matte finish.';
-        if (focus === 'exterior') return 'Focus on car exterior: glossy paint, remove swirls and minor scratches, sharp reflections.';
-        if (focus === 'wheels') return 'Focus on wheels and tires: remove brake dust and dirt, enhance rim clarity without changing the design, add natural tire shine, keep realistic tire sidewall texture, preserve vehicle color and model.';
+        if (focus === 'interior') return 'Operate ONLY on the car interior visible in the photo: deep-clean upholstery and plastics, remove dust and stains, revive leather with a subtle satin finish, sharpen console details; DO NOT alter exterior body, car model, or colors; ensure a clearly visible, realistic improvement.';
+        if (focus === 'exterior') return 'Operate ONLY on the car exterior body: clean road grime, increase paint gloss, reduce light swirl marks and water spots, strengthen natural reflections; DO NOT change car model, wheel design, badges, or paint color; ensure a clearly visible, realistic improvement.';
+        if (focus === 'wheels') return 'Operate ONLY on wheels and tires: remove brake dust and dirt, brighten and clarify rims WITHOUT changing the design, add natural tire dressing shine, keep sidewall texture realistic; DO NOT change wheel model/size or car paint; ensure a clearly visible, realistic improvement.';
       }
       return '';
     }
