@@ -228,7 +228,7 @@
         const choices = {
           barber: ['fade', 'buzz', 'undercut', 'pompadour'],
           dental: ['whitening', 'alignment', 'veneers'],
-          detailing: ['interior', 'exterior']
+          detailing: ['interior', 'exterior', 'wheels']
         }[vertical] || [];
         // Store current vertical so we can send it with the request
         root.__ba_vertical = vertical;
@@ -327,7 +327,11 @@
         showStatus('Generated successfully!', 'success');
         
       } catch (err) {
-        showStatus(`Error: ${err.message}`, 'error');
+        // Friendlier errors for users (common cases)
+        let msg = err && err.message || 'Failed';
+        if (/413|payload too large/i.test(msg)) msg = 'Image too large. Please upload JPG/PNG under 25MB.';
+        if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
+        showStatus(`Error: ${msg}`, 'error');
       } finally {
         genBtn.disabled = false;
       }

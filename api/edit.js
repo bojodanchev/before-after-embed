@@ -21,7 +21,8 @@ export default async function handler(req, res){
 
   try{
     console.log('Processing edit request...');
-    const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 10 * 1024 * 1024 });
+    // Allow larger smartphone photos (up to ~25MB)
+    const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 25 * 1024 * 1024 });
     const { fields, files } = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
     });
@@ -107,6 +108,7 @@ export default async function handler(req, res){
         const focus = opts.focus;
         if (focus === 'interior') return 'Focus on car interior: deep-clean upholstery, remove stains, crisp textures, subtle matte finish.';
         if (focus === 'exterior') return 'Focus on car exterior: glossy paint, remove swirls and minor scratches, sharp reflections.';
+        if (focus === 'wheels') return 'Focus on wheels and tires: remove brake dust and dirt, enhance rim clarity without changing the design, add natural tire shine, keep realistic tire sidewall texture, preserve vehicle color and model.';
       }
       return '';
     }

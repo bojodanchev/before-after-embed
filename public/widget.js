@@ -174,10 +174,10 @@
       }
 
       if (v === 'detailing'){
-        renderChoices('focus', ['exterior','interior']);
+        renderChoices('focus', ['exterior','interior','wheels']);
         const select = document.createElement('select');
         select.setAttribute('data-opt','focus');
-        ['exterior','interior'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
+        ['exterior','interior','wheels'].forEach(opt =>{ const o=document.createElement('option'); o.value=opt; o.textContent=opt; select.appendChild(o); });
         select.style.display = 'none'; optionsContainer.appendChild(select);
       } else if (v === 'dental'){
         renderChoices('treatment', ['whitening','alignment','veneers']);
