@@ -60,7 +60,7 @@ export default async function handler(req, res){
       }
 
       // If Whop is enabled, return its checkout URL instead
-      if (isWhopEnabled()){
+      if (usingWhop){
         const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
           ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
           : (req.headers.origin || '');
@@ -107,7 +107,7 @@ export default async function handler(req, res){
       const price = (process.env.STRIPE_PRICE_TOPUP || '').trim();
 
       // Whop one-time top-up
-      if (isWhopEnabled()){
+      if (usingWhop){
         const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
           ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
           : (req.headers.origin || '');
