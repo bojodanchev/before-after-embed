@@ -152,6 +152,48 @@ export default async function handler(req, res){
     }catch(e){ return res.status(500).send('Whop success processing failed'); }
   }
 
+  // Whop webhook (MVP): secure via Authorization: Bearer WHOP_WEBHOOK_SECRET
+  if (resource === 'whop' && segments[1] === 'webhook' && (req.method === 'POST' || req.method === 'GET')){
+    try{
+      const auth = (req.headers.authorization || '').toString();
+      const token = auth.replace(/^Bearer\s+/i, '').trim();
+      const expected = (process.env.WHOP_WEBHOOK_SECRET || '').trim();
+      if (!expected || token !== expected){ return res.status(401).json({ error: 'Unauthorized' }); }
+
+      const body = req.body || {};
+      // Extract buyer email and normalize plan from various possible payload shapes
+      const email = (body?.customer?.email || body?.user?.email || body?.buyer?.email || body?.email || '').toString().trim();
+      let planName = (body?.product?.name || body?.plan || body?.price?.nickname || body?.price?.name || '').toString().toLowerCase();
+      // Fallback: try SKU/plan IDs we know
+      const ref = (body?.product?.id || body?.plan_id || body?.price_id || body?.product_id || '').toString();
+      function inferPlan(name){
+        const s = (name || '').toLowerCase();
+        if (s.includes('pro')) return 'pro';
+        if (s.includes('growth')) return 'growth';
+        if (s.includes('starter')) return 'starter';
+        return '';
+      }
+      let planId = inferPlan(planName) || inferPlan(ref);
+      // Optional top-up amount
+      const credited = Number(body?.metadata?.topup || body?.topup || 0);
+
+      if (!email && !planId){ return res.status(200).json({ ok:true, note:'ignored: missing email/plan' }); }
+
+      // Map to our client by email
+      let client = null;
+      try{ client = await getClientByEmail(email); }catch{}
+      if (!client){ return res.status(200).json({ ok:true, note:'client not found by email' }); }
+
+      if (plans[planId]){
+        await setClientPlan(client.id, planId);
+        try{ const embeds = await listEmbedsForClient(client.id); for (const e of embeds){ await logUsage('plan_updated', e.id, { planId, source:'whop_webhook' }); } }catch{}
+      }
+      if (credited > 0){ await incrMonthlyBonusForClient(client.id, credited); try{ const embeds = await listEmbedsForClient(client.id); for (const e of embeds){ await logUsage('topup_applied', e.id, { credited, source:'whop_webhook' }); } }catch{} }
+
+      return res.status(200).json({ ok:true });
+    }catch(e){ return res.status(500).json({ error: e?.message || 'Webhook failed' }); }
+  }
+
   if (resource === 'webhook'){
     // Minimal webhook: set plan on checkout completion
     const sig = req.headers['stripe-signature'];
