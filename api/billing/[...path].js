@@ -22,7 +22,7 @@ const PRICE_MAP = {
 };
 
 export default async function handler(req, res){
-  const usingWhop = isWhopEnabled();
+  const usingWhop = isWhopEnabled() || Boolean((process.env.WHOP_CHECKOUT_STARTER||process.env.WHOP_CHECKOUT_GROWTH||process.env.WHOP_CHECKOUT_PRO||'').trim());
   const stripe = usingWhop ? null : getStripe();
   if (!usingWhop && !stripe) return res.status(500).json({ error: 'Stripe not configured' });
   // Guard: prevent test keys in production
