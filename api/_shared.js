@@ -558,4 +558,29 @@ export async function bumpCounter(key, by){
   return v;
 }
 
+export function isWhopEnabled(){
+  return String(process.env.BILLING_PROVIDER || '').toLowerCase() === 'whop';
+}
+
+export function buildWhopCheckoutUrl({ planId, clientId, token, origin }){
+  // For MVP, assume per-plan Whop checkout links via env vars
+  const map = {
+    free: process.env.WHOP_CHECKOUT_FREE || '',
+    starter: process.env.WHOP_CHECKOUT_STARTER || '',
+    growth: process.env.WHOP_CHECKOUT_GROWTH || '',
+    pro: process.env.WHOP_CHECKOUT_PRO || '',
+    topup: process.env.WHOP_CHECKOUT_TOPUP || '',
+  };
+  const base = map[planId] || '';
+  if (!base) return '';
+  const url = new URL(base);
+  // Append return URL params so Whop can redirect back
+  const ret = new URL('/api/billing/whop/success', origin || 'https://before-after-embed.vercel.app');
+  ret.searchParams.set('token', token || '');
+  ret.searchParams.set('plan', planId);
+  ret.searchParams.set('clientId', clientId || '');
+  url.searchParams.set('return_url', ret.toString());
+  return url.toString();
+}
+
 export { fal };

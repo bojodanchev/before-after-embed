@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getClientByToken, setClientPlan, plans, incrMonthlyBonusForClient, logUsage, listEmbedsForClient } from '../_shared.js';
+import { getClientByToken, setClientPlan, plans, incrMonthlyBonusForClient, logUsage, listEmbedsForClient, isWhopEnabled, buildWhopCheckoutUrl } from '../_shared.js';
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -58,6 +58,16 @@ export default async function handler(req, res){
         return res.status(200).json({ url, bypass: true });
       }
 
+      // If Whop is enabled, return its checkout URL instead
+      if (isWhopEnabled()){
+        const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
+          ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+          : (req.headers.origin || '');
+        const url = buildWhopCheckoutUrl({ planId, clientId: client.id, token, origin });
+        if (!url) return res.status(500).json({ error: 'Whop checkout not configured for this plan' });
+        return res.status(200).json({ url, provider: 'whop' });
+      }
+
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         line_items: [{ price, quantity: 1 }],
@@ -91,6 +101,23 @@ export default async function handler(req, res){
       const { units } = req.body || {}; // units of 100 generations
       const n = Math.max(1, Number(units || 1));
       const price = (process.env.STRIPE_PRICE_TOPUP || '').trim();
+
+      // Whop one-time top-up
+      if (isWhopEnabled()){
+        const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
+          ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+          : (req.headers.origin || '');
+        const base = process.env.WHOP_CHECKOUT_TOPUP || '';
+        if (!base) return res.status(400).json({ error: 'Top-up not configured' });
+        const url = new URL(base);
+        const ret = new URL('/api/billing/whop/success', origin);
+        ret.searchParams.set('token', token);
+        ret.searchParams.set('clientId', client.id);
+        ret.searchParams.set('topup', String(n*100));
+        url.searchParams.set('return_url', ret.toString());
+        return res.status(200).json({ url: url.toString(), provider: 'whop' });
+      }
+
       if (!price) return res.status(400).json({ error: 'Top-up price not configured' });
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
@@ -101,6 +128,24 @@ export default async function handler(req, res){
       });
       return res.status(200).json({ url: session.url });
     }catch(e){ return res.status(500).json({ error: e?.message || 'Top-up failed' }); }
+  }
+  // Whop success return URL handler (no signature verification in MVP; trust redirect)
+  if (resource === 'whop' && segments[1] === 'success' && req.method === 'GET'){
+    try{
+      const token = extractToken(req);
+      const client = await getClientByToken(token);
+      if (!client) return res.status(401).send('Unauthorized');
+      const planId = (req.query?.plan || '').toString();
+      const credited = Number((req.query?.topup || '').toString());
+      if (plans[planId]){ await setClientPlan(client.id, planId); }
+      if (credited > 0){ await incrMonthlyBonusForClient(client.id, credited); try{ const embeds = await listEmbedsForClient(client.id); for (const e of embeds){ await logUsage('topup_applied', e.id, { credited }); } }catch{} }
+      const origin = (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'])
+        ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}`
+        : (req.headers.origin || '');
+      const url = `${origin}/app/client.html?token=${encodeURIComponent(token)}&success=1${planId?`&plan=${encodeURIComponent(planId)}`:''}${credited?`&topup=${credited}`:''}`;
+      res.writeHead(302, { Location: url });
+      return res.end();
+    }catch(e){ return res.status(500).send('Whop success processing failed'); }
   }
 
   if (resource === 'webhook'){
