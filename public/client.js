@@ -51,7 +51,9 @@
     });
 
     document.getElementById('c-stats').addEventListener('click', async () =>{
-      const data = await jget('/api/client/stats');
+      const id = (document.getElementById('c-embedId').value || '').trim();
+      if (!id) return pre('c-stats-out','Provide embedId');
+      const data = await jget('/api/client/stats?embedId='+encodeURIComponent(id));
       pre('c-stats-out', data || {});
     });
 

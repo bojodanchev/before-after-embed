@@ -204,6 +204,8 @@ function Dashboard({ token, onSignOut }) {
   const [settings, setSettings] = useState(null);
   const [savingSettings, setSavingSettings] = useState(false);
   const [planInfo, setPlanInfo] = useState(null);
+  const [monthlyUsed, setMonthlyUsed] = useState(0);
+  const [monthlyBonus, setMonthlyBonus] = useState(0);
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -290,7 +292,7 @@ function Dashboard({ token, onSignOut }) {
     if (!id) return;
     setUsageLoading(true);
     try{
-      const res = await fetch(`/api/client/usage?embedId=${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`/api/client/stats?embedId=${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error(await safeError(res));
       const data = await res.json();
       const arr = Array.isArray(data) ? data : (data?.events || []);
@@ -306,6 +308,14 @@ function Dashboard({ token, onSignOut }) {
       if (!res.ok) throw new Error(await safeError(res));
       const j = await res.json();
       setStats(j || null);
+      try{
+        const res = await fetch(`/api/client/stats`, { headers: { Authorization: `Bearer ${token}` } });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j?.error || 'Failed');
+        setPlanInfo(j.plan || null);
+        setMonthlyUsed(Number(j.monthlyUsed||0));
+        setMonthlyBonus(Number(j.monthlyBonus||0));
+      }catch(e){ /* ignore */ }
     }catch(e){ setStats(null); }
     finally{ setStatsLoading(false); }
   };

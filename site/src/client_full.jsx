@@ -157,12 +157,10 @@ const useUsage = (token, selectedEmbedId) => {
     (async () => {
       setLoading(true); setErr("");
       try{
-        const res = await fetch(`/api/client/usage?embedId=${encodeURIComponent(selectedEmbedId)}`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) throw new Error(`${res.status}`);
-        const data = await res.json();
-        const raw = Array.isArray(data) ? data : (data?.events || []);
-        const mapped = raw.map(r => ({ type: r.event, embedId: r.embedId, status: r.event === 'edit_success' ? 'ok' : r.event, timestamp: r.ts ? new Date(r.ts).toLocaleString() : '' }));
-        if (!cancelled) setEvents(mapped);
+        const res = await fetch(`/api/client/stats?embedId=${encodeURIComponent(selectedEmbedId)}`, { headers: { Authorization: `Bearer ${token}` } });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j?.error || 'Failed');
+        setEvents(j.events||[]);
       }catch(e){ if (!cancelled) setErr("Failed to load usage."); }
       finally{ if (!cancelled) setLoading(false); }
     })();
@@ -179,12 +177,11 @@ const useStats = (token) => {
     if (!token) return; setLoading(true); setErr("");
     try{
       const res = await fetch(`/api/client/stats`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!res.ok) throw new Error(`${res.status}`);
-      const data = await res.json();
-      const totals = data?.totals || { overall: 0, byEmbed: {} };
-      const last24h = data?.last24h || { overall: 0, byEmbed: {} };
-      const byEmbed = Object.entries(totals.byEmbed || {}).map(([embedId, generations]) => ({ embedId, generations }));
-      setStats({ overall: { generations: totals.overall, embeds: byEmbed.length }, last24h: { generations: last24h.overall }, byEmbed });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j?.error || 'Failed');
+      setPlan(j.plan || null);
+      setMonthlyUsed(Number(j.monthlyUsed||0));
+      setMonthlyBonus(Number(j.monthlyBonus||0));
     }catch(e){ setErr("Failed to load stats."); }
     finally{ setLoading(false); }
   };

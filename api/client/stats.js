@@ -1,4 +1,4 @@
-import { getClientByToken, listEmbedsForClient, listUsage, getClientPlan, getMonthlyUsageForClient, getMonthlyBonusForClient } from "../_shared.js";
+import { getClientByToken, listEmbedsForClient, listUsage, getClientPlan, getMonthlyUsageForClient, getMonthlyBonusForClient, getStorageMode } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -11,6 +11,21 @@ export default async function handler(req, res){
   const token = extractToken(req);
   const client = await getClientByToken(token);
   if (!client) return res.status(401).json({ error: 'Unauthorized' });
+
+  // If embedId is provided, act like previous /client/usage and return events
+  const embedId = (req.query?.embedId || '').toString().trim();
+  if (embedId){
+    const allowed = (await listEmbedsForClient(client.id)).some(e=> e.id === embedId);
+    if (!allowed) return res.status(403).json({ error: 'Forbidden' });
+    res.setHeader('Cache-Control', 'no-store');
+    let events = await listUsage(embedId, 100);
+    if (!events || events.length === 0){
+      const all = await listUsage(undefined, 200);
+      events = (all || []).filter(e => e && e.embedId === embedId);
+    }
+    return res.status(200).json({ events, storage: getStorageMode() });
+  }
+
   const embeds = await listEmbedsForClient(client.id);
   const now = Date.now();
   const ids = embeds.map(e=> e.id);
@@ -31,7 +46,6 @@ export default async function handler(req, res){
       }
     }
   }
-  // Plan + monthly usage for progress bar
   let plan = null; let monthlyUsed = 0; let monthlyBonus = 0;
   try{ plan = await getClientPlan(client.id); }catch{}
   try{ monthlyUsed = await getMonthlyUsageForClient(client.id); }catch{}

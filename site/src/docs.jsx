@@ -296,7 +296,7 @@ function Docs() {
             <li><code>POST /api/client/me</code> — {t('request magic link.','заявка за magic link.')}</li>
             <li><code>GET/POST/PATCH/DELETE /api/client/embeds</code> — {t('manage embeds (token required).','управление на embeds (изисква token).')}</li>
             <li><code>GET /api/client/stats</code> — {t('usage and quota.','използване и квота.')}</li>
-            <li><code>GET /api/client/usage?embedId=...</code> — {t('recent render events.','скорошни render събития.')}</li>
+            <li><code>GET /api/client/stats?embedId=...</code> — {t('recent render events.','скорошни render събития.')}</li>
             <li><code>GET /api/embed/:id</code> — {t('public config for an embed.','публична конфигурация за embed.')}</li>
             <li><code>POST /api/edit</code> — {t('upload + generate (multipart/form-data).','качване + генериране (multipart/form-data).')}</li>
           </ul>
