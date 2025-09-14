@@ -22,8 +22,9 @@ const PRICE_MAP = {
 };
 
 export default async function handler(req, res){
-  const stripe = getStripe();
-  if (!stripe) return res.status(500).json({ error: 'Stripe not configured' });
+  const usingWhop = isWhopEnabled();
+  const stripe = usingWhop ? null : getStripe();
+  if (!usingWhop && !stripe) return res.status(500).json({ error: 'Stripe not configured' });
   // Guard: prevent test keys in production
   try{
     const env = (process.env.VERCEL_ENV || process.env.NODE_ENV || '').toString();
@@ -80,6 +81,9 @@ export default async function handler(req, res){
   }
 
   if (resource === 'portal' && req.method === 'POST'){
+    if (usingWhop){
+      return res.status(400).json({ error: 'Billing portal not available with Whop. Manage subscription in Whop.' });
+    }
     try{
       const token = extractToken(req);
       const client = await getClientByToken(token);
