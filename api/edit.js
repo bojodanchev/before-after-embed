@@ -127,11 +127,17 @@ export default async function handler(req, res){
     const result = await fal.subscribe("fal-ai/nano-banana/edit", {
       input: {
         prompt: effectivePrompt,
-        image_urls: [base64Image],
+        image_url: base64Image,
       },
       logs: false,
       timeout: 120000,
     });
+
+    if (result?.error) {
+      console.error('fal edit error', result.error);
+      await logUsage('edit_error', embedId, { reason: 'fal_error', detail: result.error, prompt: effectivePrompt, clientId: embedClientId });
+      return res.status(502).json({ error: 'Image edit failed', detail: result.error });
+    }
 
     const { data } = result || {};
     if (!data){
@@ -178,7 +184,7 @@ export default async function handler(req, res){
     });
     const fallbackEmbedId = 'anonymous';
     try { await logUsage('edit_error', fallbackEmbedId, { reason: 'exception', message: err?.message || '' }); } catch {}
-    res.status(500).json({ error: 'Edit failed', details: err?.message });
+    res.status(500).json({ error: 'Edit failed', details: err?.message, detail: err?.response?.body || err?.body });
   }
 }
 

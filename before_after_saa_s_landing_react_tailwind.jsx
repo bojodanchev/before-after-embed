@@ -314,7 +314,7 @@ export default function BeforeAfterLanding() {
   const closeFeedback = () => setFeedbackOpen(false);
   useEffect(() => {
     if (seenFeedback.demo_exit) return;
-    const timer = setTimeout(() => triggerFeedback('demo_exit'), 20000);
+    const timer = setTimeout(() => triggerFeedback('demo_exit'), 6000);
     const onMouseLeave = (event) => {
       if (event.clientY <= 0) {
         triggerFeedback('demo_exit');
