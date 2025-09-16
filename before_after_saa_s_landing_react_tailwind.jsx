@@ -207,16 +207,12 @@ const LiveDemo = ({ onExit }) => {
   const [afterSrc, setAfterSrc] = useState("");
   const [status, setStatus] = useState("");
   const [slider, setSlider] = useState(50);
-  const [hasInteracted, setHasInteracted] = useState(false);
 
   const handleMouseLeave = () => {
-    if (hasInteracted) {
-      onExit?.('demo_exit');
-    }
+    onExit?.('demo_exit');
   };
 
   const onPick = () => {
-    setHasInteracted(true);
     fileRef.current?.click();
   };
   const onFile = (e) => {
@@ -224,13 +220,11 @@ const LiveDemo = ({ onExit }) => {
     if (!f) return;
     setBeforeSrc(URL.createObjectURL(f));
     setAfterSrc("");
-    setHasInteracted(true);
   };
 
   const onGenerate = async () => {
     const f = fileRef.current?.files?.[0];
     if (!f) { setStatus('Please choose an image.'); return; }
-    setHasInteracted(true);
     setStatus('Uploading...'); setAfterSrc(""); setSlider(50);
     const fd = new FormData();
     fd.append('image', f);
