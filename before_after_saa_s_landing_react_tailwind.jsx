@@ -19,7 +19,6 @@ const Badge = ({ children, className = "" }) => (
   <span className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 ${className}`}>{children}</span>
 );
 import { Check, ArrowRight, Code2, Gauge, Layers, Paintbrush, Shield, Sparkles, Terminal, Image as ImageIcon } from "lucide-react";
-import { captureLandingView, trackDemoStart, trackDemoGenerate, trackCtaClick, trackPricingSelect } from "./site/src/analytics.js";
 
 // Simple utility components
 const Container = ({ children, className = "" }) => (
@@ -64,35 +63,17 @@ const LiveDemo = () => {
   const [status, setStatus] = useState("");
   const [slider, setSlider] = useState(50);
 
-  const onPick = () => {
-    trackDemoStart({ step: 'open_picker' });
-    fileRef.current?.click();
-  };
+  const onPick = () => fileRef.current?.click();
   const onFile = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
     setBeforeSrc(URL.createObjectURL(f));
     setAfterSrc("");
-    const meta = {
-      step: 'file_selected',
-      file_type: f.type || 'unknown',
-    };
-    if (f.size) meta.file_size_kb = Math.round(f.size / 1024);
-    trackDemoStart(meta);
   };
 
   const onGenerate = async () => {
     const f = fileRef.current?.files?.[0];
-    if (!f) {
-      setStatus('Please choose an image.');
-      trackDemoGenerate('missing_file');
-      return;
-    }
-    const generateMeta = {
-      file_type: f.type || 'unknown',
-    };
-    if (f.size) generateMeta.file_size_kb = Math.round(f.size / 1024);
-    trackDemoGenerate('requested', generateMeta);
+    if (!f) { setStatus('Please choose an image.'); return; }
     setStatus('Uploading...'); setAfterSrc(""); setSlider(50);
     const fd = new FormData();
     fd.append('image', f);
@@ -104,20 +85,8 @@ const LiveDemo = () => {
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error || 'Failed');
       setStatus('Rendering complete');
-      const { outputUrl, durationMs } = json;
-      const hasOutput = Boolean(outputUrl);
-      if (hasOutput) {
-        setAfterSrc(outputUrl);
-      } else {
-        setStatus('No image returned');
-      }
-      const successMeta = { has_output: hasOutput };
-      if (typeof durationMs === 'number') successMeta.duration_ms = durationMs;
-      trackDemoGenerate('success', successMeta);
-    }catch(err){
-      setStatus('Error: '+err.message);
-      trackDemoGenerate('error', { message: err.message });
-    }
+      if (json.outputUrl) setAfterSrc(json.outputUrl); else setStatus('No image returned');
+    }catch(err){ setStatus('Error: '+err.message); }
   };
 
   return (
@@ -172,9 +141,6 @@ const LiveDemo = () => {
 
 export default function BeforeAfterLanding() {
   const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
-  useEffect(() => {
-    captureLandingView();
-  }, []);
   useEffect(() => { try { localStorage.setItem('lang', lang); } catch {} }, [lang]);
   const t = (en, bg) => (lang === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
@@ -207,15 +173,8 @@ export default function BeforeAfterLanding() {
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/client.html" target="_top"><Button
-              variant="secondary"
-              className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex"
-              onClick={() => trackCtaClick({ id: 'header_client_portal', label: 'Client Portal', href: '/client.html', location: 'header', extra: { lang } })}
-            >{t('Client Portal','Портал за клиенти')}</Button></a>
-            <a href="#demo"><Button
-              className="gap-2"
-              onClick={() => trackCtaClick({ id: 'header_demo', label: 'Try demo', href: '#demo', location: 'header', extra: { lang } })}
-            >{t('Try the demo','Пробвайте демото')} <ArrowRight className="h-4 w-4"/></Button></a>
+            <a href="/client.html" target="_top"><Button variant="secondary" className="hidden bg-white/10 text-white hover:bg-white/20 sm:inline-flex">{t('Client Portal','Портал за клиенти')}</Button></a>
+            <a href="#demo"><Button className="gap-2">{t('Try the demo','Пробвайте демото')} <ArrowRight className="h-4 w-4"/></Button></a>
             <div className="inline-flex items-center rounded-md border border-white/20 bg-white/5 p-0.5">
               <button onClick={()=> setLang('en')} className={`${lang==='en' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>EN</button>
               <button onClick={()=> setLang('bg')} className={`${lang==='bg' ? 'bg-white/20 text-white' : 'text-white/80'} rounded px-2 py-1 text-xs`}>BG</button>
@@ -232,19 +191,10 @@ export default function BeforeAfterLanding() {
             <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Let customers visualize results before they buy','Нека клиентите видят резултата преди да купят')}</h1>
             <p className="mt-4 text-lg text-white/70">{t('Embed a beautiful, one‑click AI visualizer on any website. Perfect for barbers, dental clinics, car detailing and more. Upload a photo, click Generate, slide to compare.','Вградете красив AI визуализатор с едно кликване на всеки сайт. Перфектен за барбери, дентални клиники, авто детайлинг и др. Качете снимка, натиснете Генерирай и плъзнете за сравнение.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a href="#demo"><Button
-                size="lg"
-                className="gap-2"
-                onClick={() => trackCtaClick({ id: 'hero_demo', label: 'Try live demo', href: '#demo', location: 'hero', extra: { lang } })}
-              >
+              <a href="#demo"><Button size="lg" className="gap-2">
                 {t('Try the Live Demo','Опитайте демото на живо')} <ArrowRight className="h-5 w-5" />
               </Button></a>
-              <a href="/client.html" target="_top"><Button
-                size="lg"
-                variant="secondary"
-                className="bg-white/10 text-white hover:bg-white/20"
-                onClick={() => trackCtaClick({ id: 'hero_client_portal', label: 'Client Portal', href: '/client.html', location: 'hero', extra: { lang } })}
-              >
+              <a href="/client.html" target="_top"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
                 {t('Client Portal','Портал за клиенти')}
               </Button></a>
             </div>
@@ -327,15 +277,8 @@ export default function BeforeAfterLanding() {
               <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
               <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
               <div className="mt-6 flex gap-3">
-                <Button
-                  className="gap-2"
-                  onClick={() => trackCtaClick({ id: 'docs_create_account', label: 'Create account', href: '/client.html', location: 'docs_cta', extra: { lang } })}
-                >Create account <ArrowRight className="h-4 w-4" /></Button>
-                <Button
-                  variant="secondary"
-                  className="bg-white/10 text-white hover:bg-white/20"
-                  onClick={() => trackCtaClick({ id: 'docs_talk_sales', label: 'Talk to sales', href: 'mailto:team@beforeafter.app', location: 'docs_cta', extra: { lang } })}
-                >Talk to sales</Button>
+                <Button className="gap-2">Create account <ArrowRight className="h-4 w-4" /></Button>
+                <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">Talk to sales</Button>
               </div>
             </div>
             <div>
@@ -388,28 +331,24 @@ export default function BeforeAfterLanding() {
           <div className="mt-10 grid gap-6 md:grid-cols-4">
             {[
               {
-                slug: 'free',
                 name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
                 includes: t("10 generations / mo","10 генерирания / месец"),
                 bullets: [t("1 embed","1 ембед"), t("Watermark required","С воден знак"), t("Basic light/dark theme","Базова светла/тъмна тема")],
                 footnote: t("For trials; limited usage","За тестове; ограничена употреба")
               },
               {
-                slug: 'starter',
                 name: t("Starter","Стартер"), price: "$24", badge: null, popular:false,
                 includes: t("300 generations / mo","300 генерирания / месец"),
                 bullets: [t("1 embed","1 ембед"), t("Basic light/dark theme","Базова светла/тъмна тема"), t("Watermark removed","Без воден знак")],
                 footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
               },
               {
-                slug: 'growth',
                 name: t("Growth","Гроус"), price: "$49", badge: t("Most Popular","Най‑популярен"), popular:true,
                 includes: t("600 generations / mo","600 генерирания / месец"),
                 bullets: [t("Up to 3 embeds","До 3 ембеда"), t("Customizable theme","Персонализируема тема"), t("Remove watermark","Без воден знак"), t("Basic analytics","Базова аналитика")],
                 footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
               },
               {
-                slug: 'pro',
                 name: t("Pro","Про"), price: "$99", badge: null, popular:false,
                 includes: t("1,500 generations / mo","1,500 генерирания / месец"),
                 bullets: [t("Up to 10 embeds","До 10 ембеда"), t("Advanced analytics","Разширена аналитика"), t("API + Webhooks","API + Уебкукове"), t("Priority support","Приоритетна поддръжка")],
@@ -432,10 +371,7 @@ export default function BeforeAfterLanding() {
                     ))}
                   </ul>
                   <div className="mt-4 text-xs text-white/60">{p.footnote}</div>
-                  <a href="/client.html" target="_top"><Button
-                    className="mt-6 w-full"
-                    onClick={() => trackPricingSelect({ plan: p.slug, interval: 'monthly', location: 'pricing_grid', extra: { lang } })}
-                  >{t('Choose','Изберете')} {p.name}</Button></a>
+                  <a href="/client.html" target="_top"><Button className="mt-6 w-full">{t('Choose','Изберете')} {p.name}</Button></a>
                 </CardContent>
               </Card>
             ))}

@@ -6,12 +6,6 @@
 3. `npm run dev`
 4. Open `http://localhost:3000`
 
-## Analytics & session recordings
-- The marketing site now loads PostHog when `VITE_POSTHOG_KEY` (or `NEXT_PUBLIC_POSTHOG_KEY`) is set. Add the key plus optional host (`VITE_POSTHOG_HOST` / `NEXT_PUBLIC_POSTHOG_HOST`) to your `.env` or Vercel project settings.
-- Events fired: `landing_view`, `demo_start` (with steps), `demo_generate` (`requested`, `success`, `error`, `missing_file`), `cta_click`, `pricing_select`, and `lead_capture` helper.
-- Session recordings are enabled with inputs masked by default. Use the `data-ph-mask` attribute to force masking specific elements if you add forms.
-- After updating env vars, restart `npm run dev` (or redeploy) so Vite picks up the PostHog configuration.
-
 ## Vercel deployment
 - Set env vars in Vercel Project Settings:
   - `FAL_KEY`: your fal.ai API key
