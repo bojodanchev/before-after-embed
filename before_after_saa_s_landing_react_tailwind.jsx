@@ -18,7 +18,7 @@ const CardContent = ({ children, className = "" }) => (<div className={`p-4 ${cl
 const Badge = ({ children, className = "" }) => (
   <span className={`inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70 ${className}`}>{children}</span>
 );
-import { Check, ArrowRight, Code2, Gauge, Layers, Paintbrush, Shield, Sparkles, Terminal, Image as ImageIcon } from "lucide-react";
+import { Check, ArrowRight, Code2, Gauge, Layers, Paintbrush, Shield, Sparkles, Terminal, Image as ImageIcon, X } from "lucide-react";
 
 // Simple utility components
 const Container = ({ children, className = "" }) => (
@@ -55,25 +55,182 @@ const CodeBlock = ({ code }) => {
   );
 };
 
+const feedbackPresets = {
+  demo_exit: {
+    title: "Quick question before you go?",
+    question: "What stopped you from finishing the demo or signing up?",
+    options: [
+      "Need more sample before/after cases",
+      "Not sure patients will trust the AI result",
+      "Don’t know how to embed it on my site",
+      "Pricing feels unclear or high",
+    ],
+  },
+  pricing_hover: {
+    title: "Thinking about pricing?",
+    question: "What would help you feel confident choosing a plan?",
+    options: [
+      "Want to see ROI numbers",
+      "Need custom plan details",
+      "Prefer a live walkthrough first",
+      "Waiting on internal approval",
+    ],
+  },
+};
+
+const FeedbackPrompt = ({ open, context, onClose }) => {
+  const preset = feedbackPresets[context] || feedbackPresets.demo_exit;
+  const [message, setMessage] = useState("");
+  const [contact, setContact] = useState("");
+  const [status, setStatus] = useState("idle");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setMessage("");
+      setContact("");
+      setStatus("idle");
+      setError("");
+    }
+  }, [open, context]);
+
+  if (!open) return null;
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!message.trim()) {
+      setError("Please share a quick note so we know how to help.");
+      return;
+    }
+    try {
+      setStatus("sending");
+      const resp = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          context,
+          message: message.trim(),
+          contact: contact.trim() || undefined,
+        }),
+      });
+      if (!resp.ok) throw new Error("Request failed");
+      setStatus("sent");
+    } catch (err) {
+      console.error("Feedback submit error", err);
+      setError("We couldn't save that. Please try again or email team@beforeafter.app.");
+      setStatus("idle");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 px-4">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-900 p-6 shadow-2xl">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-xl font-semibold text-white">{preset.title}</h3>
+            <p className="mt-1 text-sm text-white/70">{preset.question}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-md border border-white/10 bg-white/5 p-1 text-white/60 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close feedback"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {status === "sent" ? (
+          <div className="mt-6 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-200">
+            Thank you — we’ll follow up within a business day.
+          </div>
+        ) : (
+          <form className="mt-4 space-y-4" onSubmit={onSubmit}>
+            <div className="flex flex-wrap gap-2">
+              {preset.options?.map((opt) => (
+                <button
+                  type="button"
+                  key={opt}
+                  onClick={() => setMessage(opt)}
+                  className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wide text-white/60">Share a quick note</label>
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                rows={4}
+                className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none"
+                placeholder="Tell us what’s missing or what you’re worried about"
+              />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-wide text-white/60">How can we reach out?</label>
+              <input
+                type="email"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none"
+                placeholder="Email (optional)"
+              />
+              <p className="mt-1 text-[11px] text-white/40">We’ll only use this to reply with ideas or a sample tailored to you.</p>
+            </div>
+            {error && <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">{error}</div>}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-white/60 underline-offset-4 hover:text-white hover:underline"
+              >
+                Maybe later
+              </button>
+              <Button type="submit" disabled={status === "sending"} className="gap-2">
+                {status === "sending" ? "Sending..." : "Send feedback"}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Live demo wired to backend /api/edit
-const LiveDemo = () => {
+const LiveDemo = ({ onExit }) => {
   const fileRef = useRef(null);
   const [beforeSrc, setBeforeSrc] = useState("");
   const [afterSrc, setAfterSrc] = useState("");
   const [status, setStatus] = useState("");
   const [slider, setSlider] = useState(50);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  const onPick = () => fileRef.current?.click();
+  const handleMouseLeave = () => {
+    if (hasInteracted) {
+      onExit?.('demo_exit');
+    }
+  };
+
+  const onPick = () => {
+    setHasInteracted(true);
+    fileRef.current?.click();
+  };
   const onFile = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
     setBeforeSrc(URL.createObjectURL(f));
     setAfterSrc("");
+    setHasInteracted(true);
   };
 
   const onGenerate = async () => {
     const f = fileRef.current?.files?.[0];
     if (!f) { setStatus('Please choose an image.'); return; }
+    setHasInteracted(true);
     setStatus('Uploading...'); setAfterSrc(""); setSlider(50);
     const fd = new FormData();
     fd.append('image', f);
@@ -90,7 +247,7 @@ const LiveDemo = () => {
   };
 
   return (
-  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6">
+  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6" onMouseLeave={handleMouseLeave}>
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Badge variant="secondary" className="bg-white/10 text-white">Live Demo</Badge>
@@ -142,6 +299,20 @@ const LiveDemo = () => {
 export default function BeforeAfterLanding() {
   const [lang, setLang] = useState(() => { try { return localStorage.getItem('lang') || 'en'; } catch { return 'en'; } });
   useEffect(() => { try { localStorage.setItem('lang', lang); } catch {} }, [lang]);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackContext, setFeedbackContext] = useState('demo_exit');
+  const [seenFeedback, setSeenFeedback] = useState({});
+  const triggerFeedback = (ctx) => {
+    if (!ctx) return;
+    setSeenFeedback((prev) => {
+      if (prev[ctx]) return prev;
+      setFeedbackContext(ctx);
+      setFeedbackOpen(true);
+      return { ...prev, [ctx]: true };
+    });
+  };
+  const closeFeedback = () => setFeedbackOpen(false);
+  const discoveryCallLink = 'https://calendly.com/bojodanchev';
   const t = (en, bg) => (lang === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
   data-embed-id="your-embed-id"
@@ -155,6 +326,8 @@ export default function BeforeAfterLanding() {
   data-width="100%" data-height="460px"><\/script>`;
 
   return (
+    <>
+    <FeedbackPrompt open={feedbackOpen} context={feedbackContext} onClose={closeFeedback} />
     <div className="min-h-screen overflow-x-hidden bg-neutral-950 text-white">
       {/* Navigation */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
@@ -202,7 +375,7 @@ export default function BeforeAfterLanding() {
 
           {/* Hero visual */}
           <div className="mt-12">
-            <LiveDemo />
+            <LiveDemo onExit={() => triggerFeedback('demo_exit')} />
           </div>
         </Container>
       </section>
@@ -328,7 +501,7 @@ export default function BeforeAfterLanding() {
       <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
           <SectionTitle eyebrow={t('Pricing','Цени')} title={t('Clear, adoption‑first plans','Ясни планове с фокус върху приемането')} subtitle={t('All paid tiers include overage: $10 per extra 100 generations.','Всички платени планове включват надвишаване: $10 за всеки допълнителни 100 генерирания.')} />
-          <div className="mt-10 grid gap-6 md:grid-cols-4">
+          <div className="mt-10 grid gap-6 md:grid-cols-4" onMouseEnter={() => triggerFeedback('pricing_hover')}>
             {[
               {
                 name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
@@ -375,6 +548,41 @@ export default function BeforeAfterLanding() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-t border-white/10 py-16 sm:py-20">
+        <Container>
+          <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:grid-cols-[1.4fr_1fr] sm:p-10">
+            <div>
+              <h3 className="text-2xl font-semibold">Book a 15‑minute discovery call</h3>
+              <p className="mt-3 text-sm text-white/70">
+                Skip the back-and-forth. We’ll walk through your current patient journey, show a live embed, and answer implementation or pricing questions.
+              </p>
+              <p className="mt-3 text-sm text-white/60">
+                Perfect if you want to validate ROI, compare with existing visualizers, or see how we’d tailor the gallery for your clinic.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a href={discoveryCallLink} target="_blank" rel="noreferrer">
+                  <Button size="lg" className="gap-2">
+                    {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </a>
+                <a href="mailto:team@beforeafter.app?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
+                  {t('Email questions instead','Пишете ни вместо това')}
+                </a>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-5 text-sm text-white/70">
+              <h4 className="text-base font-semibold text-white">What we cover in the call</h4>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li>• Live walkthrough of the embed + client portal</li>
+                <li>• Sample before/after tuned to your services</li>
+                <li>• Pricing guidance and ROI calculator</li>
+                <li>• Next steps if you’d like a pilot</li>
+              </ul>
+            </div>
           </div>
         </Container>
       </section>
@@ -450,5 +658,6 @@ export default function BeforeAfterLanding() {
         </Container>
       </footer>
     </div>
+    </>
   );
 }

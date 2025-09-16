@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import multer from "multer";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { fal } from "@fal-ai/client";
 
@@ -75,6 +76,7 @@ const embedConfigs = {
 
 // Simple in-memory usage log (MVP)
 const usageEvents = [];
+const feedbackSubmissions = [];
 function logUsage(event, embedId, meta) {
   usageEvents.push({
     id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -83,6 +85,43 @@ function logUsage(event, embedId, meta) {
     embedId,
     meta: meta || {},
   });
+}
+
+function makeMailTransport() {
+  const host = (process.env.SMTP_HOST || '').trim();
+  const user = (process.env.SMTP_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || '').trim();
+  if (!host || !user || !pass) return null;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const secure = (process.env.SMTP_SECURE || 'false').toString() === 'true';
+  if ((host.includes('gmail.com') || user.endsWith('@gmail.com')) && pass) {
+    return nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
+  }
+  return nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+}
+
+async function notifyFeedback(entry) {
+  const to = (process.env.FEEDBACK_NOTIFY_EMAIL || '').trim();
+  const from = (process.env.EMAIL_FROM || process.env.FEEDBACK_NOTIFY_EMAIL || 'no-reply@beforeafter.app').trim();
+  const transport = makeMailTransport();
+  if (!transport || !to) {
+    return;
+  }
+  const subject = `[Feedback] ${entry.context || 'general'} – ${new Date(entry.ts).toLocaleString('en-US')}`;
+  const lines = [
+    `<p><strong>Context:</strong> ${entry.context}</p>`,
+    `<p><strong>Message:</strong></p>`,
+    `<p>${entry.message.replace(/\n/g, '<br/>')}</p>`,
+  ];
+  if (entry.contact) {
+    lines.push(`<p><strong>Contact:</strong> ${entry.contact}</p>`);
+  }
+  lines.push('<p>Logged automatically from the landing feedback prompt.</p>');
+  try {
+    await transport.sendMail({ from, to, subject, html: lines.join('\n') });
+  } catch (err) {
+    console.error('Feedback email failed', err?.message || err);
+  }
 }
 
 // Public endpoint to fetch embed configuration
@@ -213,7 +252,25 @@ app.post("/api/usage", (req, res) => {
   res.json({ ok: true });
 });
 
+app.post("/api/feedback", (req, res) => {
+  const { context, message, contact } = req.body || {};
+  const body = (message || "").toString().trim();
+  if (!body) {
+    return res.status(400).json({ error: "message is required" });
+  }
+  const entry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    ts: Date.now(),
+    context: (context || "general").toString(),
+    message: body,
+    contact: (contact || "").toString().trim(),
+  };
+  feedbackSubmissions.push(entry);
+  console.log("Feedback received", entry);
+  notifyFeedback(entry);
+  res.json({ ok: true });
+});
+
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);
 });
-

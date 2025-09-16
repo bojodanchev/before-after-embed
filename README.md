@@ -6,6 +6,12 @@
 3. `npm run dev`
 4. Open `http://localhost:3000`
 
+## Qualitative feedback toolkit
+- The marketing site now opens a lightweight feedback prompt after someone interacts with the live demo or hovers on pricing. Responses are posted to `/api/feedback` and logged in the server console.
+- Update the Calendly/meeting URL in `before_after_saa_s_landing_react_tailwind.jsx` (`discoveryCallLink`) if you need a different booking page.
+- Use `docs/demo-followup-template.md` for an email/DM script when checking in with demo visitors who paused.
+- To get email alerts from feedback submissions, set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SECURE`, `EMAIL_FROM`, and `FEEDBACK_NOTIFY_EMAIL` in your environment.
+
 ## Vercel deployment
 - Set env vars in Vercel Project Settings:
   - `FAL_KEY`: your fal.ai API key
