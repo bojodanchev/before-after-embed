@@ -101,8 +101,8 @@ function makeMailTransport() {
 }
 
 async function notifyFeedback(entry) {
-  const to = (process.env.FEEDBACK_NOTIFY_EMAIL || '').trim();
-  const from = (process.env.EMAIL_FROM || process.env.FEEDBACK_NOTIFY_EMAIL || 'no-reply@beforeafter.app').trim();
+  const to = (process.env.FEEDBACK_NOTIFY_EMAIL || process.env.EMAIL_FROM || process.env.SMTP_USER || '').trim();
+  const from = (process.env.EMAIL_FROM || process.env.SMTP_USER || to || 'no-reply@beforeafter.app').trim();
   const transport = makeMailTransport();
   if (!transport || !to) {
     return;
@@ -118,7 +118,7 @@ async function notifyFeedback(entry) {
   }
   lines.push('<p>Logged automatically from the landing feedback prompt.</p>');
   try {
-    await transport.sendMail({ from, to, subject, html: lines.join('\n') });
+    await transport.sendMail({ from, to, subject, html: lines.join('\n'), replyTo: entry.contact || undefined });
   } catch (err) {
     console.error('Feedback email failed', err?.message || err);
   }
@@ -267,7 +267,7 @@ app.post("/api/feedback", (req, res) => {
   };
   feedbackSubmissions.push(entry);
   console.log("Feedback received", entry);
-  notifyFeedback(entry);
+  notifyFeedback(entry).catch(() => {});
   res.json({ ok: true });
 });
 
