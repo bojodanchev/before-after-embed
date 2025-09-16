@@ -299,58 +299,73 @@ export default function BeforeAfterLanding() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackContext, setFeedbackContext] = useState('demo_exit');
   const [seenFeedback, setSeenFeedback] = useState({});
+  const exitTriggeredRef = useRef(false);
   const triggerFeedback = useCallback((ctx) => {
     if (!ctx) return;
     setSeenFeedback((prev) => {
       if (prev[ctx]) return prev;
       setFeedbackContext(ctx);
       setFeedbackOpen(true);
+      exitTriggeredRef.current = true;
       return { ...prev, [ctx]: true };
     });
   }, []);
   const closeFeedback = () => setFeedbackOpen(false);
   useEffect(() => {
-    if (seenFeedback.demo_exit) return;
-
-    let imminent = false;
+    if (exitTriggeredRef.current) return;
 
     const markExit = (source) => {
-      if (imminent) return;
-      imminent = true;
+      if (exitTriggeredRef.current) return;
       triggerFeedback(source || 'demo_exit');
     };
 
     const handleMouseMove = (event) => {
-      if (event.clientY <= 24 || event.clientX <= 8 || event.clientX >= (window.innerWidth - 8)) {
+      if (exitTriggeredRef.current) return;
+      const nearTop = event.clientY <= 16;
+      const nearLeft = event.clientX <= 8;
+      const nearRight = event.clientX >= window.innerWidth - 8;
+      if (nearTop || nearLeft || nearRight) {
         markExit('demo_exit');
       }
     };
 
     const handleMouseOut = (event) => {
-      if (event.relatedTarget || event.toElement) return;
-      markExit('demo_exit');
+      if (exitTriggeredRef.current) return;
+      if (!event.relatedTarget && !event.toElement) {
+        markExit('demo_exit');
+      }
     };
 
     const handleVisibility = () => {
+      if (exitTriggeredRef.current) return;
       if (document.visibilityState === 'hidden') {
         markExit('demo_exit');
       }
+    };
+
+    const handleBlur = () => {
+      if (exitTriggeredRef.current) return;
+      markExit('demo_exit');
     };
 
     const handlePageHide = () => markExit('demo_exit');
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('mouseleave', handleMouseOut);
     document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('blur', handleBlur);
     window.addEventListener('pagehide', handlePageHide);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('mouseleave', handleMouseOut);
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('blur', handleBlur);
       window.removeEventListener('pagehide', handlePageHide);
     };
-  }, [seenFeedback.demo_exit, triggerFeedback]);
+  }, [triggerFeedback]);
   const discoveryCallLink = 'https://calendly.com/bojodanchev';
   const t = (en, bg) => (lang === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
