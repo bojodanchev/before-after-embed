@@ -311,22 +311,41 @@ export default function BeforeAfterLanding() {
   const closeFeedback = () => setFeedbackOpen(false);
   useEffect(() => {
     if (seenFeedback.demo_exit) return;
+
+    let imminent = false;
+
+    const markExit = (source) => {
+      if (imminent) return;
+      imminent = true;
+      triggerFeedback(source || 'demo_exit');
+    };
+
+    const handleMouseMove = (event) => {
+      if (event.clientY <= 24 || event.clientX <= 8 || event.clientX >= (window.innerWidth - 8)) {
+        markExit('demo_exit');
+      }
+    };
+
     const handleMouseOut = (event) => {
       if (event.relatedTarget || event.toElement) return;
-      if (event.clientY <= 0 || event.clientX <= 0 || event.clientX >= window.innerWidth) {
-        triggerFeedback('demo_exit');
-      }
+      markExit('demo_exit');
     };
+
     const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
-        triggerFeedback('demo_exit');
+        markExit('demo_exit');
       }
     };
-    const handlePageHide = () => triggerFeedback('demo_exit');
+
+    const handlePageHide = () => markExit('demo_exit');
+
+    document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseout', handleMouseOut);
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('pagehide', handlePageHide);
+
     return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseout', handleMouseOut);
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('pagehide', handlePageHide);
