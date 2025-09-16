@@ -201,20 +201,13 @@ const FeedbackPrompt = ({ open, context, onClose }) => {
 };
 
 // Live demo wired to backend /api/edit
-const LiveDemo = ({ onExit, onInteract }) => {
+const LiveDemo = ({ onExit }) => {
   const fileRef = useRef(null);
   const [beforeSrc, setBeforeSrc] = useState("");
   const [afterSrc, setAfterSrc] = useState("");
   const [status, setStatus] = useState("");
   const [slider, setSlider] = useState(50);
   const [hasInteracted, setHasInteracted] = useState(false);
-
-  const markInteraction = () => {
-    if (!hasInteracted) {
-      setHasInteracted(true);
-      onInteract?.();
-    }
-  };
 
   const handleMouseLeave = () => {
     if (hasInteracted) {
@@ -223,7 +216,7 @@ const LiveDemo = ({ onExit, onInteract }) => {
   };
 
   const onPick = () => {
-    markInteraction();
+    setHasInteracted(true);
     fileRef.current?.click();
   };
   const onFile = (e) => {
@@ -231,13 +224,13 @@ const LiveDemo = ({ onExit, onInteract }) => {
     if (!f) return;
     setBeforeSrc(URL.createObjectURL(f));
     setAfterSrc("");
-    markInteraction();
+    setHasInteracted(true);
   };
 
   const onGenerate = async () => {
     const f = fileRef.current?.files?.[0];
     if (!f) { setStatus('Please choose an image.'); return; }
-    markInteraction();
+    setHasInteracted(true);
     setStatus('Uploading...'); setAfterSrc(""); setSlider(50);
     const fd = new FormData();
     fd.append('image', f);
@@ -254,12 +247,7 @@ const LiveDemo = ({ onExit, onInteract }) => {
   };
 
   return (
-  <div
-    id="demo"
-    className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6"
-    onMouseLeave={handleMouseLeave}
-    onTouchEnd={handleMouseLeave}
-  >
+  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6" onMouseLeave={handleMouseLeave}>
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Badge variant="secondary" className="bg-white/10 text-white">Live Demo</Badge>
@@ -291,14 +279,7 @@ const LiveDemo = ({ onExit, onInteract }) => {
           </div>
           )}
           {/* Slider */}
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={slider}
-            onChange={(e)=>{ setSlider(Number(e.target.value)); markInteraction(); }}
-            className="absolute left-3 right-3 bottom-3"
-          />
+          <input type="range" min="0" max="100" value={slider} onChange={(e)=>setSlider(Number(e.target.value))} className="absolute left-3 right-3 bottom-3" />
         </div>
         <div className="border-t border-white/10 bg-black/40 p-3 text-center text-sm text-white/70">Upload a photo, click Generate, slide to compare</div>
           </div>
@@ -321,7 +302,6 @@ export default function BeforeAfterLanding() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackContext, setFeedbackContext] = useState('demo_exit');
   const [seenFeedback, setSeenFeedback] = useState({});
-  const [demoTouched, setDemoTouched] = useState(false);
   const triggerFeedback = useCallback((ctx) => {
     if (!ctx) return;
     setSeenFeedback((prev) => {
@@ -330,11 +310,11 @@ export default function BeforeAfterLanding() {
       setFeedbackOpen(true);
       return { ...prev, [ctx]: true };
     });
-  }, [setFeedbackContext, setFeedbackOpen, setSeenFeedback]);
+  }, []);
   const closeFeedback = () => setFeedbackOpen(false);
-  const exitPromptSeen = Boolean(seenFeedback.demo_exit);
   useEffect(() => {
-    if (!demoTouched || exitPromptSeen) return;
+    if (seenFeedback.demo_exit) return;
+    const timer = setTimeout(() => triggerFeedback('demo_exit'), 20000);
     const onMouseLeave = (event) => {
       if (event.clientY <= 0) {
         triggerFeedback('demo_exit');
@@ -348,10 +328,11 @@ export default function BeforeAfterLanding() {
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
+      clearTimeout(timer);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [demoTouched, exitPromptSeen, triggerFeedback]);
+  }, [seenFeedback.demo_exit, triggerFeedback]);
   const discoveryCallLink = 'https://calendly.com/bojodanchev';
   const t = (en, bg) => (lang === 'bg' ? bg : en);
   const embedSnippet = `<script async src="https://before-after-embed.vercel.app/embed.js"
@@ -415,7 +396,7 @@ export default function BeforeAfterLanding() {
 
           {/* Hero visual */}
           <div className="mt-12">
-            <LiveDemo onExit={() => triggerFeedback('demo_exit')} onInteract={() => setDemoTouched(true)} />
+            <LiveDemo onExit={() => triggerFeedback('demo_exit')} />
           </div>
         </Container>
       </section>
