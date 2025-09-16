@@ -201,11 +201,11 @@ app.post("/api/edit", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "Missing prompt. Provide 'prompt' or choose a 'vertical'." });
     }
 
-    // Use the edit endpoint; accepts a single data URL or hosted URL.
+    // Use the edit endpoint; accepts data URLs via image_urls array.
     const result = await fal.subscribe("fal-ai/nano-banana/edit", {
       input: {
         prompt: effectivePrompt,
-        image_url: base64Image,
+        image_urls: [base64Image],
       },
       logs: false,
       timeout: 120000,

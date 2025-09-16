@@ -127,7 +127,7 @@ export default async function handler(req, res){
     const result = await fal.subscribe("fal-ai/nano-banana/edit", {
       input: {
         prompt: effectivePrompt,
-        image_url: base64Image,
+        image_urls: [base64Image],
       },
       logs: false,
       timeout: 120000,
