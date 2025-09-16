@@ -128,6 +128,7 @@ export default async function handler(req, res){
       input: {
         prompt: effectivePrompt,
         image_urls: [base64Image],
+        image_url: base64Image,
       },
       logs: false,
       timeout: 120000,

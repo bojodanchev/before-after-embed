@@ -240,7 +240,10 @@ const LiveDemo = ({ onExit }) => {
     try{
       const resp = await fetch('/api/edit', { method:'POST', body: fd });
       const json = await resp.json();
-      if (!resp.ok) throw new Error(json.error || 'Failed');
+      if (!resp.ok) {
+        const msg = json?.detail || json?.details || json?.error || 'Failed';
+        throw new Error(msg);
+      }
       setStatus('Rendering complete');
       if (json.outputUrl) setAfterSrc(json.outputUrl); else setStatus('No image returned');
     }catch(err){ setStatus('Error: '+err.message); }
@@ -314,7 +317,6 @@ export default function BeforeAfterLanding() {
   const closeFeedback = () => setFeedbackOpen(false);
   useEffect(() => {
     if (seenFeedback.demo_exit) return;
-    const timer = setTimeout(() => triggerFeedback('demo_exit'), 4000);
     const onMouseLeave = (event) => {
       if (event.clientY <= 0) {
         triggerFeedback('demo_exit');
@@ -328,7 +330,6 @@ export default function BeforeAfterLanding() {
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
-      clearTimeout(timer);
       document.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('visibilitychange', onVisibility);
     };
@@ -522,7 +523,7 @@ export default function BeforeAfterLanding() {
       <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
         <Container>
           <SectionTitle eyebrow={t('Pricing','Цени')} title={t('Clear, adoption‑first plans','Ясни планове с фокус върху приемането')} subtitle={t('All paid tiers include overage: $10 per extra 100 generations.','Всички платени планове включват надвишаване: $10 за всеки допълнителни 100 генерирания.')} />
-          <div className="mt-10 grid gap-6 md:grid-cols-4" onMouseEnter={() => triggerFeedback('pricing_hover')}>
+          <div className="mt-10 grid gap-6 md:grid-cols-4">
             {[
               {
                 name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
