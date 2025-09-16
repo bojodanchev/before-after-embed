@@ -317,21 +317,25 @@ export default function BeforeAfterLanding() {
   const closeFeedback = () => setFeedbackOpen(false);
   useEffect(() => {
     if (seenFeedback.demo_exit) return;
-    const onMouseLeave = (event) => {
-      if (event.clientY <= 0) {
+    const handleMouseOut = (event) => {
+      if (event.relatedTarget || event.toElement) return;
+      if (event.clientY <= 0 || event.clientX <= 0 || event.clientX >= window.innerWidth) {
         triggerFeedback('demo_exit');
       }
     };
-    const onVisibility = () => {
+    const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         triggerFeedback('demo_exit');
       }
     };
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('visibilitychange', onVisibility);
+    const handlePageHide = () => triggerFeedback('demo_exit');
+    document.addEventListener('mouseout', handleMouseOut);
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pagehide', handlePageHide);
     return () => {
-      document.removeEventListener('mouseleave', onMouseLeave);
-      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('mouseout', handleMouseOut);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('pagehide', handlePageHide);
     };
   }, [seenFeedback.demo_exit, triggerFeedback]);
   const discoveryCallLink = 'https://calendly.com/bojodanchev';
