@@ -201,16 +201,12 @@ const FeedbackPrompt = ({ open, context, onClose }) => {
 };
 
 // Live demo wired to backend /api/edit
-const LiveDemo = ({ onExit }) => {
+const LiveDemo = () => {
   const fileRef = useRef(null);
   const [beforeSrc, setBeforeSrc] = useState("");
   const [afterSrc, setAfterSrc] = useState("");
   const [status, setStatus] = useState("");
   const [slider, setSlider] = useState(50);
-
-  const handleMouseLeave = () => {
-    onExit?.('demo_exit');
-  };
 
   const onPick = () => {
     fileRef.current?.click();
@@ -244,7 +240,7 @@ const LiveDemo = ({ onExit }) => {
   };
 
   return (
-  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6" onMouseLeave={handleMouseLeave}>
+  <div id="demo" className="relative grid gap-4 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4 sm:p-6">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Badge variant="secondary" className="bg-white/10 text-white">Live Demo</Badge>
@@ -616,15 +612,15 @@ export default function BeforeAfterLanding() {
               <p className="mt-3 text-sm text-white/60">
                 Perfect if you want to validate ROI, compare with existing visualizers, or see how we’d tailor the gallery for your clinic.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <a href={discoveryCallLink} target="_blank" rel="noreferrer">
-                  <Button
-                    size="lg"
-                    className="gap-2 !border-none !bg-gradient-to-r !from-violet-500 !via-pink-500 !to-cyan-400 !text-white hover:!opacity-90"
-                  >
-                    {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </a>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a href={discoveryCallLink} target="_blank" rel="noreferrer">
+                <Button
+                  size="lg"
+                  className="gap-2 transition-transform duration-150 hover:scale-[1.03]"
+                >
+                  {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
+                </Button>
+              </a>
                 <a href="mailto:team@beforeafter.app?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
                   {t('Email questions instead','Пишете ни вместо това')}
                 </a>
