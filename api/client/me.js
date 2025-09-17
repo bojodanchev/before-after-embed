@@ -9,6 +9,43 @@ function extractToken(req){
 }
 
 export default async function handler(req, res){
+  const action = (req.query?.action || req.body?.action || '').toString();
+
+  if (req.method === 'POST' && action === 'feedback'){
+    const { message, context, contact } = req.body || {};
+    const body = (message || '').toString().trim();
+    if (!body) return res.status(400).json({ error: 'message is required' });
+    const entry = {
+      context: (context || 'general').toString(),
+      message: body,
+      contact: (contact || '').toString().trim() || undefined,
+      ts: Date.now(),
+    };
+    console.log('feedback submission', entry);
+    const transport = makeTransport();
+    if (!transport){
+      console.error('feedback transport unavailable');
+      return res.status(500).json({ error: 'Email transport unavailable' });
+    }
+    const to = (process.env.FEEDBACK_NOTIFY_EMAIL || process.env.EMAIL_FROM || process.env.SMTP_USER || 'bojodanchev@gmail.com').toString().trim();
+    const from = (process.env.EMAIL_FROM || process.env.SMTP_USER || to || 'no-reply@beforeafter.app').toString().trim();
+    const subject = `[Feedback] ${entry.context} – ${new Date(entry.ts).toLocaleString('en-US')}`;
+    const htmlLines = [
+      `<p><strong>Context:</strong> ${entry.context}</p>`,
+      `<p><strong>Message:</strong></p>`,
+      `<p>${entry.message.replace(/\n/g, '<br/>')}</p>`,
+    ];
+    if (entry.contact) htmlLines.push(`<p><strong>Contact:</strong> ${entry.contact}</p>`);
+    htmlLines.push('<p>Logged automatically from the landing feedback prompt.</p>');
+    try {
+      await transport.sendMail({ from, to, subject, html: htmlLines.join('\n'), replyTo: entry.contact || undefined });
+    }catch(err){
+      console.error('feedback email failed', err?.message || err);
+      return res.status(500).json({ error: 'Feedback failed', detail: err?.message || String(err) });
+    }
+    return res.status(200).json({ ok: true });
+  }
+
   // GET with one-time login token ?t=... performs redirect
   if (req.method === 'GET'){
     const t = (req.query?.t || '').toString().trim();

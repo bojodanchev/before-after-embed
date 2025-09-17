@@ -105,7 +105,7 @@ const FeedbackPrompt = ({ open, context, onClose }) => {
     }
     try {
       setStatus("sending");
-      const resp = await fetch("/api/feedback", {
+      const resp = await fetch("/api/client/me?action=feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

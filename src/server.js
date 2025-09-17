@@ -121,6 +121,7 @@ async function notifyFeedback(entry) {
     await transport.sendMail({ from, to, subject, html: lines.join('\n'), replyTo: entry.contact || undefined });
   } catch (err) {
     console.error('Feedback email failed', err?.message || err);
+    throw err;
   }
 }
 
@@ -259,7 +260,7 @@ app.post("/api/usage", (req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/api/feedback", (req, res) => {
+async function handleFeedbackRequest(req, res) {
   const { context, message, contact } = req.body || {};
   const body = (message || "").toString().trim();
   if (!body) {
@@ -274,8 +275,24 @@ app.post("/api/feedback", (req, res) => {
   };
   feedbackSubmissions.push(entry);
   console.log("Feedback received", entry);
-  notifyFeedback(entry).catch(() => {});
-  res.json({ ok: true });
+  try {
+    await notifyFeedback(entry);
+  } catch (err) {
+    return res.status(500).json({ error: "Feedback failed", detail: err?.message || String(err) });
+  }
+  return res.json({ ok: true });
+}
+
+app.post("/api/feedback", (req, res) => {
+  handleFeedbackRequest(req, res);
+});
+
+app.post("/api/client/me", (req, res) => {
+  const action = (req.query?.action || req.body?.action || '').toString();
+  if (action === 'feedback') {
+    return handleFeedbackRequest(req, res);
+  }
+  return res.status(404).json({ error: 'Not found' });
 });
 
 app.listen(port, () => {
