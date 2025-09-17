@@ -320,19 +320,25 @@ export default function BeforeAfterLanding() {
       triggerFeedback(source || 'demo_exit');
     };
 
-    const handleMouseLeave = (event) => {
+    const pointerRef = { x: null, y: null };
+
+    const handleMouseMove = (event) => {
       if (exitTriggeredRef.current) return;
-      // Compatible with the vanilla example: any true mouse leave shows the modal
-      if (!event.relatedTarget && !event.toElement) {
-        markExit('document_mouseleave');
+      const prevY = pointerRef.y;
+      pointerRef.x = event.clientX;
+      pointerRef.y = event.clientY;
+      if (prevY === null) return;
+      const movingUp = event.clientY < prevY - 2;
+      if (movingUp && event.clientY <= 32) {
+        markExit('mousemove_top');
       }
     };
 
-    const handleMouseOut = (event) => {
+    const handleMouseLeave = (event) => {
       if (exitTriggeredRef.current) return;
-      // If leaving the window entirely, relatedTarget is null
-      if (!event.relatedTarget && !event.toElement) {
-        markExit('document_mouseout');
+      if (event.relatedTarget || event.toElement) return;
+      if (event.clientY <= 0 || event.clientX <= 0 || event.clientX >= window.innerWidth) {
+        markExit('document_mouseleave');
       }
     };
 
@@ -343,24 +349,19 @@ export default function BeforeAfterLanding() {
       }
     };
 
-    const handleBlur = () => {
-      if (exitTriggeredRef.current) return;
-      markExit('window_blur');
-    };
-
     const handlePageHide = () => markExit('page_hide');
 
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseout', handleMouseOut, { capture: true });
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave, { capture: true });
+    document.addEventListener('mouseout', handleMouseLeave, { capture: true });
     document.addEventListener('visibilitychange', handleVisibility);
-    window.addEventListener('blur', handleBlur);
     window.addEventListener('pagehide', handlePageHide);
 
     return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseout', handleMouseOut, { capture: true });
+      document.removeEventListener('mousemove', handleMouseMove, { passive: true });
+      document.removeEventListener('mouseleave', handleMouseLeave, { capture: true });
+      document.removeEventListener('mouseout', handleMouseLeave, { capture: true });
       document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('blur', handleBlur);
       window.removeEventListener('pagehide', handlePageHide);
     };
   }, [triggerFeedback]);

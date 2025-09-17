@@ -101,7 +101,7 @@ function makeMailTransport() {
 }
 
 async function notifyFeedback(entry) {
-  const to = (process.env.FEEDBACK_NOTIFY_EMAIL || process.env.EMAIL_FROM || process.env.SMTP_USER || '').trim();
+  const to = (process.env.FEEDBACK_NOTIFY_EMAIL || process.env.EMAIL_FROM || process.env.SMTP_USER || 'bojodanchev@gmail.com').toString().trim();
   const from = (process.env.EMAIL_FROM || process.env.SMTP_USER || to || 'no-reply@beforeafter.app').trim();
   const transport = makeMailTransport();
   if (!transport || !to) {
