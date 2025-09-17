@@ -607,7 +607,7 @@ export default function BeforeAfterLanding() {
 
       <section className="border-t border-white/10 py-16 sm:py-20">
         <Container>
-          <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 sm:grid-cols-[1.4fr_1fr] sm:p-10">
+          <div className="grid gap-6 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-6 sm:grid-cols-[1.4fr_1fr] sm:p-10">
             <div>
               <h3 className="text-2xl font-semibold">Book a 15‑minute discovery call</h3>
               <p className="mt-3 text-sm text-white/70">
@@ -618,7 +618,10 @@ export default function BeforeAfterLanding() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a href={discoveryCallLink} target="_blank" rel="noreferrer">
-                  <Button size="lg" className="gap-2">
+                  <Button
+                    size="lg"
+                    className="gap-2 !border-none !bg-gradient-to-r !from-violet-500 !via-pink-500 !to-cyan-400 !text-white hover:!opacity-90"
+                  >
                     {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
                   </Button>
                 </a>
@@ -627,7 +630,7 @@ export default function BeforeAfterLanding() {
                 </a>
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-5 text-sm text-white/70">
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-5 text-sm text-white/70">
               <h4 className="text-base font-semibold text-white">What we cover in the call</h4>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>• Live walkthrough of the embed + client portal</li>
