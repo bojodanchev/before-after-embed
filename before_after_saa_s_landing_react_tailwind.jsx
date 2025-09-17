@@ -319,48 +319,60 @@ export default function BeforeAfterLanding() {
       triggerFeedback(source || 'demo_exit');
     };
 
+    let lastY = null;
+    let lastX = null;
+
     const handleMouseMove = (event) => {
       if (exitTriggeredRef.current) return;
-      const nearTop = event.clientY <= 16;
-      const nearLeft = event.clientX <= 8;
-      const nearRight = event.clientX >= window.innerWidth - 8;
-      if (nearTop || nearLeft || nearRight) {
-        markExit('demo_exit');
+      const { clientY, clientX, movementY, movementX } = event;
+      const movingUp = movementY < -2 || (lastY !== null && clientY < lastY - 2);
+      const nearTop = clientY <= 24;
+      if (movingUp && nearTop) {
+        markExit('mousemove_top');
+        return;
       }
+      const nearLeft = clientX <= 8 && (movementX <= 0 || (lastX !== null && clientX <= lastX));
+      const nearRight = clientX >= window.innerWidth - 8 && (movementX >= 0 || (lastX !== null && clientX >= lastX));
+      if (nearLeft || nearRight) {
+        markExit('mousemove_side');
+        return;
+      }
+      lastY = clientY;
+      lastX = clientX;
     };
 
     const handleMouseOut = (event) => {
       if (exitTriggeredRef.current) return;
       if (!event.relatedTarget && !event.toElement) {
-        markExit('demo_exit');
+        markExit('mouse_out');
       }
     };
 
     const handleVisibility = () => {
       if (exitTriggeredRef.current) return;
       if (document.visibilityState === 'hidden') {
-        markExit('demo_exit');
+        markExit('visibility_hidden');
       }
     };
 
     const handleBlur = () => {
       if (exitTriggeredRef.current) return;
-      markExit('demo_exit');
+      markExit('window_blur');
     };
 
-    const handlePageHide = () => markExit('demo_exit');
+    const handlePageHide = () => markExit('page_hide');
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseout', handleMouseOut);
-    document.addEventListener('mouseleave', handleMouseOut);
+    document.addEventListener('mousemove', handleMouseMove, { passive: true });
+    document.addEventListener('mouseout', handleMouseOut, { capture: true });
+    document.addEventListener('mouseleave', handleMouseOut, { capture: true });
     document.addEventListener('visibilitychange', handleVisibility);
     window.addEventListener('blur', handleBlur);
     window.addEventListener('pagehide', handlePageHide);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseout', handleMouseOut);
-      document.removeEventListener('mouseleave', handleMouseOut);
+      document.removeEventListener('mouseout', handleMouseOut, { capture: true });
+      document.removeEventListener('mouseleave', handleMouseOut, { capture: true });
       document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('pagehide', handlePageHide);
