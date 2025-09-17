@@ -278,7 +278,7 @@ const LiveDemo = () => {
           </div>
 
       <div className="grid gap-2 sm:flex sm:items-center sm:justify-between">
-        <div className="text-xs text-white/60">{status || 'Powered by fal.ai image edit model'}</div>
+        <div className="text-xs text-white/60">{status || 'Powered by the newest AI image model'}</div>
         <div className="flex items-center gap-2">
           <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
           <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20" onClick={onPick}>Choose image</Button>
@@ -499,8 +499,12 @@ export default function BeforeAfterLanding() {
               <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
               <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
               <div className="mt-6 flex gap-3">
-                <Button className="gap-2">Create account <ArrowRight className="h-4 w-4" /></Button>
-                <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">Talk to sales</Button>
+                <a href="/client.html" target="_top">
+                  <Button className="gap-2">{t('Create account','Създайте акаунт')} <ArrowRight className="h-4 w-4" /></Button>
+                </a>
+                <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex">
+                  <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">{t('Talk to sales','Говорете с продажби')}</Button>
+                </a>
               </div>
             </div>
             <div>
@@ -613,15 +617,15 @@ export default function BeforeAfterLanding() {
                 Perfect if you want to validate ROI, compare with existing visualizers, or see how we’d tailor the gallery for your clinic.
               </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={discoveryCallLink} target="_blank" rel="noreferrer">
-                <Button
-                  size="lg"
-                  className="gap-2 transition-transform duration-150 hover:scale-[1.03]"
-                >
-                  {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
-                </Button>
-              </a>
-                <a href="mailto:team@beforeafter.app?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
+                <a href={discoveryCallLink} target="_blank" rel="noreferrer">
+                  <Button
+                    size="lg"
+                    className="gap-2 transition-transform duration-150 hover:scale-[1.03]"
+                  >
+                    {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </a>
+                <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
                   {t('Email questions instead','Пишете ни вместо това')}
                 </a>
               </div>
