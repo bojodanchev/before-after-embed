@@ -50,8 +50,8 @@ function DentalPage(){
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(6,182,212,0.15),_transparent_60%)]" />
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Show a Before/After smile before treatment','Покажете усмивката „Преди/След” преди лечението')}</h1>
-            <p className="mt-4 text-lg text-white/70">{t('Perfect for whitening, veneers and alignment. Upload, generate, and slide to compare.','Идеално за избелване, фасети и подравняване. Качете снимка, генерирайте резултат и преместете плъзгача, за да сравните.')}</p>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('How do patients see a smile makeover before treatment?','Как пациентите да видят усмивката „Преди/След“ преди лечението?')}</h1>
+            <p className="mt-4 text-lg text-white/70">{t('Embed Before/After, let patients upload a selfie, and preview whitening, veneers, or alignment instantly.','Вградете Before/After, оставете пациентите да качат селфи и визуализирайте избелване, фасети или подравняване мигновено.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a href="/client.html" target="_top"><Button>{t('Get started','Започнете')}</Button></a>
               <a href="/app/docs.html"><Button variant="secondary">{t('Docs','Документация')}</Button></a>
@@ -64,8 +64,8 @@ function DentalPage(){
         <Container>
           <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-blue-600/15 via-sky-500/15 to-cyan-400/15 p-8 sm:grid-cols-2">
             <div>
-              <h3 className="text-2xl font-semibold">{t('Install in 60 seconds','Инсталирайте за 60 секунди')}</h3>
-              <p className="mt-2 text-white/80">{t('Paste the script and use data-variant / data-theme to style.','Поставете скрипта и използвайте data-variant и data-theme за визия.')}</p>
+              <h3 className="text-2xl font-semibold">{t('How fast can you install the dental preview?','Колко бързо се инсталира денталният визуализатор?')}</h3>
+              <p className="mt-2 text-white/80">{t('Paste one script, adjust data-variant and data-theme, and you are live.','Поставете един скрипт, коригирайте data-variant и data-theme и сте онлайн.')}</p>
             </div>
             <div className="rounded-2xl border border-blue-900/20 bg-black/60 p-4 font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap break-words text-white/90">{snippet}</pre>
@@ -76,7 +76,7 @@ function DentalPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Recommended options','Препоръчителни опции')}</h2>
+          <h2 className="text-2xl font-semibold">{t('Which treatments do patients explore most?','Кои процедури пациентите разглеждат най-често?')}</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/80">
             <li>{t('Whitening — natural brighter shade without harming enamel','Избелване — естествено по-светли зъби без изгаряне на емайла')}</li>
             <li>{t('Alignment — subtle straightening of the smile','Подравняване — дискретно изправяне на усмивката')}</li>
@@ -87,7 +87,7 @@ function DentalPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Why clinics choose us','Защо клиниките ни избират')}</h2>
+          <h2 className="text-2xl font-semibold">{t('Why do dental clinics choose Before/After?','Защо денталните клиники избират Before/After?')}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3 text-sm text-white/80">
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
               <div className="text-base font-medium text-white">{t('Reduce no‑shows','По-малко неявявания')}</div>
@@ -107,7 +107,7 @@ function DentalPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('How it works','Как работи')}</h2>
+          <h2 className="text-2xl font-semibold">{t('How does the workflow run chairside?','Как протича процесът до стола?')}</h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-3 text-sm text-white/80">
             <li className="rounded-xl border border-white/10 bg-white/5 p-4"><b>1.</b> {t('Paste the script on your site.','Поставяте скрипта на сайта си.')}</li>
             <li className="rounded-xl border border-white/10 bg-white/5 p-4"><b>2.</b> {t('Patients upload a selfie, choose whitening / alignment / veneers.','Пациентът качва снимка и избира избелване / подравняване / фасети.')}</li>
@@ -118,7 +118,7 @@ function DentalPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Results you can expect','Какви резултати да очаквате')}</h2>
+          <h2 className="text-2xl font-semibold">{t('What outcomes do dental teams report?','Какви резултати споделят денталните екипи?')}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3 text-center">
             {[{k:'+18%',v:t('higher case acceptance','по-висок прием на планове')},{k:'-22%',v:t('fewer no‑shows','по-малко неявявания')},{k:'< 60s',v:t('to first visualization','до първа визуализация')}].map((s,i)=> (
               <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-6">
@@ -135,5 +135,4 @@ function DentalPage(){
 }
 
 createRoot(document.getElementById('root')).render(<DentalPage />);
-
 

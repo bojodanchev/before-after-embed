@@ -49,8 +49,8 @@ function DetailingPage(){
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(239,68,68,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(251,113,133,0.15),_transparent_60%)]" />
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Show the shine before the polish','Покажете блясъка преди полирането')}</h1>
-            <p className="mt-4 text-lg text-white/70">{t('Perfect for paint correction, wraps and ceramic coat upsells. Upload, generate, and slide to compare.','Перфектно за корекция на боя, фолиа и керамични покрития. Качете, генерирайте и плъзнете за сравнение.')}</p>
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('How do car owners see the shine before the polish?','Как собствениците да видят блясъка преди полирането?')}</h1>
+            <p className="mt-4 text-lg text-white/70">{t('Embed Before/After, let them upload a shot of their vehicle, and preview paint correction, wraps, or coatings instantly.','Вградете Before/After, позволете им да качат снимка на автомобила и покажете корекция на боя, фолио или покритие мигновено.')}</p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <a href="/client.html" target="_top"><Button>{t('Get started','Започнете')}</Button></a>
               <a href="/app/docs.html"><Button variant="secondary">{t('Docs','Документация')}</Button></a>
@@ -63,8 +63,8 @@ function DetailingPage(){
         <Container>
           <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-red-600/15 via-rose-500/15 to-orange-400/15 p-8 sm:grid-cols-2">
             <div>
-              <h3 className="text-2xl font-semibold">{t('Install in 60 seconds','Инсталирайте за 60 секунди')}</h3>
-              <p className="mt-2 text-white/80">{t('Paste the script and use data-variant / data-theme to style.','Поставете скрипта и използвайте data-variant и data-theme за визия.')}</p>
+              <h3 className="text-2xl font-semibold">{t('How fast can you launch the detailing preview?','Колко бързо може да стартирате детайлинг визуализацията?')}</h3>
+              <p className="mt-2 text-white/80">{t('Drop in the script, adjust the data attributes, and start showcasing results.','Поставете скрипта, настройте data атрибутите и започнете да показвате резултати.')}</p>
             </div>
             <div className="rounded-2xl border border-red-900/20 bg-black/60 p-4 font-mono text-sm leading-relaxed">
               <pre className="whitespace-pre-wrap break-words text-white/90">{snippet}</pre>
@@ -75,7 +75,7 @@ function DetailingPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Recommended options','Препоръчителни опции')}</h2>
+          <h2 className="text-2xl font-semibold">{t('Which services benefit most from Before/After?','Кои услуги печелят най-много от Before/After?')}</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/80">
             <li>{t('Paint correction — remove swirls and fine scratches; realistic reflections','Корекция на боя — премахване на въртележки и фини драскотини; реалистични отражения')}</li>
             <li>{t('Ceramic coating — emphasize gloss and water beading','Керамично покритие — подчертан блясък и капчици')}</li>
@@ -86,7 +86,7 @@ function DetailingPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Why detailers choose us','Защо детайлърите ни избират')}</h2>
+          <h2 className="text-2xl font-semibold">{t('Why do detailing teams choose Before/After?','Защо екипите за детайлинг избират Before/After?')}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3 text-sm text-white/80">
             <div className="rounded-xl border border-white/10 bg-white/5 p-4">
               <div className="text-base font-medium text-white">{t('Upsell with visuals','Ъпсел с визия')}</div>
@@ -106,7 +106,7 @@ function DetailingPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('How it works','Как работи')}</h2>
+          <h2 className="text-2xl font-semibold">{t('How does the workflow operate in the shop?','Как протича процесът във вашия сервиз?')}</h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-3 text-sm text-white/80">
             <li className="rounded-xl border border-white/10 bg-white/5 p-4"><b>1.</b> {t('Paste the script on your site.','Поставете скрипта на сайта си.')}</li>
             <li className="rounded-xl border border-white/10 bg-white/5 p-4"><b>2.</b> {t('Clients upload a photo, choose correction / wrap / coat.','Клиентите качват снимка и избират корекция / фолио / покритие.')}</li>
@@ -117,7 +117,7 @@ function DetailingPage(){
 
       <section className="border-t border-white/10 py-12">
         <Container>
-          <h2 className="text-2xl font-semibold">{t('Results you can expect','Какви резултати да очаквате')}</h2>
+          <h2 className="text-2xl font-semibold">{t('What results do detailing studios report?','Какви резултати споделят детайлинг студиата?')}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3 text-center">
             {[{k:'+30%',v:t('higher premium upsells','повече премиум ъпсел')},{k:'-20%',v:t('fewer quote drop‑offs','по-малко отказани оферти')},{k:'< 60s',v:t('to first visualization','до първа визуализация')}].map((s,i)=> (
               <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-6">
@@ -134,5 +134,4 @@ function DetailingPage(){
 }
 
 createRoot(document.getElementById('root')).render(<DetailingPage />);
-
 

@@ -32,6 +32,11 @@ app.use(
 
 app.use(express.json({ limit: "15mb" }));
 
+// Redirect root to marketing site for SEO crawlability
+app.get('/', (req, res) => {
+  res.redirect(301, '/app/');
+});
+
 // Static hosting for widget/demo
 app.use(express.static("public"));
 

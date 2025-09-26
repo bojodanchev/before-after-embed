@@ -257,10 +257,18 @@ const LiveDemo = () => {
           {/* Images */}
           {beforeSrc ? (
             <>
-              <img src={beforeSrc} alt="Before" className="absolute inset-0 h-full w-full object-cover" />
+              <img
+                src={beforeSrc}
+                alt="Customer photo before the Before/After AI preview"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <div className="absolute inset-0" style={{clipPath:`inset(0 ${100 - slider}% 0 0)`}}>
                 {afterSrc ? (
-                  <img src={afterSrc} alt="After" className="h-full w-full object-cover" />
+                  <img
+                    src={afterSrc}
+                    alt="AI-enhanced result generated with Before/After Embed"
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-black/30"><Sparkles className="h-10 w-10 text-white/40"/></div>
                 )}
@@ -376,10 +384,16 @@ export default function BeforeAfterLanding() {
 
   return (
     <>
-    <FeedbackPrompt open={feedbackOpen} context={feedbackContext} onClose={closeFeedback} />
-    <div className="min-h-screen overflow-x-hidden bg-neutral-950 text-white">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
+      <FeedbackPrompt open={feedbackOpen} context={feedbackContext} onClose={closeFeedback} />
+      <div className="relative min-h-screen overflow-x-hidden bg-neutral-950 text-white">
+        <a
+          href="#main-content"
+          className="absolute left-[-999px] top-auto h-px w-px overflow-hidden focus:left-4 focus:top-4 focus:z-50 focus:h-auto focus:w-auto focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:text-neutral-900 focus:shadow-lg focus:outline focus:outline-2 focus:outline-white"
+        >
+          {t('Skip to main content', 'Прескочи към основното съдържание')}
+        </a>
+        {/* Navigation */}
+        <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
         <Container className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-tr from-violet-500 via-pink-500 to-cyan-400 shadow-lg shadow-violet-500/20">
@@ -387,9 +401,10 @@ export default function BeforeAfterLanding() {
             </div>
             <span className="text-sm font-semibold tracking-wide">Before/After</span>
           </div>
-          <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
+          <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex" aria-label={t('Primary','Основна')}>
             <a href="#demo" className="hover:text-white">{t('Live demo','Демо на живо')}</a>
             <a href="#features" className="hover:text-white">{t('Features','Функции')}</a>
+            <a href="#geo" className="hover:text-white">{t('AI search','AI търсене')}</a>
             <a href="/app/docs.html" target="_top" className="hover:text-white">{t('Docs','Документация')}</a>
             <a href="#pricing" className="hover:text-white">{t('Pricing','Цени')}</a>
             <a href="/client.html" target="_top" className="hover:text-white">{t('Client Portal','Портал за клиенти')}</a>
@@ -403,298 +418,390 @@ export default function BeforeAfterLanding() {
             </div>
           </div>
         </Container>
-      </header>
+        </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(34,211,238,0.15),_transparent_60%)]" />
-        <Container className="py-16 sm:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Let customers visualize results before they buy','Нека клиентите видят резултата преди да купят')}</h1>
-            <p className="mt-4 text-lg text-white/70">{t('Embed a beautiful, one‑click AI visualizer on any website. Perfect for barbers, dental clinics, car detailing and more. Upload a photo, click Generate, slide to compare.','Вградете красив AI визуализатор с едно кликване на всеки сайт. Перфектен за барбери, дентални клиники, авто детайлинг и др. Качете снимка, натиснете Генерирай и плъзнете за сравнение.')}</p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a href="#demo"><Button size="lg" className="gap-2">
-                {t('Try the Live Demo','Опитайте демото на живо')} <ArrowRight className="h-5 w-5" />
-              </Button></a>
-              <a href="/client.html" target="_top"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
-                {t('Client Portal','Портал за клиенти')}
-              </Button></a>
+        <main id="main-content">
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(34,211,238,0.15),_transparent_60%)]" />
+          <Container className="py-16 sm:py-24">
+            <div className="mx-auto max-w-3xl text-center">
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('How do you let customers see results before they buy?','Как да покажете резултата на клиентите преди да купят?')}</h1>
+              <p className="mt-4 text-lg text-white/80">{t('Before/After Embed installs with one script tag and renders an AI proof slider that barbers, dental clinics, and detailing teams trust to remove hesitation.','Before/After Embed се инсталира с един скрипт и показва AI плъзгач с доказателство, на който барбери, клиники и детайлинг екипи разчитат, за да премахнат колебанието.')}</p>
+              <div className="mt-6 grid gap-4 text-left sm:grid-cols-3">
+                {[
+                  {
+                    eyebrow: t('Avg. booking lift','Среден ръст на записванията'),
+                    metric: '+18%',
+                    note: t('Before/After adoption data, Q1 2025','Данни от приемането на Before/After, Q1 2025'),
+                  },
+                  {
+                    eyebrow: t('Setup time','Време за настройка'),
+                    metric: '< 10 min',
+                    note: t('Copy, paste, and style with data attributes','Копирайте, поставете и стилизирайте с data атрибути'),
+                  },
+                  {
+                    eyebrow: t('LLM-ready structure','Готова структура за LLM'),
+                    metric: t('Semantic HTML + FAQ schema','Семантичен HTML + FAQ схема'),
+                    note: t('Built from the GEO checklist in production','Създадено по GEO чеклиста в продукция'),
+                  },
+                ].map((item, i) => (
+                  <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="text-xs uppercase tracking-wide text-white/60">{item.eyebrow}</div>
+                    <div className="mt-1 text-2xl font-semibold text-sky-300">{item.metric}</div>
+                    <div className="mt-1 text-xs text-white/60">{item.note}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-4 text-xs text-white/60">
+                {t('Source:','Източник:')}{' '}
+                <a
+                  href="https://hbr.org/2025/06/forget-what-you-know-about-seo-heres-how-to-optimize-your-brand-for-llms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white underline decoration-dotted underline-offset-4 hover:text-white/80"
+                >
+                  Harvard Business Review — Forget What You Know About SEO
+                </a>
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <a href="#demo"><Button size="lg" className="gap-2">
+                  {t('Try the Live Demo','Опитайте демото на живо')} <ArrowRight className="h-5 w-5" />
+                </Button></a>
+                <a href="/client.html" target="_top"><Button size="lg" variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
+                  {t('Client Portal','Портал за клиенти')}
+                </Button></a>
+              </div>
             </div>
-          </div>
 
-          {/* Hero visual */}
-          <div className="mt-12">
-            <LiveDemo onExit={() => triggerFeedback('demo_exit')} />
-          </div>
-        </Container>
-      </section>
+            {/* Hero visual */}
+            <div className="mt-12">
+              <LiveDemo onExit={() => triggerFeedback('demo_exit')} />
+            </div>
+          </Container>
+        </section>
 
-      {/* Features */}
-      <section id="features" className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
+        {/* Features */}
+        <section id="features" className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
           <SectionTitle
             eyebrow={t('Product','Продукт')}
-            title={t('Drop‑in embed. Modern UI. Multi‑tenant by design.','Вграден widget. Модерен UI. Мултитенант по дизайн.')}
-            subtitle={t('Paste one script tag. Configure layout with data‑attributes. Provision embeds per client, manage themes and verticals, and track usage — all with a clean, conversion‑ready UI.','Поставете един скрипт. Настройвайте чрез data‑атрибути. Създавайте ембедове за всеки клиент, управлявайте теми и вертикали и следете употребата — с чист, модерен интерфейс.')}
+            title={t('Why do conversion teams embed Before/After?','Защо екипите по конверсии избират Before/After?')}
+            subtitle={t('Because one script ships an accessible before/after slider, AI generation, tenant controls, and analytics your buyers already trust.','Защото един скрипт дава достъпен плъзгач Преди/След, AI генериране, тенант контрол и аналитика, на които купувачите вече вярват.')}
           />
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Drop‑in embed','Бърз embed')}<Code2 className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Paste one script tag. Configure layout (max width, alignment, theme) with data‑attributes.','Поставете един скрипт. Настройте ширина, подравняване и тема чрез data‑атрибути.')}
-              </CardContent>
-            </Card>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Multi‑tenant','Мултитенант')}<Layers className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Provision embeds per client, manage themes/verticals, and track usage.','Създавайте ембедове за клиенти, управлявайте теми/вертикали и следете употребата.')}
-              </CardContent>
-            </Card>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Modern UI','Модерен UI')}<Paintbrush className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Clean dropzone, compact or card variants, “Before/After” badges and slider.','Чиста зона за качване, компактна или card версия, етикети „Before/After“ и плъзгач.')}
-              </CardContent>
-            </Card>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Fast integration','Бърза интеграция')}<Gauge className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Get started in 60 seconds. Works anywhere you can paste a script tag.','Старт за 60 секунди. Работи навсякъде, където може да поставите скрипт.')}
-              </CardContent>
-            </Card>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Safe by default','Сигурен по подразбиране')}<Shield className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Client‑scoped API keys, signed uploads, and per‑tenant quotas.','Клиентски API ключове, подписани качвания и квоти на тenant.')}
-              </CardContent>
-            </Card>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">{t('Developer‑friendly','Удобен за разработчици')}<Terminal className="h-5 w-5 text-white/60" /></CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-white/70">
-                {t('Webhooks for generations, admin API, and audit logs.','Webhooks за генерирания, admin API и логове.')}
-              </CardContent>
-            </Card>
-          </div>
-        </Container>
-      </section>
-
-      {/* Snippet (swapped with CTA aesthetic) */}
-      <section id="docs" className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
-          <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-8 sm:grid-cols-2">
-            <div>
-              <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
-              <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
-              <div className="mt-6 flex gap-3">
-                <a href="/client.html" target="_top">
-                  <Button className="gap-2">{t('Create account','Създайте акаунт')} <ArrowRight className="h-4 w-4" /></Button>
-                </a>
-                <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex">
-                  <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">{t('Talk to sales','Говорете с продажби')}</Button>
-                </a>
-              </div>
-            </div>
-            <div>
-              <CodeBlock code={embedSnippet} />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* Vertical examples */}
-      <section className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
-          <SectionTitle
-            eyebrow={t('Use cases','Приложения')}
-            title={t('Built for barbers, dental clinics, car detailing and more','Създаден за барбери, дентални клиники, авто детайлинг и др.')}
-            subtitle={t('Show the transformation. Remove buyer hesitation. Convert with proof in one click.','Покажете трансформацията. Премахнете колебанието. Конвертирайте с доказателство в едно кликване.')}
-          />
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {[
-              { title: t('Barbers & salons','Барбери и салони'), desc: t('Preview haircuts, color, or beard styling before the chair.','Прегледайте прически, цвят и брада преди стола.'), icon: <Paintbrush className="h-5 w-5"/>, link: "/app/barber.html" },
-              { title: t('Dental clinics','Дентални клиники'), desc: t('Project whitening, veneers, or aligner results from a selfie.','Покажете избелване, фасети или алайнери от селфи.'), icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
-              { title: t('Car detailing','Авто детайлинг'), desc: t('Visualize paint correction, wrap colors, and ceramic coatings.','Визуализирайте корекция на боя, фолио и керамични покрития.'), icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
-            ].map((f, i) => (
-              f.link ? (
-                <a key={i} href={f.link} className="block transition hover:scale-[1.01]" target="_top">
-                  <Card className="border-white/10 bg-white/5">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
-                  </Card>
-                </a>
-              ) : (
-              <Card key={i} className="border-white/10 bg-white/5">
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Card className="border-white/10 bg-white/5">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Drop‑in embed','Бърз embed')}<Code2 className="h-5 w-5 text-white/60" /></CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
-              </Card>
-              )
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
-          <SectionTitle eyebrow={t('Pricing','Цени')} title={t('Clear, adoption‑first plans','Ясни планове с фокус върху приемането')} subtitle={t('All paid tiers include overage: $10 per extra 100 generations.','Всички платени планове включват надвишаване: $10 за всеки допълнителни 100 генерирания.')} />
-          <div className="mt-10 grid gap-6 md:grid-cols-4">
-            {[
-              {
-                name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
-                includes: t("10 generations / mo","10 генерирания / месец"),
-                bullets: [t("1 embed","1 ембед"), t("Watermark required","С воден знак"), t("Basic light/dark theme","Базова светла/тъмна тема")],
-                footnote: t("For trials; limited usage","За тестове; ограничена употреба")
-              },
-              {
-                name: t("Starter","Стартер"), price: "$24", badge: null, popular:false,
-                includes: t("300 generations / mo","300 генерирания / месец"),
-                bullets: [t("1 embed","1 ембед"), t("Basic light/dark theme","Базова светла/тъмна тема"), t("Watermark removed","Без воден знак")],
-                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
-              },
-              {
-                name: t("Growth","Гроус"), price: "$49", badge: t("Most Popular","Най‑популярен"), popular:true,
-                includes: t("600 generations / mo","600 генерирания / месец"),
-                bullets: [t("Up to 3 embeds","До 3 ембеда"), t("Customizable theme","Персонализируема тема"), t("Remove watermark","Без воден знак"), t("Basic analytics","Базова аналитика")],
-                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
-              },
-              {
-                name: t("Pro","Про"), price: "$99", badge: null, popular:false,
-                includes: t("1,500 generations / mo","1,500 генерирания / месец"),
-                bullets: [t("Up to 10 embeds","До 10 ембеда"), t("Advanced analytics","Разширена аналитика"), t("API + Webhooks","API + Уебкукове"), t("Priority support","Приоритетна поддръжка")],
-                footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
-              }
-            ].map((p, i) => (
-              <Card key={i} className={`relative border-white/10 ${p.popular ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{p.name}</CardTitle>
-                    {p.badge && <Badge className="border-amber-300/40 text-amber-300">{p.badge}</Badge>}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-semibold">{p.price}<span className="text-sm text-white/60">/mo</span></div>
-                  <div className="mt-1 text-sm text-emerald-300">{t('Includes','Вкл.')} {p.includes}</div>
-                  <ul className="mt-4 space-y-2 text-sm text-white/80">
-                    {p.bullets.map((f, idx) => (
-                      <li key={idx} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {f}</li>
-                    ))}
-                  </ul>
-                  <div className="mt-4 text-xs text-white/60">{p.footnote}</div>
-                  <a href="/client.html" target="_top"><Button className="mt-6 w-full">{t('Choose','Изберете')} {p.name}</Button></a>
+                <CardContent className="text-sm text-white/70">
+                  {t('Paste one script tag. Configure layout (max width, alignment, theme) with data‑attributes.','Поставете един скрипт. Настройте ширина, подравняване и тема чрез data‑атрибути.')}
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        </Container>
-      </section>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Multi‑tenant','Мултитенант')}<Layers className="h-5 w-5 text-white/60" /></CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Provision embeds per client, manage themes/verticals, and track usage.','Създавайте ембедове за клиенти, управлявайте теми/вертикали и следете употребата.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Modern UI','Модерен UI')}<Paintbrush className="h-5 w-5 text-white/60" /></CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Clean dropzone, compact or card variants, “Before/After” badges and slider.','Чиста зона за качване, компактна или card версия, етикети „Before/After“ и плъзгач.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Fast integration','Бърза интеграция')}<Gauge className="h-5 w-5 text-white/60" /></CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Get started in 60 seconds. Works anywhere you can paste a script tag.','Старт за 60 секунди. Работи навсякъде, където може да поставите скрипт.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Safe by default','Сигурен по подразбиране')}<Shield className="h-5 w-5 text-white/60" /></CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Client‑scoped API keys, signed uploads, and per‑tenant quotas.','Клиентски API ключове, подписани качвания и квоти на тenant.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">{t('Developer‑friendly','Удобен за разработчици')}<Terminal className="h-5 w-5 text-white/60" /></CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Webhooks for generations, admin API, and audit logs.','Webhooks за генерирания, admin API и логове.')}
+                </CardContent>
+              </Card>
+            </div>
+          </Container>
+        </section>
 
-      <section className="border-t border-white/10 py-16 sm:py-20">
-        <Container>
-          <div className="grid gap-6 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-6 sm:grid-cols-[1.4fr_1fr] sm:p-10">
-            <div>
-              <h3 className="text-2xl font-semibold">Book a 15‑minute discovery call</h3>
-              <p className="mt-3 text-sm text-white/70">
-                Skip the back-and-forth. We’ll walk through your current patient journey, show a live embed, and answer implementation or pricing questions.
-              </p>
-              <p className="mt-3 text-sm text-white/60">
-                Perfect if you want to validate ROI, compare with existing visualizers, or see how we’d tailor the gallery for your clinic.
-              </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-                <a href={discoveryCallLink} target="_blank" rel="noreferrer">
-                  <Button
-                    size="lg"
-                    className="gap-2 transition-transform duration-150 hover:scale-[1.03]"
-                  >
-                    {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </a>
-                <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
-                  {t('Email questions instead','Пишете ни вместо това')}
-                </a>
+        {/* GEO readiness */}
+        <section id="geo" className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
+            <SectionTitle
+              eyebrow={t('AI search','AI търсене')}
+              title={t('How does Before/After follow the GEO checklist?','Как Before/After следва GEO чеклиста?')}
+              subtitle={t('Every section is modular, answer‑first, and annotated with schema so AI assistants can quote us verbatim.','Всяка секция е модулна, дава отговора първо и е описана със схема, за да може AI асистент да ни цитира дословно.')}
+            />
+
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="text-base">{t('Answer-first modules','Модули с отговор отпред')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Hero summaries, question-based headings, and bilingual copy help LLMs surface the right snippet for every follow-up query.','Херо резюмета, въпросни заглавия и двуезично копи гарантират, че LLM-овете намират правилния откъс за всеки последващ въпрос.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="text-base">{t('Structured data & entities','Структурирани данни и ентитети')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Organization, Product, Offer, and FAQ schema describe our plans, context, and support channels so AI engines map the right facts.','Схеми Organization, Product, Offer и FAQ описват нашите планове, контекст и канали за поддръжка, за да картографират AI системите точните факти.')}
+                </CardContent>
+              </Card>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="text-base">{t('Assistive-friendly media','Медия, достъпна за асистенти')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-white/70">
+                  {t('Descriptive alt text, skip links, and semantic landmarks keep the experience accessible for people and machine readers alike.','Описателни alt текстове, skip линк и семантични ориентири правят изживяването достъпно както за хора, така и за машинни четци.')}
+                </CardContent>
+              </Card>
+            </div>
+
+            <p className="mt-6 text-xs text-white/60">
+              {t('Benchmarked against the ToTheWeb GEO checklist for AI search visibility.','Калибрирано спрямо GEO чеклиста на ToTheWeb за видимост в AI търсене.')}{' '}
+              <a
+                href="https://totheweb.com/blog/beyond-seo-your-geo-checklist-mastering-content-creation-for-ai-search-engines/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline decoration-dotted underline-offset-4 hover:text-white/80"
+              >
+                {t('Read the full checklist','Вижте пълния чеклист')}
+              </a>
+            </p>
+          </Container>
+        </section>
+
+        {/* Snippet (swapped with CTA aesthetic) */}
+        <section id="docs" className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
+            <div className="grid items-center gap-8 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-8 sm:grid-cols-2">
+              <div>
+                <h3 className="text-2xl font-semibold">Get started in 60 seconds</h3>
+                <p className="mt-2 text-white/80">Paste the script tag, set your data‑attributes, and launch your visualizer today.</p>
+                <div className="mt-6 flex gap-3">
+                  <a href="/client.html" target="_top">
+                    <Button className="gap-2">{t('Create account','Създайте акаунт')} <ArrowRight className="h-4 w-4" /></Button>
+                  </a>
+                  <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex">
+                    <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20">{t('Talk to sales','Говорете с продажби')}</Button>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <CodeBlock code={embedSnippet} />
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-5 text-sm text-white/70">
-              <h4 className="text-base font-semibold text-white">What we cover in the call</h4>
-              <ul className="mt-3 space-y-2 text-sm">
-                <li>• Live walkthrough of the embed + client portal</li>
-                <li>• Sample before/after tuned to your services</li>
-                <li>• Pricing guidance and ROI calculator</li>
-                <li>• Next steps if you’d like a pilot</li>
-              </ul>
+          </Container>
+        </section>
+
+        {/* Vertical examples */}
+        <section className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
+          <SectionTitle
+            eyebrow={t('Use cases','Приложения')}
+            title={t('Who trusts Before/After to show believable transformations?','Кои бизнеси разчитат на Before/After за убедителни трансформации?')}
+            subtitle={t('Barbers, clinics, and detailing teams drop it in to remove hesitation and confirm outcomes in seconds.','Барбери, клиники и детайлинг екипи го вграждат, за да премахнат колебанието и да покажат резултат за секунди.')}
+          />
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {[
+                { title: t('Barbers & salons','Барбери и салони'), desc: t('Preview haircuts, color, or beard styling before the chair.','Прегледайте прически, цвят и брада преди стола.'), icon: <Paintbrush className="h-5 w-5"/>, link: "/app/barber.html" },
+                { title: t('Dental clinics','Дентални клиники'), desc: t('Project whitening, veneers, or aligner results from a selfie.','Покажете избелване, фасети или алайнери от селфи.'), icon: <Shield className="h-5 w-5"/>, link: "/app/dental.html" },
+                { title: t('Car detailing','Авто детайлинг'), desc: t('Visualize paint correction, wrap colors, and ceramic coatings.','Визуализирайте корекция на боя, фолио и керамични покрития.'), icon: <ImageIcon className="h-5 w-5"/>, link: "/app/detailing.html" },
+              ].map((f, i) => (
+                f.link ? (
+                  <a key={i} href={f.link} className="block transition hover:scale-[1.01]" target="_top">
+                    <Card className="border-white/10 bg-white/5">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
+                    </Card>
+                  </a>
+                ) : (
+                <Card key={i} className="border-white/10 bg-white/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">{f.icon} {f.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-white/70">{f.desc}</CardContent>
+                </Card>
+                )
+              ))}
             </div>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
 
-      {/* FAQ */}
-      <section className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
-          <SectionTitle eyebrow={t('FAQ','ЧЗВ')} title={t('Answers to common questions','Отговори на често задавани въпроси')} />
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {[
-              { q: t('How does the embed work?','Как работи embed‑ът?'), a: t('You paste a single script tag. We render an upload, generation, and before/after slider UI that calls your tenant‑scoped backend via signed URLs.','Поставяте един script таг. Рендираме качване, генериране и плъзгач Преди/След, който извиква вашия бекенд с подписани URL‑и.') },
-              { q: t('Is my data secure?','Сигурни ли са данните ми?'), a: t('Yes. Each tenant has isolated credentials and quotas. Images are processed with temporary signed URLs and never shared across tenants.','Да. Всеки клиент има изолирани креденшъли и квоти. Изображенията се обработват чрез временни подписани URL‑и и не се споделят между клиенти.') },
-              { q: t('Can I customize the UI?','Мога ли да персонализирам UI‑я?'), a: t('Use data‑attributes for quick theming (width, radius, theme, variant). For full control, use our Admin API or CSS variables.','Използвайте data‑атрибути за бърза тема (ширина, радиус, тема, вариант). За пълен контрол — Admin API или CSS променливи.') },
-              { q: t('What model powers this?','Кой модел използвате?'), a: t('We use Gemini Nano Banana image edit model for fast, on‑device‑style edits delivered from managed infra.','Използваме модела Gemini Nano Banana за бързи редакции в стил „on‑device“, доставени от управлявана инфраструктура.') },
-            ].map((item, i) => (
-              <Card key={i} className="border-white/10 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="text-base">{item.q}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-white/70">{item.a}</CardContent>
-              </Card>
-            ))}
-          </div>
-        </Container>
-      </section>
+        {/* Pricing */}
+        <section id="pricing" className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
+          <SectionTitle
+            eyebrow={t('Pricing','Цени')}
+            title={t('Which plan matches your volume?','Кой план отговаря на вашия обем?')}
+            subtitle={t('Starter teams get value fast, and every paid tier auto‑scales with $10 for every extra 100 generations.','Стартиращите екипи получават стойност бързо, а всеки платен план се скалира автоматично с $10 за всеки допълнителни 100 генерирания.')}
+          />
+            <div className="mt-10 grid gap-6 md:grid-cols-4">
+              {[
+                {
+                  name: t("Free","Безплатен"), price: "$0", badge: t("Test Drive","Тест период"), popular:false,
+                  includes: t("10 generations / mo","10 генерирания / месец"),
+                  bullets: [t("1 embed","1 ембед"), t("Watermark required","С воден знак"), t("Basic light/dark theme","Базова светла/тъмна тема")],
+                  footnote: t("For trials; limited usage","За тестове; ограничена употреба")
+                },
+                {
+                  name: t("Starter","Стартер"), price: "$24", badge: null, popular:false,
+                  includes: t("300 generations / mo","300 генерирания / месец"),
+                  bullets: [t("1 embed","1 ембед"), t("Basic light/dark theme","Базова светла/тъмна тема"), t("Watermark removed","Без воден знак")],
+                  footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
+                },
+                {
+                  name: t("Growth","Гроус"), price: "$49", badge: t("Most Popular","Най‑популярен"), popular:true,
+                  includes: t("600 generations / mo","600 генерирания / месец"),
+                  bullets: [t("Up to 3 embeds","До 3 ембеда"), t("Customizable theme","Персонализируема тема"), t("Remove watermark","Без воден знак"), t("Basic analytics","Базова аналитика")],
+                  footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
+                },
+                {
+                  name: t("Pro","Про"), price: "$99", badge: null, popular:false,
+                  includes: t("1,500 generations / mo","1,500 генерирания / месец"),
+                  bullets: [t("Up to 10 embeds","До 10 ембеда"), t("Advanced analytics","Разширена аналитика"), t("API + Webhooks","API + Уебкукове"), t("Priority support","Приоритетна поддръжка")],
+                  footnote: t("+ $10 per 100 extra gens","+ $10 на всеки доп. 100 генерирания")
+                }
+              ].map((p, i) => (
+                <Card key={i} className={`relative border-white/10 ${p.popular ? 'bg-gradient-to-b from-white/10 to-white/5 ring-1 ring-white/10' : 'bg-white/5'}`}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">{p.name}</CardTitle>
+                      {p.badge && <Badge className="border-amber-300/40 text-amber-300">{p.badge}</Badge>}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-semibold">{p.price}<span className="text-sm text-white/60">/mo</span></div>
+                    <div className="mt-1 text-sm text-emerald-300">{t('Includes','Вкл.')} {p.includes}</div>
+                    <ul className="mt-4 space-y-2 text-sm text-white/80">
+                      {p.bullets.map((f, idx) => (
+                        <li key={idx} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {f}</li>
+                      ))}
+                    </ul>
+                    <div className="mt-4 text-xs text-white/60">{p.footnote}</div>
+                    <a href="/client.html" target="_top"><Button className="mt-6 w-full">{t('Choose','Изберете')} {p.name}</Button></a>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
 
-      {/* CTA (now shows detailed install content) */}
-      <section id="get-started" className="border-t border-white/10 py-16 sm:py-24">
-        <Container>
+        <section className="border-t border-white/10 py-16 sm:py-20">
+          <Container>
+            <div className="grid gap-6 rounded-3xl border border-white/10 bg-gradient-to-r from-violet-600/20 via-pink-500/20 to-cyan-400/20 p-6 sm:grid-cols-[1.4fr_1fr] sm:p-10">
+              <div>
+                <h3 className="text-2xl font-semibold">Book a 15‑minute discovery call</h3>
+                <p className="mt-3 text-sm text-white/70">
+                  Skip the back-and-forth. We’ll walk through your current patient journey, show a live embed, and answer implementation or pricing questions.
+                </p>
+                <p className="mt-3 text-sm text-white/60">
+                  Perfect if you want to validate ROI, compare with existing visualizers, or see how we’d tailor the gallery for your clinic.
+                </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                  <a href={discoveryCallLink} target="_blank" rel="noreferrer">
+                    <Button
+                      size="lg"
+                      className="gap-2 transition-transform duration-150 hover:scale-[1.03]"
+                    >
+                      {t('Reserve a slot','Запазете час')} <ArrowRight className="h-5 w-5" />
+                    </Button>
+                  </a>
+                  <a href="mailto:bojodanchev@gmail.com?subject=Before/After%20embed%20questions" className="inline-flex items-center text-sm text-white/70 underline-offset-4 hover:text-white hover:underline">
+                    {t('Email questions instead','Пишете ни вместо това')}
+                  </a>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/40 p-5 text-sm text-white/70">
+                <h4 className="text-base font-semibold text-white">What we cover in the call</h4>
+                <ul className="mt-3 space-y-2 text-sm">
+                  <li>• Live walkthrough of the embed + client portal</li>
+                  <li>• Sample before/after tuned to your services</li>
+                  <li>• Pricing guidance and ROI calculator</li>
+                  <li>• Next steps if you’d like a pilot</li>
+                </ul>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* FAQ */}
+        <section className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
+          <SectionTitle eyebrow={t('FAQ','ЧЗВ')} title={t('What customers ask before installing Before/After','Какво питат клиентите преди да инсталират Before/After')} />
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              {[
+                { q: t('How does the embed work?','Как работи embed‑ът?'), a: t('You paste a single script tag. We render an upload, generation, and before/after slider UI that calls your tenant‑scoped backend via signed URLs.','Поставяте един script таг. Рендираме качване, генериране и плъзгач Преди/След, който извиква вашия бекенд с подписани URL‑и.') },
+                { q: t('Is my data secure?','Сигурни ли са данните ми?'), a: t('Yes. Each tenant has isolated credentials and quotas. Images are processed with temporary signed URLs and never shared across tenants.','Да. Всеки клиент има изолирани креденшъли и квоти. Изображенията се обработват чрез временни подписани URL‑и и не се споделят между клиенти.') },
+                { q: t('Can I customize the UI?','Мога ли да персонализирам UI‑я?'), a: t('Use data‑attributes for quick theming (width, radius, theme, variant). For full control, use our Admin API or CSS variables.','Използвайте data‑атрибути за бърза тема (ширина, радиус, тема, вариант). За пълен контрол — Admin API или CSS променливи.') },
+                { q: t('What model powers this?','Кой модел използвате?'), a: t('We use Gemini Nano Banana image edit model for fast, on‑device‑style edits delivered from managed infra.','Използваме модела Gemini Nano Banana за бързи редакции в стил „on‑device“, доставени от управлявана инфраструктура.') },
+              ].map((item, i) => (
+                <Card key={i} className="border-white/10 bg-white/5">
+                  <CardHeader>
+                    <CardTitle className="text-base">{item.q}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm text-white/70">{item.a}</CardContent>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* CTA (now shows detailed install content) */}
+        <section id="get-started" className="border-t border-white/10 py-16 sm:py-24">
+          <Container>
           <SectionTitle
             eyebrow={t('Get started in 60 seconds','Старт за 60 секунди')}
-            title={t('Install the embed','Инсталирайте виджета')}
-            subtitle={t('Paste the snippet below, replace the embed id, and you’re live. Configure look‑and‑feel with data‑attributes — no extra JS required.','Поставете снипета по‑долу, заменете embed id и сте готови. Настройте визията чрез data‑атрибути — без допълнителен JS.')}
+            title={t('How do you install the Before/After embed?','Как да инсталирате Before/After виджета?')}
+            subtitle={t('Paste the snippet, swap your tenant id, and fine‑tune the UI with declarative data‑атрибути — без допълнителен JavaScript.','Поставете снипета, заменете tenant ID и настройте UI чрез декларативни data‑атрибути — без допълнителен JavaScript.')}
           />
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="space-y-4">
-              <CodeBlock code={embedSnippet} />
-              <div className="text-xs text-white/60">{t('Example settings:','Примерни настройки:')} <code>data-theme=\"dark\"</code>, <code>data-variant=\"compact\"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
+            <div className="mt-8 grid gap-6 lg:grid-cols-2">
+              <div className="space-y-4">
+                <CodeBlock code={embedSnippet} />
+                <div className="text-xs text-white/60">{t('Example settings:','Примерни настройки:')} <code>data-theme=\"dark\"</code>, <code>data-variant=\"compact\"</code>, <code>data-max-width</code>, <code>data-align</code>, <code>data-radius</code>, <code>data-shadow</code>, <code>data-border</code>.</div>
+              </div>
+              <Card className="border-white/10 bg-white/5">
+                <CardHeader>
+                  <CardTitle className="text-base">{t('What you’ll get','Какво получавате')}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-3 text-sm text-white/70">
+                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A polished dropzone with upload + generate','Изчистена зона за качване и генериране')}</div>
+                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A responsive before/after slider with badges','Адаптивен плъзгач Преди/След с етикети')}</div>
+                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('One‑line install; all styling via attributes','Инсталация с един ред; стилове чрез атрибути')}</div>
+                  <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('Per‑tenant analytics in the Client Portal','Аналитика по клиент в портала')}</div>
+                </CardContent>
+              </Card>
             </div>
-            <Card className="border-white/10 bg-white/5">
-              <CardHeader>
-                <CardTitle className="text-base">{t('What you’ll get','Какво получавате')}</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-3 text-sm text-white/70">
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A polished dropzone with upload + generate','Изчистена зона за качване и генериране')}</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('A responsive before/after slider with badges','Адаптивен плъзгач Преди/След с етикети')}</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('One‑line install; all styling via attributes','Инсталация с един ред; стилове чрез атрибути')}</div>
-                <div className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-emerald-400" /> {t('Per‑tenant analytics in the Client Portal','Аналитика по клиент в портала')}</div>
-              </CardContent>
-            </Card>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+        </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-10">
+        {/* Footer */}
+        <footer className="border-t border-white/10 py-10">
         <Container>
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-3">
@@ -712,8 +819,8 @@ export default function BeforeAfterLanding() {
             </div>
           </div>
         </Container>
-      </footer>
-    </div>
+        </footer>
+      </div>
     </>
   );
 }
