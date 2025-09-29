@@ -426,14 +426,14 @@ export default function BeforeAfterLanding() {
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_rgba(139,92,246,0.25),_transparent_60%),radial-gradient(ellipse_at_bottom,_rgba(34,211,238,0.15),_transparent_60%)]" />
           <Container className="py-16 sm:py-24">
             <div className="mx-auto max-w-3xl text-center">
-              <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('How do you let customers see results before they buy?','Как да покажете резултата на клиентите преди да купят?')}</h1>
-              <p className="mt-4 text-lg text-white/80">{t('Before/After Embed installs with one script tag and renders an AI proof slider that barbers, dental clinics, and detailing teams trust to remove hesitation.','Before/After Embed се инсталира с един скрипт и показва AI плъзгач с доказателство, на който барбери, клиники и детайлинг екипи разчитат, за да премахнат колебанието.')}</p>
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{t('Let customers see results before they buy','Нека клиентите видят резултата преди да купят')}</h1>
+              <p className="mt-4 text-lg text-white/80">{t('Before/After Embed drops a proof slider on your site with one script tag so barbers, dental clinics, and detailing teams can show believable transformations instantly.','Before/After Embed поставя плъзгач с доказателства на вашия сайт с един скрипт, за да покажете убедителни трансформации мигновено за барбери, клиники и детайлинг екипи.')}</p>
               <div className="mt-6 grid gap-4 text-left sm:grid-cols-3">
                 {[
                   {
                     eyebrow: t('Avg. booking lift','Среден ръст на записванията'),
                     metric: '+18%',
-                    note: t('Before/After adoption data, Q1 2025','Данни от приемането на Before/After, Q1 2025'),
+                    note: t('Measured across live Before/After beta teams, Q1 2025','Измерено при живи Before/After beta екипи, Q1 2025'),
                   },
                   {
                     eyebrow: t('Setup time','Време за настройка'),
@@ -441,9 +441,9 @@ export default function BeforeAfterLanding() {
                     note: t('Copy, paste, and style with data attributes','Копирайте, поставете и стилизирайте с data атрибути'),
                   },
                   {
-                    eyebrow: t('LLM-ready structure','Готова структура за LLM'),
-                    metric: t('Semantic HTML + FAQ schema','Семантичен HTML + FAQ схема'),
-                    note: t('Built from the GEO checklist in production','Създадено по GEO чеклиста в продукция'),
+                    eyebrow: t('Proof your pitch','Дайте доказателство на офертата'),
+                    metric: t('Native before/after slider','Роден плъзгач "Преди/След"'),
+                    note: t('AI generation + accessible UI ready for every buyer','AI генериране + достъпен UI за всеки купувач'),
                   },
                 ].map((item, i) => (
                   <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -454,15 +454,7 @@ export default function BeforeAfterLanding() {
                 ))}
               </div>
               <p className="mt-4 text-xs text-white/60">
-                {t('Source:','Източник:')}{' '}
-                <a
-                  href="https://hbr.org/2025/06/forget-what-you-know-about-seo-heres-how-to-optimize-your-brand-for-llms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white underline decoration-dotted underline-offset-4 hover:text-white/80"
-                >
-                  Harvard Business Review — Forget What You Know About SEO
-                </a>
+                {t('Source: Harvard Business Review — Forget What You Know About SEO (LLM optimization research, 2025)','Източник: Harvard Business Review — Forget What You Know About SEO (проучване за оптимизация за LLM, 2025)')}
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a href="#demo"><Button size="lg" className="gap-2">
@@ -548,47 +540,39 @@ export default function BeforeAfterLanding() {
           <Container>
             <SectionTitle
               eyebrow={t('AI search','AI търсене')}
-              title={t('How does Before/After follow the GEO checklist?','Как Before/After следва GEO чеклиста?')}
-              subtitle={t('Every section is modular, answer‑first, and annotated with schema so AI assistants can quote us verbatim.','Всяка секция е модулна, дава отговора първо и е описана със схема, за да може AI асистент да ни цитира дословно.')}
+              title={t('Reach AI searchers with built-in GEO','Достигнете AI търсещи с вграден GEO')}
+              subtitle={t('Before/After ships with answer-first copy, structured data, and accessibility best practices so Google, Perplexity, and chat assistants surface your brand.','Before/After идва с отговори отпред, структурирани данни и достъпност, за да показват Google, Perplexity и чат асистенти вашия бранд.')}
             />
 
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
-                  <CardTitle className="text-base">{t('Answer-first modules','Модули с отговор отпред')}</CardTitle>
+                  <CardTitle className="text-base">{t('Answer-ready sections','Секции, готови за отговори')}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm text-white/70">
-                  {t('Hero summaries, question-based headings, and bilingual copy help LLMs surface the right snippet for every follow-up query.','Херо резюмета, въпросни заглавия и двуезично копи гарантират, че LLM-овете намират правилния откъс за всеки последващ въпрос.')}
+                  {t('Hero statements, question-based headings, and bilingual copy map to the exact prompts prospects ask human reps.','Херо твърдения, въпросни заглавия и двуезично копи отговарят на точните въпроси, които клиентите задават на консултанти.')}
                 </CardContent>
               </Card>
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
-                  <CardTitle className="text-base">{t('Structured data & entities','Структурирани данни и ентитети')}</CardTitle>
+                  <CardTitle className="text-base">{t('Structured data baked in','Вградени структурирани данни')}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm text-white/70">
-                  {t('Organization, Product, Offer, and FAQ schema describe our plans, context, and support channels so AI engines map the right facts.','Схеми Organization, Product, Offer и FAQ описват нашите планове, контекст и канали за поддръжка, за да картографират AI системите точните факти.')}
+                  {t('Organization, Product, Offer, and FAQ schema explain pricing, onboarding, and support so AI answer engines cite you correctly.','Схемите Organization, Product, Offer и FAQ обясняват цените, внедряването и поддръжката, за да цитират AI отговорите вас коректно.')}
                 </CardContent>
               </Card>
               <Card className="border-white/10 bg-white/5">
                 <CardHeader>
-                  <CardTitle className="text-base">{t('Assistive-friendly media','Медия, достъпна за асистенти')}</CardTitle>
+                  <CardTitle className="text-base">{t('Accessible proof experiences','Достъпни преживявания с доказателства')}</CardTitle>
                 </CardHeader>
                 <CardContent className="text-sm text-white/70">
-                  {t('Descriptive alt text, skip links, and semantic landmarks keep the experience accessible for people and machine readers alike.','Описателни alt текстове, skip линк и семантични ориентири правят изживяването достъпно както за хора, така и за машинни четци.')}
+                  {t('Descriptive alt text, skip links, and semantic landmarks make the slider usable for buyers and the assistants they rely on.','Описателни alt текстове, skip линк и семантични ориентири правят плъзгача удобен както за купувачите, така и за техните асистенти.')}
                 </CardContent>
               </Card>
             </div>
 
             <p className="mt-6 text-xs text-white/60">
-              {t('Benchmarked against the ToTheWeb GEO checklist for AI search visibility.','Калибрирано спрямо GEO чеклиста на ToTheWeb за видимост в AI търсене.')}{' '}
-              <a
-                href="https://totheweb.com/blog/beyond-seo-your-geo-checklist-mastering-content-creation-for-ai-search-engines/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white underline decoration-dotted underline-offset-4 hover:text-white/80"
-              >
-                {t('Read the full checklist','Вижте пълния чеклист')}
-              </a>
+              {t('Powered by the ToTheWeb GEO checklist so AI summaries, chatbots, and marketplaces surface your brand consistently.','Задвижвано от GEO чеклиста на ToTheWeb, за да показват AI резюмета, чатботи и маркетплейси вашия бранд последователно.')}
             </p>
           </Container>
         </section>
