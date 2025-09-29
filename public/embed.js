@@ -316,13 +316,14 @@
           method: 'POST',
           body: formData
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload) {
+          const detail = payload?.error || payload?.details || payload?.detail || response.statusText || `HTTP ${response.status}`;
+          throw new Error(detail);
         }
-        
-        const result = await response.json();
-        afterUrl = result.outputUrl;
+
+        afterUrl = payload.outputUrl;
         renderSlider(slider, beforeUrl, afterUrl);
         showStatus('Generated successfully!', 'success');
         
@@ -331,6 +332,8 @@
         let msg = err && err.message || 'Failed';
         if (/413|payload too large/i.test(msg)) msg = 'Image too large. Please upload JPG/PNG under 25MB.';
         if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
+        if (/Generation limit/i.test(msg)) msg = 'Monthly generation limit reached. Please upgrade your plan to continue.';
+        if (/empty|greater than 0/i.test(msg)) msg = 'Uploaded image seems empty. Please re-upload the photo.';
         showStatus(`Error: ${msg}`, 'error');
       } finally {
         genBtn.disabled = false;
@@ -338,6 +341,10 @@
     });
 
     function renderSlider(root, before, after) {
+      if (typeof root.__baCleanup === 'function') {
+        try { root.__baCleanup(); } catch (_e) {}
+      }
+
       root.innerHTML = `
         <div style="position: relative; height: 100%">
           <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
@@ -349,6 +356,7 @@
       
       const r = root.querySelector('#r');
       const b = root.querySelector('#b');
+      const sliderCtl = root.querySelector('.slider-control');
       let isDragging = false;
       
       function updateSlider(x) {
@@ -356,36 +364,100 @@
         const percent = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
         r.style.left = `${percent}%`;
         b.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+        if (sliderCtl) sliderCtl.setAttribute('aria-valuenow', Math.round(percent));
       }
-      
-      r.addEventListener('mousedown', (e) => {
+
+      const getClientX = (e) => {
+        if (typeof e?.clientX === 'number') return e.clientX;
+        if (e?.touches?.[0]) return e.touches[0].clientX;
+        if (e?.changedTouches?.[0]) return e.changedTouches[0].clientX;
+        return null;
+      };
+
+      const startDrag = (e) => {
+        const x = getClientX(e);
+        if (x != null) updateSlider(x);
         isDragging = true;
-        e.preventDefault();
-      });
-      
-      root.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-          updateSlider(e.clientX);
+        if (typeof e?.preventDefault === 'function') e.preventDefault();
+      };
+
+      const moveDrag = (e) => {
+        if (!isDragging) return;
+        const x = getClientX(e);
+        if (x != null) {
+          updateSlider(x);
+          if (e?.cancelable && typeof e.preventDefault === 'function') e.preventDefault();
         }
-      });
-      
-      root.addEventListener('mouseup', () => {
+      };
+
+      const endDrag = () => {
         isDragging = false;
-      });
-      
+      };
+
+      const cleanupFns = [];
+
+      if (window.PointerEvent) {
+        r.addEventListener('pointerdown', (e) => {
+          startDrag(e);
+          r.setPointerCapture?.(e.pointerId);
+        });
+        const pointerMove = (e) => moveDrag(e);
+        const pointerUp = (e) => {
+          endDrag();
+          r.releasePointerCapture?.(e.pointerId);
+        };
+        r.addEventListener('pointermove', pointerMove);
+        r.addEventListener('pointerup', pointerUp);
+        root.addEventListener('pointermove', moveDrag);
+        root.addEventListener('pointerup', endDrag);
+        root.addEventListener('pointerleave', endDrag);
+        cleanupFns.push(() => {
+          r.removeEventListener('pointermove', pointerMove);
+          r.removeEventListener('pointerup', pointerUp);
+          root.removeEventListener('pointermove', moveDrag);
+          root.removeEventListener('pointerup', endDrag);
+          root.removeEventListener('pointerleave', endDrag);
+        });
+      } else {
+        r.addEventListener('mousedown', startDrag);
+        const mouseMove = (e) => moveDrag(e);
+        const mouseUp = () => endDrag();
+        document.addEventListener('mousemove', mouseMove);
+        document.addEventListener('mouseup', mouseUp);
+        r.addEventListener('touchstart', startDrag, { passive: true });
+        const touchMove = (e) => moveDrag(e);
+        const touchEnd = () => endDrag();
+        document.addEventListener('touchmove', touchMove, { passive: false });
+        document.addEventListener('touchend', touchEnd);
+        document.addEventListener('touchcancel', touchEnd);
+        cleanupFns.push(() => {
+          document.removeEventListener('mousemove', mouseMove);
+          document.removeEventListener('mouseup', mouseUp);
+          document.removeEventListener('touchmove', touchMove);
+          document.removeEventListener('touchend', touchEnd);
+          document.removeEventListener('touchcancel', touchEnd);
+        });
+      }
+
       root.addEventListener('click', (e) => {
         if (!isDragging) {
-          updateSlider(e.clientX);
+          const x = getClientX(e);
+          if (x != null) updateSlider(x);
         }
       });
 
-      const sliderCtl = root.querySelector('.slider-control');
       sliderCtl.addEventListener('keydown', (e)=>{
         const rect = root.getBoundingClientRect();
         const current = parseFloat(r.style.left) || 50;
         if (e.key === 'ArrowLeft'){ updateSlider(rect.left + (rect.width * Math.max(0,current-5)/100)); e.preventDefault(); }
         if (e.key === 'ArrowRight'){ updateSlider(rect.left + (rect.width * Math.min(100,current+5)/100)); e.preventDefault(); }
       });
+
+      root.__baCleanup = () => {
+        cleanupFns.forEach((fn) => {
+          try { fn(); } catch (_e) {}
+        });
+      };
     }
 
     function showStatus(message, type) {

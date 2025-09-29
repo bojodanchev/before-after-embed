@@ -23,9 +23,25 @@ export default async function handler(req, res){
     console.log('Processing edit request...');
     // Allow larger smartphone photos (up to ~25MB)
     const form = formidable({ multiples: false, keepExtensions: false, maxFileSize: 25 * 1024 * 1024 });
-    const { fields, files } = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
-    });
+    let parsed;
+    try {
+      parsed = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => err ? reject(err) : resolve({ fields, files }));
+      });
+    } catch (parseErr) {
+      const message = (parseErr?.message || '').toLowerCase();
+      const code = (parseErr?.code || '').toString();
+      if (code === 'LIMIT_FILE_SIZE' || message.includes('max file size')) {
+        return res.status(413).json({ error: 'Image too large. Please upload JPG/PNG/WEBP/HEIC under 25MB.' });
+      }
+      if (message.includes('greater than 0') || message.includes('empty')) {
+        return res.status(400).json({ error: 'Uploaded image appears to be empty. Please re-upload the photo.' });
+      }
+      console.error('Form parse error', parseErr);
+      return res.status(400).json({ error: 'Unable to read the uploaded image. Please try again.' });
+    }
+
+    const { fields, files } = parsed;
     
     // Parsed field/file keys available for debugging; avoid verbose logs in production
     // console.debug('Parsed fields:', Object.keys(fields));
