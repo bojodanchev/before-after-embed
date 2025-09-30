@@ -248,7 +248,7 @@
           root.getElementById('wm').style.display = 'block';
         }
         
-        const choices = {
+        const choices = conf.verticalOptions?.choices || {
           barber: ['fade', 'buzz', 'undercut', 'pompadour'],
           dental: ['whitening', 'alignment', 'veneers'],
           detailing: ['interior', 'exterior', 'wheels']

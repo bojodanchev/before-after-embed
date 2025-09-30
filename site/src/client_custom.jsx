@@ -442,6 +442,16 @@ function Dashboard({ token, onSignOut }) {
 
   // Usage & Stats
   useEffect(() => { setPreviewBrandColor(null); }, [settings?.brandColor]);
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get('showInstaller') === '1') {
+      setShowInstaller(true);
+      sp.delete('showInstaller');
+      const url = new URL(window.location.href);
+      url.search = sp.toString();
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   const [usageEmbedId, setUsageEmbedId] = useState("");
   const [usage, setUsage] = useState([]);
@@ -449,6 +459,9 @@ function Dashboard({ token, onSignOut }) {
   const [toast, setToast] = useState("");
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [showInstaller, setShowInstaller] = useState(false);
+  const [installerStep, setInstallerStep] = useState(1);
+  const [installerPlacement, setInstallerPlacement] = useState('wide');
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -612,6 +625,12 @@ function Dashboard({ token, onSignOut }) {
         {!!toast && (
           <div className="fixed right-4 top-16 z-50 rounded-lg border border-emerald-400/30 bg-emerald-500/15 px-3 py-2 text-sm text-emerald-300 shadow-lg">
             {toast}
+          </div>
+        )}
+        {!embeds.length && (
+          <div className="rounded-xl border border-white/10 bg-amber-500/10 p-4 text-sm text-amber-100">
+            {t('New here? Use the guided setup to embed your widget in three quick steps.','За първи път сте тук? Пуснете ръководството за настройка в три стъпки.')}
+            <Button className="ml-3" variant="subtle" onClick={()=> { setInstallerStep(1); setShowInstaller(true); }}>{t('Start guided setup','Стартирайте ръководството')}</Button>
           </div>
         )}
         <Section title={t('Embeds','Ембедове')}>
