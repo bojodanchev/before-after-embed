@@ -248,15 +248,16 @@ function Dashboard({ token, onSignOut }) {
   const [embedId, setEmbedId] = useState("");
   const brandColor = settings?.brandColor || '#f97316';
   const templateOptions = useMemo(
-    () => TEMPLATE_LIBRARY.map((tpl) =>
-      tpl.id === 'brand'
-        ? {
-            ...tpl,
-            attrs: { ...tpl.attrs, brandColor },
-            preview: { ...tpl.preview, accent: brandColor },
-          }
-        : tpl
-    ),
+    () =>
+      TEMPLATE_LIBRARY.map((tpl) =>
+        tpl.id === 'brand'
+          ? {
+              ...tpl,
+              attrs: { ...tpl.attrs, brandColor },
+              preview: { ...tpl.preview, accent: brandColor },
+            }
+          : tpl
+      ),
     [brandColor]
   );
   const [selectedTemplateId, setSelectedTemplateId] = useState('light');
