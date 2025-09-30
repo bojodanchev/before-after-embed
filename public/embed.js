@@ -260,7 +260,13 @@
           opts.innerHTML = choices.map(o => 
             `<button class="opt" data-o="${o}">${(vertical==='dental' && cfg.locale==='bg')?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
           ).join('');
-          
+
+          const defaultButton = opts.querySelector('button');
+          if (defaultButton) {
+            selectedOpt = defaultButton.dataset.o;
+            defaultButton.classList.add('selected');
+          }
+
           opts.addEventListener('click', e => {
             const b = e.target.closest('.opt');
             if (!b) return;
