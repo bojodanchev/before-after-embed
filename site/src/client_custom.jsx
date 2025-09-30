@@ -27,34 +27,102 @@ async function safeError(res) {
 }
 
 const EMBED_SCRIPT_URL = import.meta.env.VITE_EMBED_SCRIPT_URL || 'https://before-after-embed.vercel.app/embed.js';
-const buildEmbedSnippet = (embedId, preset, theme, opt={}) => {
-  const defaults = {
-    maxWidth: '640px',
-    align: 'center',
-    radius: '14px',
-    shadow: 'true',
-    border: 'true',
-    width: '100%',
-    height: '460px',
+const camelToKebab = (key) => key.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+
+const buildEmbedSnippet = (embedId, templateConfig = {}, extra = {}) => {
+  const merged = {
+    embedId: embedId || 'your-embed-id',
+    ...('attrs' in templateConfig ? templateConfig.attrs : templateConfig),
+    ...extra,
   };
-  const o = Object.assign({}, defaults, opt);
-  const attrs = [
-    `async`,
-    `src="${EMBED_SCRIPT_URL}"`,
-    `data-embed-id="${embedId || "your-embed-id"}"`,
-    `data-theme="${theme}"`,
-    `data-variant="${preset}"`,
-    ...(o.vertical ? [`data-vertical="${o.vertical}"`] : []),
-    `data-max-width="${o.maxWidth}"`,
-    `data-align="${o.align}"`,
-    `data-radius="${o.radius}"`,
-    `data-shadow="${o.shadow}"`,
-    `data-border="${o.border}"`,
-    `data-width="${o.width}"`,
-    `data-height="${o.height}"`,
-  ].join(" ");
-  return `<script ${attrs}></script>`;
+
+  const parts = [`async`, `src="${EMBED_SCRIPT_URL}"`];
+  Object.entries(merged).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    const attr = `data-${camelToKebab(key.replace(/^data-/, ''))}`;
+    parts.push(`${attr}="${String(value)}"`);
+  });
+  return `<script ${parts.join(' ')}></script>`;
 };
+
+const TEMPLATE_LIBRARY = [
+  {
+    id: 'light',
+    name: 'Light',
+    subtitle: 'Bright card for white backgrounds',
+    attrs: {
+      theme: 'light',
+      wide: 'true',
+      border: 'true',
+      shadow: 'false',
+      radius: '18px',
+      align: 'center',
+      height: '520px',
+    },
+    preview: { bg: '#f8fafc', fg: '#0f172a' },
+    copy: {
+      headline: 'Show the transformation instantly',
+      body: 'Upload, generate, and drag the slider so customers see the clean finish before booking.',
+    },
+  },
+  {
+    id: 'dark',
+    name: 'Dark',
+    subtitle: 'Glassmorphism card for dark sites',
+    attrs: {
+      theme: 'dark',
+      wide: 'true',
+      border: 'true',
+      shadow: 'true',
+      radius: '20px',
+      align: 'center',
+      height: '520px',
+    },
+    preview: { bg: '#0b1120', fg: '#f8fafc' },
+    copy: {
+      headline: 'Bring the shine forward',
+      body: 'Let visitors preview your AI enhancements without leaving the page.',
+    },
+  },
+  {
+    id: 'brand',
+    name: 'Brand color',
+    subtitle: 'Uses your accent color for buttons and pills',
+    attrs: {
+      theme: 'light',
+      wide: 'true',
+      border: 'true',
+      shadow: 'true',
+      radius: '18px',
+      align: 'center',
+      height: '520px',
+    },
+    preview: { bg: '#ffffff', fg: '#0f172a' },
+    copy: {
+      headline: 'Spotlight your signature look',
+      body: 'Buttons, pills, and slider accents inherit your brand color automatically.',
+    },
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal',
+    subtitle: 'Compact embed for sidebars and narrow sections',
+    attrs: {
+      theme: 'auto',
+      wide: 'false',
+      border: 'false',
+      shadow: 'false',
+      radius: '8px',
+      align: 'left',
+      height: '420px',
+    },
+    preview: { bg: '#f1f5f9', fg: '#111827' },
+    copy: {
+      headline: 'Drop into any sidebar',
+      body: 'The compact layout keeps controls stacked for a quick install.',
+    },
+  },
+];
 
 /* ===============================================================
    UI Primitives (Tailwind-only, dark/light ready)
@@ -171,27 +239,63 @@ function Dashboard({ token, onSignOut }) {
   useEffect(() => { try{ localStorage.setItem('lang', lang); }catch{} }, [lang]);
   const t = (en, bg) => (lang === 'bg' ? bg : en);
 
+  const [settings, setSettings] = useState(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [planInfo, setPlanInfo] = useState(null);
+  const [monthlyUsed, setMonthlyUsed] = useState(0);
+  const [monthlyBonus, setMonthlyBonus] = useState(0);
+
   const [embedId, setEmbedId] = useState("");
-  const [preset, setPreset] = useState("compact");
-  const [theme, setTheme] = useState("dark");
-  const [opts, setOpts] = useState({ maxWidth:'640px', align:'center', radius:'14px', shadow:'true', border:'true', width:'100%', height:'460px' });
-  const snippetCode = useMemo(() => buildEmbedSnippet(embedId, preset, theme, opts), [embedId, preset, theme, opts]);
-  // Live snippet preview
-  const [previewCode, setPreviewCode] = useState("");
+  const brandColor = settings?.brandColor || '#f97316';
+  const templateOptions = useMemo(
+    () => TEMPLATE_LIBRARY.map((tpl) =>
+      tpl.id === 'brand'
+        ? {
+            ...tpl,
+            attrs: { ...tpl.attrs, brandColor },
+            preview: { ...tpl.preview, accent: brandColor },
+          }
+        : tpl
+    ),
+    [brandColor]
+  );
+  const [selectedTemplateId, setSelectedTemplateId] = useState('light');
+  const selectedTemplate = useMemo(
+    () => templateOptions.find((tpl) => tpl.id === selectedTemplateId) || templateOptions[0],
+    [templateOptions, selectedTemplateId]
+  );
+  const snippetCode = useMemo(() => {
+    const targetId = embedId || (embeds[0]?.id || 'your-embed-id');
+    const vertical = embeds.find((e) => e.id === targetId)?.vertical;
+    return buildEmbedSnippet(targetId, selectedTemplate || {}, vertical ? { vertical } : {});
+  }, [embedId, embeds, selectedTemplate]);
+
   const previewRef = React.useRef(null);
-  useEffect(() => { setPreviewCode(snippetCode); }, [snippetCode]);
+  const escapeHtml = (str = '') => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const renderPreview = (code) => {
-    try{
-      const iframe = previewRef.current; if (!iframe) return;
-      const doc = iframe.contentDocument || iframe.contentWindow?.document; if (!doc) return;
-      // Preview MUST match production: no extra wrappers, just the snippet on a page with chosen bg
-      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${previewBg};display:flex;justify-content:${opts.align==='center'?'center':'flex-start'};padding:16px">${code}</body></html>`;
-      doc.open(); doc.write(html); doc.close();
-    }catch(_e){/* ignore */}
+    try {
+      const iframe = previewRef.current;
+      if (!iframe) return;
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) return;
+      const template = selectedTemplate || {};
+      const bg = template.preview?.bg || '#0b1120';
+      const fg = template.preview?.fg || '#f8fafc';
+      const align = template.attrs?.align === 'left' ? 'flex-start' : 'center';
+      const headline = escapeHtml(template.copy?.headline || 'Before & After preview');
+      const body = escapeHtml(template.copy?.body || 'Upload, generate, and drag the slider to compare results.');
+      const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${bg};color:${fg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;gap:16px;align-items:${align};padding:32px 24px;"><div style="max-width:680px;text-align:${align==='center'?'center':'left'}"><h2 style="margin:0;font-size:22px;font-weight:600;">${headline}</h2><p style="margin:8px 0 0;font-size:14px;opacity:0.78;">${body}</p></div>${code}</body></html>`;
+      doc.open();
+      doc.write(html);
+      doc.close();
+    } catch (_e) {
+      /* ignore */
+    }
   };
-  const [previewBg, setPreviewBg] = useState('#0b0d10');
-  const [previewError, setPreviewError] = useState('');
-  useEffect(() => { const t = setTimeout(() => { try{ renderPreview(previewCode); setPreviewError(''); }catch(e){ setPreviewError('Failed to render preview'); } }, 300); return () => clearTimeout(t); }, [previewCode, previewBg, opts.align]);
+  useEffect(() => {
+    const timer = setTimeout(() => renderPreview(snippetCode), 200);
+    return () => clearTimeout(timer);
+  }, [snippetCode, selectedTemplate]);
 
   // Usage & Stats
   const [usageEmbedId, setUsageEmbedId] = useState("");
@@ -200,12 +304,6 @@ function Dashboard({ token, onSignOut }) {
   const [toast, setToast] = useState("");
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
-  // Client settings
-  const [settings, setSettings] = useState(null);
-  const [savingSettings, setSavingSettings] = useState(false);
-  const [planInfo, setPlanInfo] = useState(null);
-  const [monthlyUsed, setMonthlyUsed] = useState(0);
-  const [monthlyBonus, setMonthlyBonus] = useState(0);
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -407,21 +505,10 @@ function Dashboard({ token, onSignOut }) {
                     <option value="dark">dark</option>
                     <option value="light">light</option>
                   </Select>
-                  {/* Primary actions */}
-                  <Button variant="outline" onClick={()=> { setEditModel({ ...e, variant: e.variant || 'card', radius: e.radius || '12px', shadow: e.shadow ?? 'true', border: e.border ?? 'true' }); setEditOpen(true); }}>Edit</Button>
-                  <Button variant="outline" onClick={async()=>{ const nid = `${e.id}-copy`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({ ...e, id: nid, name: e.name || nid }) }); fetchData(); }}>Duplicate</Button>
-                  <Button variant="outline" onClick={async()=>{ if (!confirm(`Delete embed ${e.id}?`)) return; const u = new URL('/api/client/embeds', location.origin); u.searchParams.set('id', e.id); await fetch(u.toString(), { method:'DELETE', headers:{ Authorization:`Bearer ${token}` } }); fetchData(); }}>Delete</Button>
-                  {/* Secondary actions collapsed in More */}
-                  <details className="ml-2">
-                    <summary className="cursor-pointer rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs text-white/80">More</summary>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <Button variant="subtle" onClick={()=> setEmbedId(e.id)}>Use in Snippet</Button>
-                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, e.theme))}>Copy Current</Button>
-                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'light'))}>Copy Light</Button>
-                      <Button variant="outline" onClick={()=> navigator.clipboard.writeText(buildEmbedSnippet(e.id, preset, 'dark'))}>Copy Dark</Button>
-                      <Button variant="outline" onClick={async()=>{ const opposite = e.theme === 'dark' ? 'light' : 'dark'; const nid = `${e.id}-${opposite}`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify({ ...e, id: nid, theme: opposite, name: e.name ? `${e.name} (${opposite})` : nid }) }); fetchData(); }}>Duplicate to {" "}{e.theme === 'dark' ? 'light' : 'dark'}</Button>
-                    </div>
-                  </details>
+                  <Button variant="outline" onClick={()=> { setEmbedId(e.id); setToast(`${t('Snippet builder now uses','Снипетът вече използва')} ${e.id}`); }}>Use in builder</Button>
+                  <Button variant="outline" onClick={()=> { setEditModel({ ...e, variant: e.variant || 'card', radius: e.radius || '12px', shadow: e.shadow ?? 'true', border: e.border ?? 'true' }); setEditOpen(true); }}>{t('Edit','Редакция')}</Button>
+                  <Button variant="outline" onClick={async()=>{ const nid = `${e.id}-copy`; await fetch('/api/client/embeds', { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({ ...e, id: nid, name: e.name || nid }) }); fetchData(); }}>{t('Duplicate','Дублирай')}</Button>
+                  <Button variant="outline" onClick={async()=>{ if (!confirm(`Delete embed ${e.id}?`)) return; const u = new URL('/api/client/embeds', location.origin); u.searchParams.set('id', e.id); await fetch(u.toString(), { method:'DELETE', headers:{ Authorization:`Bearer ${token}` } }); fetchData(); }}>{t('Delete','Изтрий')}</Button>
                 </div>
               </li>
             ))}
@@ -521,7 +608,30 @@ function Dashboard({ token, onSignOut }) {
               <div className="mt-4 grid gap-2 md:grid-cols-2">
                 <div>
                   <div className="mb-2 text-xs text-white/70">Live preview</div>
-                  <iframe title="edit-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'360px',border:'0',borderRadius:'10px',background:'#0b0d10'}} ref={(el)=>{ if (!el) return; const code = buildEmbedSnippet(editModel.id, editModel.variant, editModel.theme || 'dark', { vertical: editModel.vertical }).replace('data-width="100%"','data-width="'+(editModel.width||'100%')+'"').replace('data-height="460px"','data-height="'+(editModel.height||'520px')+'"'); const doc = el.contentDocument || el.contentWindow?.document; if (!doc) return; doc.open(); doc.write(`<!doctype html><html><body style=\"margin:0;background:#0b0d10\">${code}</body></html>`); doc.close(); }} />
+                  <iframe
+                    title="edit-preview"
+                    sandbox="allow-scripts allow-forms allow-same-origin"
+                    style={{width:'100%',height:'360px',border:'0',borderRadius:'10px',background:'#0b0d10'}}
+                    ref={(el)=>{
+                      if (!el) return;
+                      const tmpl = {
+                        attrs: {
+                          theme: editModel.theme || 'dark',
+                          variant: editModel.variant || 'card',
+                          width: editModel.width || '100%',
+                          height: editModel.height || '520px',
+                          radius: editModel.radius || '12px',
+                          border: editModel.border ?? 'true',
+                          shadow: editModel.shadow ?? 'true',
+                        },
+                      };
+                      const code = buildEmbedSnippet(editModel.id, tmpl, { vertical: editModel.vertical });
+                      const doc = el.contentDocument || el.contentWindow?.document; if (!doc) return;
+                      doc.open();
+                      doc.write(`<!doctype html><html><body style=\"margin:0;background:#0b0d10\">${code}</body></html>`);
+                      doc.close();
+                    }}
+                  />
                 </div>
                 <div className="flex flex-col justify-end gap-2">
                   <Button onClick={async()=>{ const payload = { ...editModel }; await fetch('/api/client/embeds', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(payload) }); setEditOpen(false); fetchData(); }}>Save changes</Button>
@@ -532,49 +642,78 @@ function Dashboard({ token, onSignOut }) {
           </div>
         )}
 
-        <Section title="Snippet Builder">
-          <div className="grid gap-2 md:grid-cols-3">
-            <Input placeholder="embedId" value={embedId} onChange={(e) => setEmbedId(e.target.value)} />
-            <Select value={preset} onChange={(e) => setPreset(e.target.value)}>
-              <option value="compact">compact</option>
-              <option value="card">card</option>
-            </Select>
-            <Select value={theme} onChange={(e) => setTheme(e.target.value)}>
-              <option value="dark">dark</option>
-              <option value="light">light</option>
-            </Select>
-          </div>
-          <div className="mt-2 grid gap-2 md:grid-cols-3">
-            <Button variant="subtle" onClick={()=>{ setPreset('compact'); setOpts({ ...opts, maxWidth:'640px', align:'center', radius:'14px', width:'100%', height:'460px' }); }}>Preset: Compact</Button>
-            <Button variant="subtle" onClick={()=>{ setPreset('card'); setOpts({ ...opts, maxWidth:'980px', align:'left', radius:'12px', width:'100%', height:'520px' }); }}>Preset: Card</Button>
-            <Button variant="subtle" onClick={()=>{ setPreset('card'); setOpts({ ...opts, maxWidth:'100%', align:'center', radius:'0px', width:'100%', height:'600px', border:'false', shadow:'false' }); }}>Preset: Full‑bleed</Button>
-          </div>
-          <pre className="mt-4 whitespace-pre-wrap break-words rounded-md bg-black/60 p-2 text-xs">{snippetCode}</pre>
-          <div className="mt-2 text-xs text-white/70">Preview is a raw HTML page containing only your snippet—identical to what a client site will execute.</div>
-          <Button className="mt-2" onClick={() => navigator.clipboard.writeText(snippetCode)}>Copy snippet</Button>
-        </Section>
-
-        <Section title="Live Snippet Preview (iframe sandbox)">
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <textarea value={previewCode} onChange={(e)=> setPreviewCode(e.target.value)} rows={10} className="w-full rounded-md border border-white/10 bg-black/40 p-2 text-xs font-mono" />
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button variant="subtle" onClick={()=> setPreviewCode(snippetCode)}>Reset to builder</Button>
-                <Button onClick={()=> renderPreview(previewCode)}>Run preview</Button>
-                <Select value={previewBg} onChange={(e)=> setPreviewBg(e.target.value)}>
-                  <option value="#0b0d10">dark page</option>
-                  <option value="#ffffff">white page</option>
-                  <option value="#f1f5f9">light grey</option>
-                </Select>
-                <Select value={opts.align} onChange={(e)=> setOpts(o=> ({...o, align:e.target.value}))}>
-                  <option value="center">center</option>
-                  <option value="left">left</option>
+        <Section title={t('Install your widget','Инсталирайте виджета')}>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label>{t('Step 1 · Choose embed','Стъпка 1 · Изберете ембед')}</Label>
+                <Select value={embedId || (embeds[0]?.id || '')} onChange={(e)=> setEmbedId(e.target.value)}>
+                  {embeds.map(e => (<option key={e.id} value={e.id}>{e.id}</option>))}
+                  {!embeds.length && <option value="">{t('No embeds yet','Няма ембеди')}</option>}
                 </Select>
               </div>
-              {!!previewError && <div className="mt-2 rounded-md border border-red-500/40 bg-red-500/10 p-2 text-xs text-red-300">{previewError}</div>}
+
+              <div className="space-y-2">
+                <Label>{t('Step 2 · Pick a style','Стъпка 2 · Изберете стил')}</Label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {templateOptions.map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      type="button"
+                      onClick={()=> setSelectedTemplateId(tpl.id)}
+                      className={`rounded-xl border px-4 py-3 text-left transition ${tpl.id === selectedTemplateId ? 'border-white/60 bg-white/10 shadow-lg' : 'border-white/10 bg-black/20 hover:border-white/30'}`}
+                    >
+                      <div className="flex items-center justify-between text-sm font-semibold">
+                        <span>{tpl.name}</span>
+                        {tpl.id === selectedTemplateId && <span className="text-xs text-emerald-300">{t('Selected','Избрано')}</span>}
+                      </div>
+                      <p className="mt-1 text-xs text-white/70">{tpl.subtitle}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('Step 3 · Copy & paste','Стъпка 3 · Копирайте и поставете')}</Label>
+                <div className="rounded-xl border border-white/10 bg-black/30 p-3">
+                  <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs text-white/80">{snippetCode}</pre>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button onClick={()=> { navigator.clipboard.writeText(snippetCode); setToast(t('Snippet copied','Кодът е копиран')); }}>{t('Copy snippet','Копирай кода')}</Button>
+                    <Button variant="subtle" onClick={()=> renderPreview(snippetCode)}>{t('Refresh preview','Обнови прегледа')}</Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('Suggested headline','Препоръчано заглавие')}</Label>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm">
+                  <div className="font-semibold text-white">{selectedTemplate?.copy?.headline}</div>
+                  <p className="mt-1 text-white/70">{selectedTemplate?.copy?.body}</p>
+                  <Button
+                    variant="subtle"
+                    className="mt-3"
+                    onClick={()=> {
+                      const text = `${selectedTemplate?.copy?.headline}\n\n${selectedTemplate?.copy?.body}`;
+                      navigator.clipboard.writeText(text);
+                      setToast(t('Copy text ready to paste','Текстът е копиран'));
+                    }}
+                  >
+                    {t('Copy text','Копирай текста')}
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 p-2">
-              <iframe ref={previewRef} title="snippet-preview" sandbox="allow-scripts allow-forms allow-same-origin" style={{width:'100%',height:'520px',border:'0',borderRadius:'10px',background:'#0b0d10'}} />
+
+            <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+              <iframe
+                ref={previewRef}
+                title="snippet-preview"
+                sandbox="allow-scripts allow-forms allow-same-origin"
+                style={{ width: '100%', height: selectedTemplate?.attrs?.height || '520px', border: '0', borderRadius: '12px', background: selectedTemplate?.preview?.bg || '#0b1120' }}
+              />
+              <p className="mt-2 text-xs text-white/60">
+                {t('Preview updates automatically. Paste the snippet anywhere on your site to launch the widget.','Прегледът се обновява автоматично. Поставете кода на сайта си, за да стартирате виджета.')}
+              </p>
             </div>
           </div>
         </Section>
@@ -736,11 +875,11 @@ export default function ClientPortalPreview() {
   const assert = (name, cond, detail = "") => tests.push({ name, pass: !!cond, detail });
 
   // Test 1: snippet builder produces required attributes
-  const s1 = buildEmbedSnippet("abc", "compact", "dark");
+  const s1 = buildEmbedSnippet("abc", { attrs: { theme: 'light', wide: 'true', radius: '18px' } });
   assert("snippet has script tag", /^<script\s.+><\/script>$/.test(s1));
   assert("includes data-embed-id", s1.includes('data-embed-id="abc"'));
-  assert("includes variant", s1.includes('data-variant="compact"'));
-  assert("includes theme", s1.includes('data-theme="dark"'));
+  assert("includes theme", s1.includes('data-theme="light"'));
+  assert("includes wide toggle", s1.includes('data-wide="true"'));
 
   // Test 2: token bootstrap prefers URL over LS
   const urlHasToken = new URL(window.location.href);
