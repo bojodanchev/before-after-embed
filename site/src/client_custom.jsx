@@ -1,5 +1,5 @@
 // /site/src/client.jsx — Canvas-friendly + React 17/18 compatible mount
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as ReactDOMClient from "react-dom/client"; // React 18+
 import ReactDOMLegacy from "react-dom"; // Fallback for React 17
 import "./index.css";
@@ -165,6 +165,147 @@ const Select = ({ children, ...props }) => (
 const Code = ({ children }) => <code className="rounded-md bg-black/40 px-1.5 py-0.5 text-[12px]">{children}</code>;
 const Label = ({ children }) => (<span className="text-xs font-medium text-white/70">{children}</span>);
 
+const ACCENT_PRESETS = ['#f97316', '#6366f1', '#22d3ee', '#ef4444', '#10b981', '#fbbf24'];
+
+const BrandAccentPicker = ({ t, canCustomize, brandColor, onApply, onPreview, setToast }) => {
+  const limitedCount = canCustomize ? ACCENT_PRESETS.length : 2;
+  const fileRef = useRef(null);
+  const [matching, setMatching] = useState(false);
+  const [upgradePreviewColor, setUpgradePreviewColor] = useState(null);
+
+  useEffect(() => {
+    setUpgradePreviewColor(null);
+  }, [canCustomize]);
+
+  const applyColor = (color, locked) => {
+    if (!color) return;
+    if (locked && !canCustomize) {
+      onPreview(color);
+      setUpgradePreviewColor(color);
+      setToast(t('Previewing premium color — upgrade to save','Преглед на премиум цвят — ъпгрейд за запис'));
+    } else {
+      onPreview(null);
+      onApply(color);
+      setUpgradePreviewColor(null);
+    }
+  };
+
+  const handleSwatch = (color, idx) => {
+    const locked = !canCustomize && idx >= limitedCount;
+    applyColor(color, locked);
+  };
+
+  const handleMatchLogo = () => {
+    fileRef.current?.click();
+  };
+
+  const extractDominantColor = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const size = 48;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, size, size);
+          const data = ctx.getImageData(0, 0, size, size).data;
+          let r = 0, g = 0, b = 0, total = data.length / 4;
+          for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+          }
+          r = Math.round(r / total);
+          g = Math.round(g / total);
+          b = Math.round(b / total);
+          const hex = `#${[r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('')}`;
+          resolve(hex);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setMatching(true);
+    try {
+      const color = await extractDominantColor(file);
+      applyColor(color, !canCustomize);
+    } catch (_err) {
+      setToast(t('Could not read that logo. Try another image.','Неуспешно извличане от логото. Опитайте друг файл.'));
+    } finally {
+      setMatching(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-2">
+      <div className="flex items-center gap-2">
+        <Label>{t('Brand color','Бранд цвят')}</Label>
+        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">{t('Tint buttons and active chips','Акцентиран цвят')}</span>
+        {!canCustomize && <span className="text-xs text-white/50">{t('Upgrade for more','Ъпгрейд за повече')}</span>}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {ACCENT_PRESETS.map((color, idx) => {
+          const active = brandColor?.toLowerCase() === color.toLowerCase() || upgradePreviewColor === color;
+          const locked = !canCustomize && idx >= limitedCount;
+          return (
+            <button
+              key={color}
+              type="button"
+              className={`h-8 w-8 rounded-full border transition ${active ? 'border-white' : 'border-white/10'} ${locked ? 'opacity-50' : ''}`}
+              style={{ background: color }}
+              onClick={() => handleSwatch(color, idx)}
+              aria-label={`Accent ${color}${locked ? ' (locked)' : ''}`}
+            />
+          );
+        })}
+        <button
+          type="button"
+          onClick={handleMatchLogo}
+          className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
+          disabled={matching}
+        >
+          {matching ? t('Detecting…','Извличане…') : t('Match logo','Цвят от лого')}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        {canCustomize && (
+          <input
+            type="color"
+            value={brandColor}
+            onChange={(e) => applyColor(e.target.value, false)}
+            className="h-8 w-12 cursor-pointer rounded border border-white/20 bg-transparent"
+            aria-label="Custom color"
+          />
+        )}
+      </div>
+      <div className="flex items-center gap-2 text-xs text-white/60">
+        <span>{t('Current accent','Текущ акцент')}: {brandColor}</span>
+        {upgradePreviewColor && !canCustomize && (
+          <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] text-amber-300">{t('Preview only • upgrade to apply','Само преглед • ъпгрейд за запис')}</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ===============================================================
    Auth hook
 ================================================================*/
@@ -246,7 +387,8 @@ function Dashboard({ token, onSignOut }) {
   const [monthlyBonus, setMonthlyBonus] = useState(0);
 
   const [embedId, setEmbedId] = useState("");
-  const brandColor = settings?.brandColor || '#f97316';
+  const [previewBrandColor, setPreviewBrandColor] = useState(null);
+  const brandColor = (previewBrandColor || settings?.brandColor || '#f97316');
   const templateOptions = useMemo(
     () =>
       TEMPLATE_LIBRARY.map((tpl) =>
@@ -299,6 +441,8 @@ function Dashboard({ token, onSignOut }) {
   }, [snippetCode, selectedTemplate]);
 
   // Usage & Stats
+  useEffect(() => { setPreviewBrandColor(null); }, [settings?.brandColor]);
+
   const [usageEmbedId, setUsageEmbedId] = useState("");
   const [usage, setUsage] = useState([]);
   const [usageLoading, setUsageLoading] = useState(false);
@@ -543,18 +687,14 @@ function Dashboard({ token, onSignOut }) {
                 </div>
                 <Input value={settings.displayName || ''} onChange={(e)=> setSettings(s=> ({...s, displayName:e.target.value}))} />
               </div>
-              <div className="grid gap-1">
-                <div className="flex items-center gap-2">
-                  <Label>Brand color</Label>
-                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Tint buttons and active chips</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input value={settings.brandColor || '#7c3aed'} onChange={(e)=> setSettings(s=> ({...s, brandColor:e.target.value}))} disabled={!planInfo || (planInfo.themeCustomization !== 'custom')} />
-                  {(!planInfo || planInfo.themeCustomization !== 'custom') && (
-                    <span className="text-xs text-white/50">Growth/Pro only</span>
-                  )}
-                </div>
-              </div>
+              <BrandAccentPicker
+                t={t}
+                canCustomize={(planInfo?.themeCustomization === 'custom')}
+                brandColor={brandColor}
+                onPreview={(color) => setPreviewBrandColor(color)}
+                onApply={(color) => setSettings((s) => ({ ...s, brandColor: color }))}
+                setToast={setToast}
+              />
               {/* Vertical-specific options removed: now selected directly in widget */}
               <div className="grid gap-1">
                 <div className="flex items-center gap-2"><Label>Default theme</Label><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">Light or dark for new embeds</span></div>
@@ -582,7 +722,24 @@ function Dashboard({ token, onSignOut }) {
                 </div>
               </details>
               <div className="md:col-span-2 flex gap-2 justify-end">
-                <Button disabled={savingSettings} onClick={async()=>{ setSavingSettings(true); try{ await fetch('/api/client/settings', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(settings) }); }finally{ setSavingSettings(false);} }}>Save settings</Button>
+                <Button
+                  disabled={savingSettings}
+                  onClick={async()=>{
+                    setSavingSettings(true);
+                    try{
+                      const payload = { ...settings };
+                      if (! (planInfo?.themeCustomization === 'custom')) {
+                        delete payload.brandColor;
+                      }
+                      await fetch('/api/client/settings', { method:'PATCH', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body: JSON.stringify(payload) });
+                      setPreviewBrandColor(null);
+                    } finally {
+                      setSavingSettings(false);
+                    }
+                  }}
+                >
+                  {t('Save settings','Запази настройките')}
+                </Button>
               </div>
             </div>
           )}
