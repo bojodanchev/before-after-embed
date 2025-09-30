@@ -141,6 +141,8 @@
           height: 4px;
           background: linear-gradient(90deg, rgba(124,58,237,.35), rgba(34,211,238,.35));
           border-radius: 2px;
+          cursor: ew-resize;
+          touch-action: none;
         }
         .slider-thumb {
           position: absolute;
@@ -396,41 +398,63 @@
 
       const cleanupFns = [];
 
+      const pointerTargets = [r, sliderCtl];
+
       if (window.PointerEvent) {
-        r.addEventListener('pointerdown', (e) => {
+        let captureTarget = null;
+        const pointerDown = (e) => {
+          captureTarget = e.currentTarget;
           startDrag(e);
-          r.setPointerCapture?.(e.pointerId);
-        });
+          captureTarget.setPointerCapture?.(e.pointerId);
+        };
         const pointerMove = (e) => moveDrag(e);
         const pointerUp = (e) => {
           endDrag();
-          r.releasePointerCapture?.(e.pointerId);
+          captureTarget?.releasePointerCapture?.(e.pointerId);
+          captureTarget = null;
         };
-        r.addEventListener('pointermove', pointerMove);
-        r.addEventListener('pointerup', pointerUp);
-        root.addEventListener('pointermove', moveDrag);
-        root.addEventListener('pointerup', endDrag);
-        root.addEventListener('pointerleave', endDrag);
+
+        pointerTargets.forEach((el) => {
+          el.addEventListener('pointerdown', pointerDown);
+          el.addEventListener('pointerup', pointerUp);
+          cleanupFns.push(() => {
+            el.removeEventListener('pointerdown', pointerDown);
+            el.removeEventListener('pointerup', pointerUp);
+          });
+        });
+
+        root.addEventListener('pointermove', pointerMove);
+        root.addEventListener('pointerup', pointerUp);
+        root.addEventListener('pointerleave', pointerUp);
         cleanupFns.push(() => {
-          r.removeEventListener('pointermove', pointerMove);
-          r.removeEventListener('pointerup', pointerUp);
-          root.removeEventListener('pointermove', moveDrag);
-          root.removeEventListener('pointerup', endDrag);
-          root.removeEventListener('pointerleave', endDrag);
+          root.removeEventListener('pointermove', pointerMove);
+          root.removeEventListener('pointerup', pointerUp);
+          root.removeEventListener('pointerleave', pointerUp);
         });
       } else {
-        r.addEventListener('mousedown', startDrag);
         const mouseMove = (e) => moveDrag(e);
         const mouseUp = () => endDrag();
+        const mouseDown = (e) => {
+          startDrag(e);
+        };
+
+        pointerTargets.forEach((el) => {
+          el.addEventListener('mousedown', mouseDown);
+          el.addEventListener('touchstart', mouseDown, { passive: true });
+        });
+
         document.addEventListener('mousemove', mouseMove);
         document.addEventListener('mouseup', mouseUp);
-        r.addEventListener('touchstart', startDrag, { passive: true });
         const touchMove = (e) => moveDrag(e);
         const touchEnd = () => endDrag();
         document.addEventListener('touchmove', touchMove, { passive: false });
         document.addEventListener('touchend', touchEnd);
         document.addEventListener('touchcancel', touchEnd);
         cleanupFns.push(() => {
+          pointerTargets.forEach((el) => {
+            el.removeEventListener('mousedown', mouseDown);
+            el.removeEventListener('touchstart', mouseDown);
+          });
           document.removeEventListener('mousemove', mouseMove);
           document.removeEventListener('mouseup', mouseUp);
           document.removeEventListener('touchmove', touchMove);
