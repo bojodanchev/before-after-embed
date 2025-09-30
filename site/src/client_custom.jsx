@@ -167,6 +167,17 @@ const Label = ({ children }) => (<span className="text-xs font-medium text-white
 
 const ACCENT_PRESETS = ['#f97316', '#6366f1', '#22d3ee', '#ef4444', '#10b981', '#fbbf24'];
 
+const StepIndicator = ({ step, total }) => (
+  <div className="flex items-center justify-center gap-2 text-xs text-white/60">
+    {Array.from({ length: total }).map((_, idx) => (
+      <span
+        key={idx}
+        className={`h-2 w-2 rounded-full ${idx + 1 <= step ? 'bg-white' : 'bg-white/20'}`}
+      />
+    ))}
+  </div>
+);
+
 const BrandAccentPicker = ({ t, canCustomize, brandColor, onApply, onPreview, setToast }) => {
   const limitedCount = canCustomize ? ACCENT_PRESETS.length : 2;
   const fileRef = useRef(null);
@@ -301,6 +312,87 @@ const BrandAccentPicker = ({ t, canCustomize, brandColor, onApply, onPreview, se
         {upgradePreviewColor && !canCustomize && (
           <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] text-amber-300">{t('Preview only • upgrade to apply','Само преглед • ъпгрейд за запис')}</span>
         )}
+      </div>
+    </div>
+  );
+};
+
+const GuidedInstallerModal = ({
+  open,
+  step,
+  placement,
+  snippet,
+  onClose,
+  onCopy,
+  onNext,
+  onPrev,
+  onPlacement,
+  onPreview,
+  t,
+}) => {
+  if (!open) return null;
+  const stepsTotal = 3;
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-4">
+      <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-neutral-950 p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-white">{t('Guided setup','Ръководство за настройка')}</h2>
+            <p className="mt-1 text-xs text-white/60">{t('Follow the steps to embed Before/After in under a minute.','Следвайте стъпките, за да вградите Before/After за по-малко от минута.')}</p>
+          </div>
+          <button onClick={onClose} className="rounded-full border border-white/20 bg-white/10 px-2 py-1 text-sm text-white/60 hover:bg-white/20">✕</button>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-xs uppercase tracking-wide text-white/40">{t('Step','Стъпка')} {step} / {stepsTotal}</span>
+          <StepIndicator step={step} total={stepsTotal} />
+        </div>
+
+        <div className="mt-4 space-y-4 text-sm text-white">
+          {step === 1 && (
+            <>
+              <p>{t('Copy the embed script and paste it anywhere on your site where you want the widget to appear.','Копирайте скрипта и го поставете на сайта си там, където искате да се появи виджетът.')}</p>
+              <div className="rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/80">
+                <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words">{snippet}</pre>
+                <Button className="mt-3" onClick={onCopy}>{t('Copy script','Копирай скрипта')}</Button>
+              </div>
+            </>
+          )}
+          {step === 2 && (
+            <>
+              <p>{t('Where will it sit on the page? Choose a layout and we’ll tailor the embed automatically.','Къде ще стои на страницата? Изберете оформление и ще настроим ембеда автоматично.')}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => onPlacement('wide')}
+                  className={`rounded-xl border px-4 py-3 text-left transition ${placement === 'wide' ? 'border-white bg-white/10 shadow-lg' : 'border-white/10 bg-black/30 hover:border-white/30'}`}
+                >
+                  <div className="text-sm font-semibold">{t('Full-width section','Пълна ширина')}</div>
+                  <p className="mt-1 text-xs text-white/70">{t('Best for hero or feature sections.','Подходящо за херо или основни секции.')}</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onPlacement('sidebar')}
+                  className={`rounded-xl border px-4 py-3 text-left transition ${placement === 'sidebar' ? 'border-white bg-white/10 shadow-lg' : 'border-white/10 bg-black/30 hover:border-white/30'}`}
+                >
+                  <div className="text-sm font-semibold">{t('Sidebar or narrow column','Странична колона')}</div>
+                  <p className="mt-1 text-xs text-white/70">{t('Keeps everything stacked in a compact panel.','Компактен панел за тесни пространства.')}</p>
+                </button>
+              </div>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <p>{t('Open a staging preview to test the widget before you paste it live.','Отворете тестов преглед, за да проверите виджета преди да го поставите на живо.')}</p>
+              <Button onClick={onPreview}>{t('Open test drive','Отвори тестов преглед')}</Button>
+              <p className="text-xs text-white/60">{t('The preview opens in a new tab with your current settings.','Прегледът се отваря в нов раздел с текущите настройки.')}</p>
+            </>
+          )}
+        </div>
+
+        <div className="mt-6 flex items-center justify-between">
+          <Button variant="subtle" onClick={step === 1 ? onClose : onPrev}>{step === 1 ? t('Close','Затвори') : t('Back','Назад')}</Button>
+          <Button onClick={step === stepsTotal ? onClose : onNext}>{step === stepsTotal ? t('Done','Готово') : t('Next','Следваща')}</Button>
+        </div>
       </div>
     </div>
   );
@@ -462,6 +554,49 @@ function Dashboard({ token, onSignOut }) {
   const [showInstaller, setShowInstaller] = useState(false);
   const [installerStep, setInstallerStep] = useState(1);
   const [installerPlacement, setInstallerPlacement] = useState('wide');
+
+  useEffect(() => {
+    if (showInstaller) {
+      handlePlacement(installerPlacement);
+    }
+  }, [showInstaller]);
+
+  const copySnippet = async () => {
+    try {
+      await navigator.clipboard.writeText(snippetCode);
+      setToast(t('Snippet copied','Кодът е копиран'));
+    } catch (_e) {
+      setToast(t('Copy failed. Select and copy manually.','Копирането неуспешно. Изберете и копирайте ръчно.'));
+    }
+  };
+
+  const handlePlacement = (placement) => {
+    setInstallerPlacement(placement);
+    if (placement === 'sidebar') {
+      setSelectedTemplateId('minimal');
+    } else if (placement === 'wide' && selectedTemplateId === 'minimal') {
+      setSelectedTemplateId('light');
+    }
+    setInstallerStep((prev) => (prev === 2 ? 3 : prev));
+  };
+
+  const openTestDrive = () => {
+    const template = selectedTemplate || {};
+    const bg = template.preview?.bg || '#0b1120';
+    const fg = template.preview?.fg || '#f8fafc';
+    const align = template.attrs?.align === 'left' ? 'flex-start' : 'center';
+    const html = `<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style="margin:0;background:${bg};color:${fg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;gap:24px;align-items:${align};padding:48px 32px;">
+      <h1 style="margin:0;font-size:24px;font-weight:600;">Before/After Test Drive</h1>
+      <p style="margin:0;font-size:14px;opacity:0.75;max-width:640px;">Paste this embed on your site to recreate the experience below.</p>
+      ${snippetCode}
+    </body></html>`;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank', 'noopener');
+    if (win) {
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+  };
 
   // Edit drawer
   const [editOpen, setEditOpen] = useState(false);
@@ -855,7 +990,7 @@ function Dashboard({ token, onSignOut }) {
                 <div className="rounded-xl border border-white/10 bg-black/30 p-3">
                   <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs text-white/80">{snippetCode}</pre>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button onClick={()=> { navigator.clipboard.writeText(snippetCode); setToast(t('Snippet copied','Кодът е копиран')); }}>{t('Copy snippet','Копирай кода')}</Button>
+                    <Button onClick={copySnippet}>{t('Copy snippet','Копирай кода')}</Button>
                     <Button variant="subtle" onClick={()=> renderPreview(snippetCode)}>{t('Refresh preview','Обнови прегледа')}</Button>
                   </div>
                 </div>
@@ -992,6 +1127,19 @@ function Dashboard({ token, onSignOut }) {
           )}
         </Section>
       </main>
+      <GuidedInstallerModal
+        open={showInstaller}
+        step={installerStep}
+        placement={installerPlacement}
+        snippet={snippetCode}
+        onClose={() => { setShowInstaller(false); setInstallerStep(1); }}
+        onCopy={copySnippet}
+        onNext={() => setInstallerStep((s) => Math.min(3, s + 1))}
+        onPrev={() => setInstallerStep((s) => Math.max(1, s - 1))}
+        onPlacement={handlePlacement}
+        onPreview={openTestDrive}
+        t={t}
+      />
     </div>
   );
 }
