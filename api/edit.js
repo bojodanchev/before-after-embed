@@ -84,6 +84,10 @@ export default async function handler(req, res){
     }catch(_e){}
 
     const buffer = await fsReadFile(file.filepath);
+    const maxBytes = 12 * 1024 * 1024; // 12MB guard for upstream service
+    if (buffer.length > maxBytes) {
+      return res.status(413).json({ error: 'Image too large. Please upload JPG/PNG/WEBP/HEIC under 12MB.' });
+    }
     const base64Image = `data:${mime};base64,${buffer.toString('base64')}`;
 
     const chosenVertical = verticalField || embedConfig?.vertical || 'barber';

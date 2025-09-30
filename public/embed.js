@@ -353,7 +353,7 @@
       } catch (err) {
         // Friendlier errors for users (common cases)
         let msg = err && err.message || 'Failed';
-        if (/413|payload too large/i.test(msg)) msg = 'Image too large. Please upload JPG/PNG under 25MB.';
+        if (/413|payload too large/i.test(msg)) msg = 'Image too large. Please upload JPG/PNG/WEBP/HEIC under 12MB.';
         if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
         if (/Generation limit/i.test(msg)) msg = 'Monthly generation limit reached. Please upgrade your plan to continue.';
         if (/empty|greater than 0/i.test(msg)) msg = 'Uploaded image seems empty. Please re-upload the photo.';
