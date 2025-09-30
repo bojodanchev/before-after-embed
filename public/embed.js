@@ -4,19 +4,40 @@
   const S = document.currentScript; 
   if (!S) return;
   
+  const datasetVariant = (S.dataset.variant || '').toLowerCase();
+  const datasetWide = (S.dataset.wide || S.dataset.wideLayout || S.dataset.layout || '').toLowerCase();
+  const allowWide = datasetWide !== 'false' && datasetWide !== 'compact';
+
+  let resolvedVariant;
+  if (datasetVariant === 'card' || datasetVariant === 'compact') {
+    resolvedVariant = datasetVariant;
+  } else {
+    let availableWidth = 0;
+    if (S.parentElement) {
+      availableWidth = S.parentElement.clientWidth || S.parentElement.getBoundingClientRect().width || 0;
+    }
+    if (!availableWidth) {
+      availableWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    }
+    resolvedVariant = (allowWide && availableWidth >= 640) ? 'card' : 'compact';
+  }
+
+  const defaultMaxWidth = resolvedVariant === 'card' ? '960px' : '640px';
+
   const cfg = {
     id: S.dataset.embedId, 
-    variant: S.dataset.variant || 'compact', 
+    variant: resolvedVariant || 'compact', 
     theme: S.dataset.theme || 'auto',
     locale: S.dataset.locale || 'en',
-    maxWidth: S.dataset.maxWidth || '640px', 
+    maxWidth: S.dataset.maxWidth || defaultMaxWidth, 
     align: S.dataset.align || 'center',
     radius: S.dataset.radius || '14px', 
     shadow: S.dataset.shadow === 'true',
     border: S.dataset.border === 'true', 
     width: S.dataset.width || '100%', 
-    height: S.dataset.height || '460px'
+    height: S.dataset.height || (resolvedVariant === 'card' ? '520px' : '460px')
   };
+  try { window.__lastBAConfig = cfg; } catch (_e) {}
   
   if (!cfg.id) return console.warn('[B/A] missing data-embed-id');
 
