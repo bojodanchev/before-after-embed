@@ -1,4 +1,4 @@
-import { listEmbeds, setEmbedConfig, listClients, createClient, assignEmbedToClient, listEmbedsForClient, getClientById, listUsage, getStorageMode, getClientPlan, setClientPlan, plans } from "../_shared.js";
+import { listEmbeds, setEmbedConfig, listClients, createClient, assignEmbedToClient, listEmbedsForClient, getClientById, listUsage, getStorageMode, getClientPlan, setClientPlan, plans, incrMonthlyBonusForClient, getMonthlyBonusForClient } from "../_shared.js";
 
 function extractToken(req){
   const auth = (req.headers.authorization || '').toString();
@@ -128,6 +128,26 @@ export default async function handler(req, res){
       const origin = req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'] ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : '';
       const link = `${origin}/client.html?token=${encodeURIComponent(c.token)}`;
       return res.status(200).json({ link });
+    }
+
+    if (resource === 'bonus'){
+      if (req.method === 'POST'){
+        const { clientId, credits } = req.body || {};
+        if (!clientId) return res.status(400).json({ error: 'clientId required' });
+        if (!credits || typeof credits !== 'number') return res.status(400).json({ error: 'credits must be a number' });
+        const c = await getClientById(clientId);
+        if (!c) return res.status(404).json({ error: 'Client not found' });
+        await incrMonthlyBonusForClient(clientId, credits);
+        const newBonus = await getMonthlyBonusForClient(clientId);
+        return res.status(200).json({ clientId, bonusCredits: newBonus });
+      }
+      if (req.method === 'GET'){
+        const clientId = (req.query?.clientId || '').toString().trim();
+        if (!clientId) return res.status(400).json({ error: 'clientId required' });
+        const bonus = await getMonthlyBonusForClient(clientId);
+        return res.status(200).json({ clientId, bonusCredits: bonus });
+      }
+      return res.status(405).json({ error: 'Method not allowed' });
     }
 
     return res.status(404).json({ error: 'Not found' });
