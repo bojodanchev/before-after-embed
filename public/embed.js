@@ -217,14 +217,14 @@
         <div style="margin-top: 12px">
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
-        <div id="placeholder" class="slider" style="display: block;" role="region">
-          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 75%; background: #000; overflow: hidden; border-radius: 8px;">
-            <img id="placeholder-after" src="https://before-after-embed.vercel.app/placeholder/after.jpg" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
-            <img id="placeholder-before" src="https://before-after-embed.vercel.app/placeholder/before.jpg" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
-            <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
+        <div id="placeholder" class="slider" style="display: block !important;" role="region">
+          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 75%; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); overflow: hidden; border-radius: 8px;">
+            <img id="placeholder-after" src="https://before-after-embed.vercel.app/placeholder/after.jpg" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">
+            <img id="placeholder-before" src="https://before-after-embed.vercel.app/placeholder/before.jpg" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0); background: linear-gradient(135deg, #6c5ce7 0%, #4c3398 100%);">
+            <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 10;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
-            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(8px); font-weight: 500;">
+            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(8px); font-weight: 500; z-index: 11;">
               👆 Slide to see the transformation
             </div>
           </div>
@@ -270,17 +270,20 @@
         root.__ba_vertical = vertical;
         
         if (choices.length > 0) {
-          opts.innerHTML = choices.map(o => 
+          opts.innerHTML = '<div style="margin-bottom: 6px; font-size: 11px; opacity: 0.7;">Choose option</div>' + choices.map(o => 
             `<button class="opt" data-o="${o}">${(vertical==='dental' && cfg.locale==='bg')?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
           ).join('');
 
           // Set default selected option (first button, which is 'interior' for detailing)
-          const defaultButton = opts.querySelector('button');
-          if (defaultButton) {
-            selectedOpt = defaultButton.dataset.o;
-            defaultButton.classList.add('selected');
-            console.log('[Before/After] Default option selected:', selectedOpt);
-          }
+          // Use setTimeout to ensure DOM is ready and CSS is applied
+          setTimeout(() => {
+            const defaultButton = opts.querySelector('button');
+            if (defaultButton) {
+              selectedOpt = defaultButton.dataset.o;
+              defaultButton.classList.add('selected');
+              console.log('[Before/After] Default option selected:', selectedOpt);
+            }
+          }, 50);
 
           opts.addEventListener('click', e => {
             const b = e.target.closest('.opt');
@@ -473,7 +476,7 @@
         // Validate final size (25MB hard limit)
         const finalSizeMB = processedFile.size / 1024 / 1024;
         if (finalSizeMB > 25) {
-          showStatus(`Image too large (${finalSizeMB.toFixed(1)}MB). Please upload a smaller photo.`, 'error');
+          showStatus(`Photo too large (${finalSizeMB.toFixed(1)}MB even after compression). Try a smaller photo or different format.`, 'error');
           console.warn('[Before/After] File size exceeds 25MB after compression:', processedFile.size);
           return;
         }
@@ -485,10 +488,19 @@
         
       beforeUrl = URL.createObjectURL(processedFile);
       placeholder.style.display = 'none';
-      slider.innerHTML = `<img src="${beforeUrl}" alt="before" style="width: 100%; height: 100%; object-fit: contain;">`;
+      
+      // Show uploaded image immediately in a preview slider
+      slider.innerHTML = `
+        <div style="position: relative; width: 100%; padding-bottom: 75%; background: #000; border-radius: 8px; overflow: hidden;">
+          <img src="${beforeUrl}" alt="Your uploaded photo" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 24px; border-radius: 12px; text-align: center; pointer-events: none; backdrop-filter: blur(8px);">
+            <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">✓ Photo uploaded!</div>
+            <div style="font-size: 12px; opacity: 0.85;">Click "Generate" to see the transformation</div>
+          </div>
+        </div>`;
       slider.style.display = 'block';
       genBtn.disabled = false;
-      hideStatus();
+      showStatus('Photo ready! Click Generate to transform it.', 'success');
       console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`);
       } catch (err) {
         showStatus('Failed to load image. Please try a different photo.', 'error');
