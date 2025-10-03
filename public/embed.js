@@ -218,9 +218,13 @@
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
         <div id="placeholder" class="slider" style="display: block;" role="region">
-          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 66.67%; background: #1a1a1a; overflow: hidden; border-radius: 8px;">
-            <img id="placeholder-after" src="https://i.imgur.com/7RYqJ8K.jpg" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
-            <img id="placeholder-before" src="https://i.imgur.com/KXvMHJ5.jpg" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);" crossorigin="anonymous">
+          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 66.67%; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); overflow: hidden; border-radius: 8px;">
+            <div id="placeholder-after" style="position: absolute; inset: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #4CAF50 0%, #45a049 50%, #3d8b40 100%); display: flex; align-items: center; justify-content: center;">
+              <div style="text-align: center; color: white; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">✨ AFTER<br><span style="font-size: 14px; opacity: 0.9;">Clean & Detailed</span></div>
+            </div>
+            <div id="placeholder-before" style="position: absolute; inset: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #6c5ce7 0%, #5f3dc4 50%, #4c3398 100%); clip-path: inset(0 50% 0 0); display: flex; align-items: center; justify-content: center;">
+              <div style="text-align: center; color: white; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">🚗 BEFORE<br><span style="font-size: 14px; opacity: 0.9;">Needs Detailing</span></div>
+            </div>
             <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
@@ -355,20 +359,6 @@
           const rect = placeholderSliderCtl.getBoundingClientRect();
           updatePlaceholderSlider(rect.left + (rect.width * newVal / 100));
           e.preventDefault();
-        }
-      });
-      
-      // Error handling for placeholder images
-      const placeholderAfter = root.getElementById('placeholder-after');
-      const placeholderBeforeImg = root.getElementById('placeholder-before');
-      
-      [placeholderAfter, placeholderBeforeImg].forEach(img => {
-        if (img) {
-          img.addEventListener('error', () => {
-            console.warn('[Before/After] Placeholder image failed to load, using fallback');
-            img.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            img.style.display = 'none';
-          });
         }
       });
     }
