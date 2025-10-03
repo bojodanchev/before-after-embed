@@ -219,11 +219,11 @@
         </div>
         <div id="placeholder" class="slider" style="display: block;" role="region">
           <div style="position: relative; width: 100%; padding-bottom: 66.67%; background: #1a1a1a; overflow: hidden; border-radius: 8px;">
-            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop&q=80" alt="Before example" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
-            <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&h=600&fit=crop&q=80" alt="After example" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=1200&h=800&fit=crop&q=90" alt="After - detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&h=800&fit=crop&q=90" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
             <div class="slider-thumb" style="left: 50%; transform: translateX(-50%); pointer-events: none;"></div>
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; text-align: center; pointer-events: none; max-width: 80%;">
-              📸 Upload a photo to see your results
+            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 18px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(4px);">
+              📸 Upload your photo to try it
             </div>
           </div>
         </div>
