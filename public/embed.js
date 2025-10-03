@@ -217,6 +217,16 @@
         <div style="margin-top: 12px">
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
+        <div id="placeholder" class="slider" style="display: block;" role="region">
+          <div style="position: relative; width: 100%; padding-bottom: 66.67%; background: #1a1a1a; overflow: hidden; border-radius: 8px;">
+            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop&q=80" alt="Before example" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&h=600&fit=crop&q=80" alt="After example" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            <div class="slider-thumb" style="left: 50%; transform: translateX(-50%); pointer-events: none;"></div>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.75); color: white; padding: 12px 20px; border-radius: 8px; font-size: 13px; text-align: center; pointer-events: none; max-width: 80%;">
+              📸 Upload a photo to see your results
+            </div>
+          </div>
+        </div>
         <div id="slider" class="slider" style="display: none;" role="region" aria-live="polite"></div>
         <div id="status" class="status" style="display: none;" role="status" aria-live="polite"></div>
         <div id="wm" class="muted" style="margin-top: 8px; display: none; text-align: center;">Powered by Before/After</div>
@@ -225,6 +235,7 @@
 
     const file = root.getElementById('file');
     const dropzone = root.getElementById('dropzone');
+    const placeholder = root.getElementById('placeholder');
     const slider = root.getElementById('slider');
     const opts = root.getElementById('opts');
     const genBtn = root.getElementById('gen');
@@ -405,12 +416,13 @@
         dataTransfer.items.add(processedFile);
         file.files = dataTransfer.files;
         
-        beforeUrl = URL.createObjectURL(processedFile);
-        slider.innerHTML = `<img src="${beforeUrl}" alt="before" style="width: 100%; height: 100%; object-fit: contain;">`;
-        slider.style.display = 'block';
-        genBtn.disabled = false;
-        hideStatus();
-        console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`);
+      beforeUrl = URL.createObjectURL(processedFile);
+      placeholder.style.display = 'none';
+      slider.innerHTML = `<img src="${beforeUrl}" alt="before" style="width: 100%; height: 100%; object-fit: contain;">`;
+      slider.style.display = 'block';
+      genBtn.disabled = false;
+      hideStatus();
+      console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`);
       } catch (err) {
         showStatus('Failed to load image. Please try a different photo.', 'error');
         console.error('[Before/After] Image load error:', err);
@@ -486,10 +498,10 @@
       }
 
       root.innerHTML = `
-        <div style="position: relative; height: 100%; min-height: 300px; background: #000;">
+        <div style="position: relative; width: 100%; padding-bottom: 75%; background: #000; border-radius: 8px; overflow: hidden;">
           <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
           <img id="b" src="${before}" alt="Before image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; clip-path: inset(0 50% 0 0);">
-          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider" style="cursor: ew-resize; touch-action: none;">
+          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
             <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
           </div>
         </div>`;
@@ -500,7 +512,7 @@
       let isDragging = false;
       
       function updateSlider(x) {
-        const rect = root.getBoundingClientRect();
+        const rect = sliderCtl.getBoundingClientRect();
         const percent = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
         r.style.left = `${percent}%`;
         b.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
