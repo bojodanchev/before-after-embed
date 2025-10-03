@@ -261,10 +261,12 @@
             `<button class="opt" data-o="${o}">${(vertical==='dental' && cfg.locale==='bg')?({whitening:'избелване',alignment:'подравняване',veneers:'фасети'}[o]||o):o}</button>`
           ).join('');
 
+          // Set default selected option (first button, which is 'interior' for detailing)
           const defaultButton = opts.querySelector('button');
           if (defaultButton) {
             selectedOpt = defaultButton.dataset.o;
             defaultButton.classList.add('selected');
+            console.log('[Before/After] Default option selected:', selectedOpt);
           }
 
           opts.addEventListener('click', e => {
@@ -273,6 +275,7 @@
             selectedOpt = b.dataset.o;
             [...opts.children].forEach(n => n.classList.remove('selected'));
             b.classList.add('selected');
+            console.log('[Before/After] Option selected:', selectedOpt);
           });
         }
       })
@@ -302,20 +305,70 @@
 
     file.addEventListener('change', handleFileSelect);
 
+    // Compress large images before upload
+    async function compressImage(file, maxSizeMB = 10, maxWidthOrHeight = 2048) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Scale down if image is too large
+            if (width > maxWidthOrHeight || height > maxWidthOrHeight) {
+              if (width > height) {
+                height = (height / width) * maxWidthOrHeight;
+                width = maxWidthOrHeight;
+              } else {
+                width = (width / height) * maxWidthOrHeight;
+                height = maxWidthOrHeight;
+              }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Try different quality levels until under target size
+            let quality = 0.9;
+            const tryCompress = () => {
+              canvas.toBlob((blob) => {
+                if (!blob) {
+                  reject(new Error('Compression failed'));
+                  return;
+                }
+                
+                const sizeMB = blob.size / 1024 / 1024;
+                if (sizeMB <= maxSizeMB || quality <= 0.5) {
+                  // Create a File object with original name
+                  const compressedFile = new File([blob], file.name, { type: 'image/jpeg' });
+                  console.log('[Before/After] Compressed:', `${(file.size/1024/1024).toFixed(1)}MB → ${sizeMB.toFixed(1)}MB`);
+                  resolve(compressedFile);
+                } else {
+                  quality -= 0.1;
+                  tryCompress();
+                }
+              }, 'image/jpeg', quality);
+            };
+            tryCompress();
+          };
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
     async function handleFileSelect() {
       const f = file.files?.[0];
       if (!f) return;
       
       try {
-        // Validate file size (25MB limit)
-        const maxSize = 25 * 1024 * 1024;
-        if (f.size > maxSize) {
-          showStatus(`Image too large (${(f.size / 1024 / 1024).toFixed(1)}MB). Please upload under 25MB.`, 'error');
-          console.warn('[Before/After] File size exceeds 25MB:', f.size);
-          return;
-        }
-        
-        // Validate file type
+        // Validate file type first
         const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
         if (!allowedTypes.includes(f.type.toLowerCase())) {
           showStatus(`Unsupported format (${f.type}). Please upload JPG, PNG, WEBP, or HEIC.`, 'error');
@@ -324,14 +377,42 @@
         }
         
         showStatus('Loading image...', 'info');
-        beforeUrl = URL.createObjectURL(f);
-        slider.innerHTML = `<img src="${beforeUrl}" alt="before">`;
+        let processedFile = f;
+        
+        // Auto-compress if file is large (> 5MB)
+        const sizeMB = f.size / 1024 / 1024;
+        if (sizeMB > 5) {
+          showStatus(`Compressing image (${sizeMB.toFixed(1)}MB)...`, 'info');
+          try {
+            processedFile = await compressImage(f, 10, 2048);
+            console.log('[Before/After] Compression complete');
+          } catch (compressionErr) {
+            console.warn('[Before/After] Compression failed, using original:', compressionErr);
+            // Continue with original file if compression fails
+          }
+        }
+        
+        // Validate final size (25MB hard limit)
+        const finalSizeMB = processedFile.size / 1024 / 1024;
+        if (finalSizeMB > 25) {
+          showStatus(`Image too large (${finalSizeMB.toFixed(1)}MB). Please upload a smaller photo.`, 'error');
+          console.warn('[Before/After] File size exceeds 25MB after compression:', processedFile.size);
+          return;
+        }
+        
+        // Store processed file for upload
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(processedFile);
+        file.files = dataTransfer.files;
+        
+        beforeUrl = URL.createObjectURL(processedFile);
+        slider.innerHTML = `<img src="${beforeUrl}" alt="before" style="width: 100%; height: 100%; object-fit: contain;">`;
         slider.style.display = 'block';
         genBtn.disabled = false;
         hideStatus();
-        console.log('[Before/After] Image loaded:', f.name, `${(f.size / 1024).toFixed(1)}KB`);
+        console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`);
       } catch (err) {
-        showStatus('Failed to load image', 'error');
+        showStatus('Failed to load image. Please try a different photo.', 'error');
         console.error('[Before/After] Image load error:', err);
       }
     }
@@ -405,11 +486,11 @@
       }
 
       root.innerHTML = `
-        <div style="position: relative; height: 100%">
-          <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
-          <img id="b" src="${before}" alt="Before image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0)">
-          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider">
-            <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%);"></div>
+        <div style="position: relative; height: 100%; min-height: 300px; background: #000;">
+          <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
+          <img id="b" src="${before}" alt="Before image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; clip-path: inset(0 50% 0 0);">
+          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider" style="cursor: ew-resize; touch-action: none;">
+            <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
           </div>
         </div>`;
       

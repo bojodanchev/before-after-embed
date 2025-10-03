@@ -320,8 +320,9 @@ function Docs() {
             <div className="rounded-lg border border-white/10 bg-white/5 p-3">
               <h3 className="font-medium text-sm">{t('📤 Upload Failing','📤 Качването се проваля')}</h3>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
-                <li><b>{t('File size','Размер на файла')}</b>: {t('Maximum 25 MB. Compress large photos before uploading.','Максимум 25 MB. Компресирайте големи снимки преди качване.')}</li>
+                <li><b>{t('File size','Размер на файла')}</b>: {t('Maximum 25 MB. Photos over 5MB are automatically compressed.','Максимум 25 MB. Снимки над 5MB се компресират автоматично.')}</li>
                 <li><b>{t('Supported formats','Поддържани формати')}</b>: JPG, PNG, WEBP, HEIC/HEIF. {t('Convert other formats (TIFF, BMP, GIF) to JPG.','Конвертирайте други формати (TIFF, BMP, GIF) в JPG.')}</li>
+                <li><b>{t('iPhone photos?','iPhone снимки?')}</b> {t('Large iPhone photos (10-30MB) are automatically compressed to ~5MB before upload.','Големи iPhone снимки (10-30MB) се компресират автоматично до ~5MB преди качване.')}</li>
                 <li><b>{t('Empty file error?','Грешка празен файл?')}</b> {t('File may be corrupted or too small. Try re-exporting the photo.','Файлът може да е повреден или твърде малък. Опитайте да експортирате снимката отново.')}</li>
                 <li><b>{t('Network timeout?','Мрежов timeout?')}</b> {t('Check your internet connection. Large files may take 10-15 seconds to upload.','Проверете интернет връзката. Големи файлове може да отнемат 10-15 секунди за качване.')}</li>
               </ul>

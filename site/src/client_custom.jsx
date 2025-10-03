@@ -265,7 +265,11 @@ const BrandAccentPicker = ({ t, canCustomize, brandColor, onApply, onPreview, se
       <div className="flex items-center gap-2">
         <Label>{t('Brand color','Бранд цвят')}</Label>
         <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">{t('Tint buttons and active chips','Акцентиран цвят')}</span>
-        {!canCustomize && <span className="text-xs text-white/50">{t('Upgrade for more','Ъпгрейд за повече')}</span>}
+        {!canCustomize && (
+          <span className="rounded-md bg-amber-500/20 px-2 py-1 text-xs text-amber-300" title={t('Upgrade to Growth or Pro plan to unlock custom brand colors','Ъпгрейднете до Growth или Pro план за да отключите персонализирани цветове')}>
+            🔒 {t('Growth/Pro only','Само Growth/Pro')}
+          </span>
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {ACCENT_PRESETS.map((color, idx) => {
@@ -962,7 +966,7 @@ function Dashboard({ token, onSignOut }) {
                 <Select value={embedId || (embeds[0]?.id || '')} onChange={(e)=> setEmbedId(e.target.value)}>
                   {embeds.map(e => (<option key={e.id} value={e.id}>{e.id}</option>))}
                   {!embeds.length && <option value="">{t('No embeds yet','Няма ембеди')}</option>}
-                </Select>
+            </Select>
               </div>
 
               <div className="space-y-2">
@@ -1151,7 +1155,8 @@ function Dashboard({ token, onSignOut }) {
                 {t('Upload Failing','Качването се проваля')}
               </h3>
               <ul className="mt-3 space-y-2 text-xs text-white/70">
-                <li>• {t('Max 25 MB. Compress large photos','Макс 25 MB. Компресирайте големи снимки')}</li>
+                <li>• {t('Photos over 5MB are auto-compressed','Снимки над 5MB се компресират автоматично')}</li>
+                <li>• {t('iPhone photos? Automatically optimized','iPhone снимки? Автоматична оптимизация')}</li>
                 <li>• {t('Supported: JPG, PNG, WEBP, HEIC','Поддържани: JPG, PNG, WEBP, HEIC')}</li>
                 <li>• {t('Network timeout? Check connection','Мрежов timeout? Проверете връзката')}</li>
               </ul>
