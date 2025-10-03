@@ -218,12 +218,14 @@
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
         <div id="placeholder" class="slider" style="display: block;" role="region">
-          <div style="position: relative; width: 100%; padding-bottom: 66.67%; background: #1a1a1a; overflow: hidden; border-radius: 8px;">
-            <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=1200&h=800&fit=crop&q=90" alt="After - detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
-            <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&h=800&fit=crop&q=90" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
-            <div class="slider-thumb" style="left: 50%; transform: translateX(-50%); pointer-events: none;"></div>
-            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 18px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(4px);">
-              📸 Upload your photo to try it
+          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 66.67%; background: #000; overflow: hidden; border-radius: 8px;">
+            <img id="placeholder-after" src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=1200&h=800&fit=crop&q=85" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+            <img id="placeholder-before" src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=1200&h=800&fit=crop&q=85" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+            <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
+              <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
+            </div>
+            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(8px); font-weight: 500;">
+              👆 Slide to see the transformation
             </div>
           </div>
         </div>
@@ -291,6 +293,71 @@
         }
       })
       .catch(() => {});
+
+    // Interactive placeholder slider
+    const placeholderContainer = root.getElementById('placeholder-container');
+    const placeholderBefore = root.getElementById('placeholder-before');
+    const placeholderThumb = root.getElementById('placeholder-thumb');
+    const placeholderSliderCtl = placeholderContainer?.querySelector('.slider-control');
+    
+    if (placeholderSliderCtl && placeholderBefore && placeholderThumb) {
+      let isDraggingPlaceholder = false;
+      
+      function updatePlaceholderSlider(x) {
+        const rect = placeholderSliderCtl.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
+        placeholderThumb.style.left = `${percent}%`;
+        placeholderBefore.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+        if (placeholderSliderCtl) placeholderSliderCtl.setAttribute('aria-valuenow', Math.round(percent));
+      }
+      
+      const getClientXPlaceholder = (e) => {
+        if (typeof e?.clientX === 'number') return e.clientX;
+        if (e?.touches?.[0]) return e.touches[0].clientX;
+        if (e?.changedTouches?.[0]) return e.changedTouches[0].clientX;
+        return null;
+      };
+      
+      const startDragPlaceholder = (e) => {
+        const x = getClientXPlaceholder(e);
+        if (x != null) updatePlaceholderSlider(x);
+        isDraggingPlaceholder = true;
+        if (typeof e?.preventDefault === 'function') e.preventDefault();
+      };
+      
+      const moveDragPlaceholder = (e) => {
+        if (!isDraggingPlaceholder) return;
+        const x = getClientXPlaceholder(e);
+        if (x != null) {
+          updatePlaceholderSlider(x);
+          if (e?.cancelable && typeof e.preventDefault === 'function') e.preventDefault();
+        }
+      };
+      
+      const endDragPlaceholder = () => {
+        isDraggingPlaceholder = false;
+      };
+      
+      placeholderSliderCtl.addEventListener('mousedown', startDragPlaceholder);
+      placeholderSliderCtl.addEventListener('touchstart', startDragPlaceholder, { passive: false });
+      document.addEventListener('mousemove', moveDragPlaceholder);
+      document.addEventListener('touchmove', moveDragPlaceholder, { passive: false });
+      document.addEventListener('mouseup', endDragPlaceholder);
+      document.addEventListener('touchend', endDragPlaceholder);
+      
+      // Keyboard support
+      placeholderSliderCtl.addEventListener('keydown', (e) => {
+        const current = parseInt(placeholderSliderCtl.getAttribute('aria-valuenow') || '50');
+        let newVal = current;
+        if (e.key === 'ArrowLeft') newVal = Math.max(0, current - 5);
+        if (e.key === 'ArrowRight') newVal = Math.min(100, current + 5);
+        if (newVal !== current) {
+          const rect = placeholderSliderCtl.getBoundingClientRect();
+          updatePlaceholderSlider(rect.left + (rect.width * newVal / 100));
+          e.preventDefault();
+        }
+      });
+    }
 
     // File handling
     dropzone.addEventListener('click', () => file.click());
