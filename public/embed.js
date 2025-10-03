@@ -307,14 +307,32 @@
       if (!f) return;
       
       try {
-        showStatus('Uploading image...', 'info');
+        // Validate file size (25MB limit)
+        const maxSize = 25 * 1024 * 1024;
+        if (f.size > maxSize) {
+          showStatus(`Image too large (${(f.size / 1024 / 1024).toFixed(1)}MB). Please upload under 25MB.`, 'error');
+          console.warn('[Before/After] File size exceeds 25MB:', f.size);
+          return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+        if (!allowedTypes.includes(f.type.toLowerCase())) {
+          showStatus(`Unsupported format (${f.type}). Please upload JPG, PNG, WEBP, or HEIC.`, 'error');
+          console.warn('[Before/After] Unsupported file type:', f.type);
+          return;
+        }
+        
+        showStatus('Loading image...', 'info');
         beforeUrl = URL.createObjectURL(f);
         slider.innerHTML = `<img src="${beforeUrl}" alt="before">`;
         slider.style.display = 'block';
         genBtn.disabled = false;
         hideStatus();
+        console.log('[Before/After] Image loaded:', f.name, `${(f.size / 1024).toFixed(1)}KB`);
       } catch (err) {
         showStatus('Failed to load image', 'error');
+        console.error('[Before/After] Image load error:', err);
       }
     }
 
@@ -325,9 +343,11 @@
         return;
       }
       
+      const startTime = Date.now();
       try {
         genBtn.disabled = true;
         showStatus('Generating...', 'info');
+        console.log('[Before/After] Starting generation...', { embedId: cfg.id, vertical: root.__ba_vertical, option: selectedOpt });
         
         const formData = new FormData();
         formData.append('image', file.files[0]);
@@ -347,23 +367,33 @@
         });
 
         const payload = await response.json().catch(() => null);
+        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+        
         if (!response.ok || !payload) {
           const detail = payload?.error || payload?.details || payload?.detail || response.statusText || `HTTP ${response.status}`;
+          console.error('[Before/After] Generation failed:', { status: response.status, error: detail, duration: `${duration}s` });
           throw new Error(detail);
         }
 
         afterUrl = payload.outputUrl;
         renderSlider(slider, beforeUrl, afterUrl);
         showStatus('Generated successfully!', 'success');
+        console.log('[Before/After] Generation complete:', { duration: `${duration}s`, outputUrl: afterUrl });
         
       } catch (err) {
         // Friendlier errors for users (common cases)
         let msg = err && err.message || 'Failed';
+        const originalMsg = msg;
+        
         if (/413|payload too large/i.test(msg)) msg = 'Image too large. Please upload JPG/PNG/WEBP/HEIC under 25MB.';
-        if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
-        if (/Generation limit/i.test(msg)) msg = 'Monthly generation limit reached. Please upgrade your plan to continue.';
-        if (/empty|greater than 0/i.test(msg)) msg = 'Uploaded image seems empty. Please re-upload the photo.';
+        else if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
+        else if (/Generation limit/i.test(msg)) msg = 'Monthly generation limit reached. Please upgrade your plan to continue.';
+        else if (/empty|greater than 0/i.test(msg)) msg = 'Uploaded image seems empty. Please re-upload the photo.';
+        else if (/network|fetch/i.test(msg)) msg = 'Network error. Please check your connection and try again.';
+        else if (/timeout/i.test(msg)) msg = 'Request timed out. The image may be too large or your connection is slow.';
+        
         showStatus(`Error: ${msg}`, 'error');
+        console.error('[Before/After] Generation error:', { error: originalMsg, userMessage: msg, embedId: cfg.id });
       } finally {
         genBtn.disabled = false;
       }

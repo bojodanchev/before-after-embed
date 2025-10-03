@@ -304,12 +304,80 @@ function Docs() {
 
         <section id="troubleshooting" className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
           <h2 className="text-lg font-semibold">{t('Troubleshooting','Отстраняване на проблеми')}</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm opacity-90">
-            <li>{t('CSP blocks script? Use','CSP блокира скрипта? Използвайте')} <code>data-variant="card"</code> (iframe).</li>
-            <li>{t('Want transparent card? Add','Искате прозрачен фон? Добавете')} <code>data-background="transparent"</code>.</li>
-            <li>{t('Slider reversed? Hard refresh to load the latest assets.','Плъзгачът е обърнат? Направете hard refresh, за да се заредят новите assets.')}</li>
-            <li>{t('Quota reached? Upgrade plan or buy top‑ups from the portal.','Достигнат лимит? Ъпгрейднете плана или купете топ‑ъпи от портала.')}</li>
-          </ul>
+          <p className="mt-2 text-sm opacity-80">{t('Common issues and solutions for the Before/After widget.','Чести проблеми и решения за Before/After widget.')}</p>
+          
+          <div className="mt-4 space-y-4">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('🚫 Widget Not Appearing','🚫 Widget не се вижда')}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li><b>{t('Check browser console','Проверете браузър конзолата')}</b>: {t('Open DevTools (F12) → Console tab. Look for red errors.','Отворете DevTools (F12) → раздел Console. Търсете червени грешки.')}</li>
+                <li><b>{t('CSP blocking?','CSP блокира?')}</b> {t('If you see "Content Security Policy" errors, use','Ако виждате „Content Security Policy" грешки, използвайте')} <code>data-variant="card"</code> (iframe).</li>
+                <li><b>{t('Network blocked?','Мрежата е блокирана?')}</b> {t('Check Network tab in DevTools. Ensure','Проверете раздел Network в DevTools. Уверете се, че')} <code>embed.js</code> {t('loads successfully.','се зарежда успешно.')}</li>
+                <li><b>{t('Cache issue?','Проблем с кеш?')}</b> {t('Hard refresh (Ctrl+F5 / Cmd+Shift+R) to clear cached assets.','Направете hard refresh (Ctrl+F5 / Cmd+Shift+R) за да изчистите кешираните файлове.')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('📤 Upload Failing','📤 Качването се проваля')}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li><b>{t('File size','Размер на файла')}</b>: {t('Maximum 25 MB. Compress large photos before uploading.','Максимум 25 MB. Компресирайте големи снимки преди качване.')}</li>
+                <li><b>{t('Supported formats','Поддържани формати')}</b>: JPG, PNG, WEBP, HEIC/HEIF. {t('Convert other formats (TIFF, BMP, GIF) to JPG.','Конвертирайте други формати (TIFF, BMP, GIF) в JPG.')}</li>
+                <li><b>{t('Empty file error?','Грешка празен файл?')}</b> {t('File may be corrupted or too small. Try re-exporting the photo.','Файлът може да е повреден или твърде малък. Опитайте да експортирате снимката отново.')}</li>
+                <li><b>{t('Network timeout?','Мрежов timeout?')}</b> {t('Check your internet connection. Large files may take 10-15 seconds to upload.','Проверете интернет връзката. Големи файлове може да отнемат 10-15 секунди за качване.')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('⚡ Generation Failing','⚡ Генерирането се проваля')}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li><b>{t('"Quota reached"','"Достигнат лимит"')}</b>: {t('Monthly generation limit reached. Upgrade your plan or buy top-ups from the Client Portal.','Достигнат месечен лимит за генерирания. Ъпгрейднете плана или купете топ-ъпи от портала.')}</li>
+                <li><b>{t('"Generation failed"','"Генерирането се провали"')}</b>: {t('AI service may be temporarily unavailable. Wait 30 seconds and try again.','AI услугата може временно да не е достъпна. Изчакайте 30 секунди и опитайте отново.')}</li>
+                <li><b>{t('Poor quality results?','Лоши резултати?')}</b> {t('Use well-lit, high-resolution photos. Avoid blurry or dark images.','Използвайте добре осветени, високо-резолютни снимки. Избягвайте замъглени или тъмни изображения.')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('🔄 Intermittent Loading','🔄 Прекъсващо зареждане')}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li><b>{t('Browser compatibility','Съвместимост на браузъра')}</b>: {t('Tested on Chrome, Firefox, Safari, Edge. Update to the latest version.','Тествано на Chrome, Firefox, Safari, Edge. Обновете до последната версия.')}</li>
+                <li><b>{t('Ad blockers','Блокери на реклами')}</b>: {t('Some aggressive blockers may interfere. Try disabling temporarily.','Някои агресивни блокери може да пречат. Опитайте да ги деактивирате временно.')}</li>
+                <li><b>{t('Firewall/VPN','Firewall/VPN')}</b>: {t('Corporate networks may block API calls. Test on a different network.','Корпоративни мрежи могат да блокират API заявки. Тествайте на друга мрежа.')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('🎨 Styling Issues','🎨 Проблеми със стилизирането')}</h3>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li><b>{t('Widget too wide?','Widget твърде широк?')}</b> {t('Set','Задайте')} <code>data-max-width="640px"</code> {t('and','и')} <code>data-align="center"</code>.</li>
+                <li><b>{t('Theme not applying?','Темата не се прилага?')}</b> {t('Ensure','Уверете се, че')} <code>data-theme="dark"</code> {t('or','или')} <code>"light"</code> {t('is set correctly.','е зададена правилно.')}</li>
+                <li><b>{t('Want custom colors?','Искате персонализирани цветове?')}</b> {t('Growth/Pro plans allow brand accent colors in the portal.','Планове Growth/Pro позволяват бранд цветове в портала.')}</li>
+                <li><b>{t('Transparent background?','Прозрачен фон?')}</b> {t('Use','Използвайте')} <code>data-variant="card"</code> + <code>data-background="transparent"</code>.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="font-medium text-sm">{t('🐛 Debugging Steps','🐛 Стъпки за отстраняване на проблеми')}</h3>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-xs opacity-90">
+                <li>{t('Open browser console (F12) and check for errors','Отворете браузър конзолата (F12) и проверете за грешки')}</li>
+                <li>{t('Check Network tab: look for failed requests to','Проверете раздел Network: търсете провалени заявки към')} <code>before-after-embed.vercel.app</code></li>
+                <li>{t('Verify your embed ID is correct in the snippet','Проверете дали вашият embed ID е правилен в снипета')}</li>
+                <li>{t('Try a different browser (Chrome recommended)','Опитайте различен браузър (препоръчва се Chrome)')}</li>
+                <li>{t('Test with a small sample image (<5MB)','Тествайте с малка примерна снимка (<5MB)')}</li>
+                <li>{t('Check Client Portal → Stats to see if renders are recorded','Проверете Портал за клиенти → Stats дали рендерите се записват')}</li>
+              </ol>
+            </div>
+
+            <div className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3">
+              <h3 className="font-medium text-sm text-emerald-400">{t('💡 Still Need Help?','💡 Все още имате нужда от помощ?')}</h3>
+              <p className="mt-2 text-xs opacity-90">{t('Contact support at','Свържете се с поддръжката на')} <a href="mailto:bojodanchev@gmail.com" className="text-emerald-400 underline">bojodanchev@gmail.com</a> {t('with:','с:')}</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
+                <li>{t('Screenshot of browser console (F12 → Console tab)','Скрийншот на браузър конзолата (F12 → раздел Console)')}</li>
+                <li>{t('Your embed ID','Вашият embed ID')}</li>
+                <li>{t('Description of the issue and steps to reproduce','Описание на проблема и стъпки за възпроизвеждане')}</li>
+                <li>{t('Browser and OS version','Версия на браузъра и ОС')}</li>
+              </ul>
+            </div>
+          </div>
         </section>
       </div>
     </div>

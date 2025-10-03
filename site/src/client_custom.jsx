@@ -1126,6 +1126,72 @@ function Dashboard({ token, onSignOut }) {
             </>
           )}
         </Section>
+
+        {/* Troubleshooting Section */}
+        <Section>
+          <h2 className="text-xl font-bold text-white">{t('Troubleshooting & Help','Отстраняване на проблеми и помощ')}</h2>
+          <p className="mt-2 text-sm text-white/60">{t('Having issues? Quick fixes and diagnostic tips.','Имате проблеми? Бързи решения и съвети за диагностика.')}</p>
+          
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <h3 className="flex items-center gap-2 font-medium text-white">
+                <span>🚫</span>
+                {t('Widget Not Showing','Widget не се показва')}
+              </h3>
+              <ul className="mt-3 space-y-2 text-xs text-white/70">
+                <li>• {t('Check browser console (F12) for errors','Проверете браузър конзолата (F12) за грешки')}</li>
+                <li>• {t('Try hard refresh (Ctrl+F5 / Cmd+Shift+R)','Направете hard refresh (Ctrl+F5 / Cmd+Shift+R)')}</li>
+                <li>• {t('CSP blocking? Use data-variant="card"','CSP блокира? Ползвайте data-variant="card"')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <h3 className="flex items-center gap-2 font-medium text-white">
+                <span>📤</span>
+                {t('Upload Failing','Качването се проваля')}
+              </h3>
+              <ul className="mt-3 space-y-2 text-xs text-white/70">
+                <li>• {t('Max 25 MB. Compress large photos','Макс 25 MB. Компресирайте големи снимки')}</li>
+                <li>• {t('Supported: JPG, PNG, WEBP, HEIC','Поддържани: JPG, PNG, WEBP, HEIC')}</li>
+                <li>• {t('Network timeout? Check connection','Мрежов timeout? Проверете връзката')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <h3 className="flex items-center gap-2 font-medium text-white">
+                <span>⚡</span>
+                {t('Generation Failing','Генерирането се проваля')}
+              </h3>
+              <ul className="mt-3 space-y-2 text-xs text-white/70">
+                <li>• {t('Quota reached? Upgrade or buy top-up','Лимит? Ъпгрейднете или купете топ-ъп')}</li>
+                <li>• {t('Use well-lit, high-res photos','Ползвайте добре осветени снимки')}</li>
+                <li>• {t('Wait 30 seconds and retry','Изчакайте 30 секунди и опитайте пак')}</li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <h3 className="flex items-center gap-2 font-medium text-white">
+                <span>🐛</span>
+                {t('Debug Checklist','Чеклист за отстраняване')}
+              </h3>
+              <ul className="mt-3 space-y-2 text-xs text-white/70">
+                <li>• {t('Open DevTools (F12) → Console + Network','Отворете DevTools (F12) → Console + Network')}</li>
+                <li>• {t('Verify embed ID is correct','Проверете дали embed ID е правилен')}</li>
+                <li>• {t('Try different browser (Chrome)','Опитайте различен браузър (Chrome)')}</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <h3 className="font-medium text-emerald-400">{t('💡 Need More Help?','💡 Нужда от повече помощ?')}</h3>
+            <p className="mt-2 text-sm text-white/70">
+              {t('Visit our','Посетете нашата')} <a href="/app/docs.html#troubleshooting" className="text-emerald-400 underline" target="_blank" rel="noopener noreferrer">{t('comprehensive troubleshooting guide','цялостна документация за отстраняване')}</a> {t('or contact support at','или се свържете с поддръжката на')} <a href="mailto:bojodanchev@gmail.com" className="text-emerald-400 underline">bojodanchev@gmail.com</a>
+            </p>
+            <p className="mt-3 text-xs text-white/60">
+              {t('Please include: browser console screenshot, embed ID, and steps to reproduce.','Моля включете: скрийншот на браузър конзолата, embed ID и стъпки за възпроизвеждане.')}
+            </p>
+          </div>
+        </Section>
       </main>
       <GuidedInstallerModal
         open={showInstaller}
