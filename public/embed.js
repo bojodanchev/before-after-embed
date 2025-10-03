@@ -218,9 +218,9 @@
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
         <div id="placeholder" class="slider" style="display: block;" role="region">
-          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 66.67%; background: #000; overflow: hidden; border-radius: 8px;">
-            <img id="placeholder-after" src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=1200&h=800&fit=crop&q=85" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
-            <img id="placeholder-before" src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=1200&h=800&fit=crop&q=85" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);">
+          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 66.67%; background: #1a1a1a; overflow: hidden; border-radius: 8px;">
+            <img id="placeholder-after" src="https://i.imgur.com/7RYqJ8K.jpg" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous">
+            <img id="placeholder-before" src="https://i.imgur.com/KXvMHJ5.jpg" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);" crossorigin="anonymous">
             <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
@@ -355,6 +355,20 @@
           const rect = placeholderSliderCtl.getBoundingClientRect();
           updatePlaceholderSlider(rect.left + (rect.width * newVal / 100));
           e.preventDefault();
+        }
+      });
+      
+      // Error handling for placeholder images
+      const placeholderAfter = root.getElementById('placeholder-after');
+      const placeholderBeforeImg = root.getElementById('placeholder-before');
+      
+      [placeholderAfter, placeholderBeforeImg].forEach(img => {
+        if (img) {
+          img.addEventListener('error', () => {
+            console.warn('[Before/After] Placeholder image failed to load, using fallback');
+            img.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            img.style.display = 'none';
+          });
         }
       });
     }
