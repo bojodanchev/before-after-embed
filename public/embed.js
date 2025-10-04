@@ -561,6 +561,7 @@
         else if (/415|unsupported/i.test(msg)) msg = 'Unsupported image. Please upload JPG/PNG/WEBP/HEIC.';
         else if (/Generation limit/i.test(msg)) msg = 'Monthly generation limit reached. Please upgrade your plan to continue.';
         else if (/empty|greater than 0/i.test(msg)) msg = 'Uploaded image seems empty. Please re-upload the photo.';
+        else if (/Image edit failed/i.test(msg) || /Edit failed/i.test(msg)) msg = 'The AI couldn\'t generate a transformation this time. Try another option or photo.';
         else if (/network|fetch/i.test(msg)) msg = 'Network error. Please check your connection and try again.';
         else if (/timeout/i.test(msg)) msg = 'Request timed out. The image may be too large or your connection is slow.';
         

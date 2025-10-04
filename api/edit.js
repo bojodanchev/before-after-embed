@@ -144,40 +144,82 @@ export default async function handler(req, res){
     // log start
     await logUsage('edit_start', embedId, { vertical: chosenVertical, hasPrompt: Boolean(promptField) });
 
-    const result = await fal.subscribe("fal-ai/nano-banana/edit", {
-      input: {
-        prompt: effectivePrompt,
-        image_urls: [base64Image],
-        image_url: base64Image,
-      },
-      logs: false,
-      timeout: 120000,
-    });
-
-    if (result?.error) {
-      console.error('fal edit error', result.error);
-      await logUsage('edit_error', embedId, { reason: 'fal_error', detail: result.error, prompt: effectivePrompt, clientId: embedClientId });
-      return res.status(502).json({ error: 'Image edit failed', detail: result.error });
+    async function runFalEdit(promptText, attemptLabel){
+      console.log('Running FAL edit attempt', { attemptLabel, embedId, vertical: chosenVertical });
+      const response = await fal.subscribe("fal-ai/nano-banana/edit", {
+        input: {
+          prompt: promptText,
+          image_urls: [base64Image],
+          image_url: base64Image,
+        },
+        logs: false,
+        timeout: 120000,
+      });
+      return response;
     }
 
-    const { data } = result || {};
-    if (!data){
-      await logUsage('edit_error', embedId, { reason: 'no_data', prompt: effectivePrompt });
-      return res.status(502).json({ error: 'No data from model' });
+    const promptAttempts = [];
+    promptAttempts.push({ label: 'primary', prompt: effectivePrompt });
+
+    if (chosenVertical === 'detailing') {
+      const basePrompt = verticalPromptPresets[chosenVertical];
+      if (basePrompt && basePrompt !== effectivePrompt) {
+        promptAttempts.push({ label: 'detailing-base', prompt: basePrompt });
+      }
+      promptAttempts.push({
+        label: 'detailing-fallback',
+        prompt: 'Professional auto detailing cleanup. Remove dirt, dust, water spots, and brake dust. Increase gloss and clarity while preserving the car model, wheels, and paint color. Generate a realistic before/after comparison.'
+      });
+    }
+
+    if (!promptField) {
+      promptAttempts.push({ label: 'minimal', prompt: verticalPromptPresets[chosenVertical] || 'Enhance the photo realistically without changing the subject identity.' });
     }
 
     let outputUrl = null;
-    if (typeof data === 'string') {
-      outputUrl = data;
-    } else if (Array.isArray(data?.images) && data.images[0]?.url) {
-      outputUrl = data.images[0].url;
-    } else if (data?.image?.url) {
-      outputUrl = data.image.url;
-    } else if (data?.url) {
-      outputUrl = data.url;
+    let lastErrorDetail = null;
+    let successfulPrompt = null;
+    let falResult = null;
+
+    for (const attempt of promptAttempts) {
+      try {
+        falResult = await runFalEdit(attempt.prompt, attempt.label);
+        if (falResult?.error) {
+          console.warn('FAL edit error', { attempt: attempt.label, error: falResult.error });
+          lastErrorDetail = falResult.error;
+          continue;
+        }
+        const { data } = falResult || {};
+        if (!data) {
+          lastErrorDetail = 'No data returned';
+          continue;
+        }
+        if (typeof data === 'string') {
+          outputUrl = data;
+        } else if (Array.isArray(data?.images) && data.images[0]?.url) {
+          outputUrl = data.images[0].url;
+        } else if (data?.image?.url) {
+          outputUrl = data.image.url;
+        } else if (data?.url) {
+          outputUrl = data.url;
+        }
+        if (outputUrl) {
+          successfulPrompt = attempt.prompt;
+          break;
+        }
+        lastErrorDetail = 'No output URL';
+      } catch (falErr) {
+        console.warn('FAL edit exception', { attempt: attempt.label, error: falErr?.message || falErr });
+        lastErrorDetail = falErr?.message || falErr;
+      }
     }
 
-    await logUsage('edit_success', embedId, { prompt: effectivePrompt, hasOutputUrl: Boolean(outputUrl), options, clientId: embedClientId, plan: plan?.id || undefined });
+    if (!outputUrl) {
+      await logUsage('edit_error', embedId, { reason: 'fal_retry_failed', prompt: effectivePrompt, detail: lastErrorDetail, clientId: embedClientId });
+      return res.status(502).json({ error: 'Image edit failed after retries', detail: lastErrorDetail });
+    }
+
+    await logUsage('edit_success', embedId, { prompt: successfulPrompt || effectivePrompt, hasOutputUrl: Boolean(outputUrl), options, clientId: embedClientId, plan: plan?.id || undefined });
     // Increment client monthly usage after success
     if (embedClientId && outputUrl){
       try{ await incrMonthlyUsageForClient(embedClientId, 1); }catch{}
