@@ -218,15 +218,13 @@
           <button id="gen" class="btn" disabled aria-disabled="true">Generate →</button>
         </div>
         <div id="placeholder" class="slider" style="display: block !important;" role="region">
-          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 75%; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); overflow: hidden; border-radius: 8px;">
-            <img id="placeholder-after" src="https://before-after-embed.vercel.app/placeholder/after.jpg" alt="After - clean detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);">
-            <img id="placeholder-before" src="https://before-after-embed.vercel.app/placeholder/before.jpg" alt="Before - dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0); background: linear-gradient(135deg, #6c5ce7 0%, #4c3398 100%);">
-            <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After comparison slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 10;">
+          <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 75%; background: linear-gradient(135deg, #1f2933 0%, #121417 100%); overflow: hidden; border-radius: 14px;">
+            <img id="placeholder-after" src="https://before-after-embed.vercel.app/placeholder/volvo-after.jpg" alt="After – detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+            <img id="placeholder-before" src="https://before-after-embed.vercel.app/placeholder/volvo-before.jpg" alt="Before – dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);" onerror="this.style.display='none';">
+            <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Preview transformation slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 10;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
-            <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; text-align: center; pointer-events: none; white-space: nowrap; backdrop-filter: blur(8px); font-weight: 500; z-index: 11;">
-              👆 Slide to see the transformation
-            </div>
+            <img src="https://before-after-embed.vercel.app/placeholder/cta-banner.png" alt="Slide CTA" style="position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: min(90%, 560px); z-index: 11; pointer-events: none;" onerror="this.style.display='none';">
           </div>
         </div>
         <div id="slider" class="slider" style="display: none;" role="region" aria-live="polite"></div>
