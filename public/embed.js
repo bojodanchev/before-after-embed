@@ -24,6 +24,32 @@
 
   const defaultMaxWidth = resolvedVariant === 'card' ? '960px' : '640px';
 
+  function resolveAsset(path) {
+    if (!path) return '';
+    const ensureLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+    try {
+      if (S?.src) {
+        return new URL(ensureLeadingSlash, S.src).href;
+      }
+    } catch (_err) {}
+    try {
+      return new URL(ensureLeadingSlash, document.baseURI).href;
+    } catch (_err) {}
+    return `https://before-after-embed.vercel.app${ensureLeadingSlash}`;
+  }
+
+  const placeholderBeforeSrc = resolveAsset('/placeholder/volvo-before.jpg');
+  const placeholderAfterSrc = resolveAsset('/placeholder/volvo-after.jpg');
+  const placeholderCtaSrc = resolveAsset('/placeholder/cta-banner.png');
+
+  // Preload placeholder images to ensure they're ready on first render
+  [placeholderBeforeSrc, placeholderAfterSrc, placeholderCtaSrc].forEach(src => {
+    if (src) {
+      const img = new Image();
+      img.src = src;
+    }
+  });
+
   const cfg = {
     id: S.dataset.embedId, 
     variant: resolvedVariant || 'compact', 
@@ -219,12 +245,12 @@
         </div>
         <div id="placeholder" class="slider" style="display: block !important;" role="region">
           <div id="placeholder-container" style="position: relative; width: 100%; padding-bottom: 75%; background: linear-gradient(135deg, #1f2933 0%, #121417 100%); overflow: hidden; border-radius: 14px;">
-            <img id="placeholder-after" src="https://before-after-embed.vercel.app/placeholder/volvo-after.jpg" alt="After – detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
-            <img id="placeholder-before" src="https://before-after-embed.vercel.app/placeholder/volvo-before.jpg" alt="Before – dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0);" onerror="this.style.display='none';">
+            <img id="placeholder-after" src="${placeholderAfterSrc}" alt="After – detailed car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s ease;" onload="this.style.opacity='1';" onerror="this.style.display='none';">
+            <img id="placeholder-before" src="${placeholderBeforeSrc}" alt="Before – dirty car" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(0 50% 0 0); opacity: 0; transition: opacity 0.3s ease;" onload="this.style.opacity='1';" onerror="this.style.display='none';">
             <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Preview transformation slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 10;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
-            <img src="https://before-after-embed.vercel.app/placeholder/cta-banner.png" alt="Slide CTA" style="position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: min(90%, 560px); z-index: 11; pointer-events: none;" onerror="this.style.display='none';">
+            <img id="placeholder-cta-img" src="${placeholderCtaSrc}" alt="Slide CTA" style="position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: min(90%, 560px); z-index: 11; pointer-events: none; opacity: 0; transition: opacity 0.3s ease 0.2s;" onload="this.style.opacity='1';" onerror="this.style.display='none';">
           </div>
         </div>
         <div id="slider" class="slider" style="display: none;" role="region" aria-live="polite"></div>

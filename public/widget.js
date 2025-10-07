@@ -44,6 +44,11 @@
   const slider = document.getElementById('w-slider');
   const statusEl = document.getElementById('w-status');
   const afterWrapper = document.querySelector('.after-wrapper');
+  const compareEl = document.getElementById('compare');
+  const fileInput = document.getElementById('w-image');
+  const ctaButton = document.getElementById('cta-try');
+  const placeholderBefore = beforeImg?.dataset?.placeholder;
+  const placeholderAfter = afterImg?.dataset?.placeholder;
   // Maintain stable aspect ratio box based on first image dimensions
   let aspect = 0;
   const verticalSel = document.getElementById('w-vertical');
@@ -54,6 +59,32 @@
   const choicesEl = document.getElementById('w-choices');
   const submitBtn = document.getElementById('w-generate');
   submitBtn.disabled = true;
+
+  function showPlaceholder() {
+    compareEl?.classList.add('is-placeholder');
+    if (placeholderBefore && beforeImg && beforeImg.src !== placeholderBefore) {
+      beforeImg.src = placeholderBefore;
+    }
+    if (placeholderAfter && afterImg && afterImg.src !== placeholderAfter) {
+      afterImg.src = placeholderAfter;
+    }
+    if (compareEl) {
+      compareEl.style.height = '';
+    }
+    aspect = 0;
+    slider.value = '50';
+    updateClip(50);
+  }
+
+  function hidePlaceholder() {
+    compareEl?.classList.remove('is-placeholder');
+  }
+
+  showPlaceholder();
+
+  if (ctaButton && fileInput) {
+    ctaButton.addEventListener('click', () => fileInput.click());
+  }
 
   if (variant === 'compact'){
     const cmp = document.querySelector('.compare');
@@ -74,24 +105,25 @@
     e.preventDefault();
     submitBtn.disabled = true;
     statusEl.textContent = 'Uploading...';
-    const file = document.getElementById('w-image').files[0];
+    const file = fileInput?.files?.[0];
     if (!file) {
       submitBtn.disabled = false;
       statusEl.textContent = 'Please choose an image.';
       return;
     }
+    hidePlaceholder();
     const localUrl = URL.createObjectURL(file);
-    beforeImg.onload = () => {
+    const handleBeforeLoad = () => {
       try {
         const w = beforeImg.naturalWidth || beforeImg.width;
         const h = beforeImg.naturalHeight || beforeImg.height;
         if (w && h) { aspect = h / w; }
         // Set compare height based on available width to prevent splash during loading
-        const cmp = document.getElementById('compare');
-        const width = cmp.clientWidth || 600;
-        cmp.style.height = aspect ? `${Math.round(width * aspect)}px` : '320px';
+        const width = compareEl.clientWidth || 600;
+        compareEl.style.height = aspect ? `${Math.round(width * aspect)}px` : '320px';
       } catch(_e) {}
     };
+    beforeImg.addEventListener('load', handleBeforeLoad, { once: true });
     beforeImg.src = localUrl;
     afterImg.removeAttribute('src');
     // Reset compare state and ensure same-panel overlay
@@ -118,16 +150,16 @@
       statusEl.textContent = 'Rendering complete';
       if (json.outputUrl) {
         // Load after image, then reveal smoothly
-        afterImg.onload = () => {
+        const handleAfterLoad = () => {
           // Match container to after image natural aspect for final render
           try{
-            const cmp = document.getElementById('compare');
-            const w = afterImg.naturalWidth || beforeImg.naturalWidth || cmp.clientWidth;
+            const w = afterImg.naturalWidth || beforeImg.naturalWidth || compareEl.clientWidth;
             const h = afterImg.naturalHeight || beforeImg.naturalHeight || 0;
-            if (w && h){ cmp.style.height = `${Math.round((h / w) * (cmp.clientWidth || w))}px`; }
+            if (w && h){ compareEl.style.height = `${Math.round((h / w) * (compareEl.clientWidth || w))}px`; }
           }catch(_e){}
           updateClip(Number(slider.value || 50));
         };
+        afterImg.addEventListener('load', handleAfterLoad, { once: true });
         afterImg.src = json.outputUrl;
         // Server logs both edit_success and a client_render; no client call needed
       } else {
@@ -199,8 +231,17 @@
   })();
 
   // Toggle submit enabled when a file is selected
-  document.getElementById('w-image').addEventListener('change', ()=>{ submitBtn.disabled = !document.getElementById('w-image').files[0]; });
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      const hasFile = !!fileInput.files?.[0];
+      submitBtn.disabled = !hasFile;
+      if (hasFile) {
+        hidePlaceholder();
+      } else {
+        showPlaceholder();
+        statusEl.textContent = '';
+      }
+    });
+  }
   document.getElementById('pick').addEventListener('click', ()=>{ /* handled */ });
 })();
-
-

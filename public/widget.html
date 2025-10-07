@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Before/After Widget</title>
+    <link rel="preload" href="/placeholder/volvo-before.jpg" as="image" />
+    <link rel="preload" href="/placeholder/volvo-after.jpg" as="image" />
+    <link rel="preload" href="/placeholder/cta-banner.png" as="image" />
     <style>
       html, body {
         background: transparent;
@@ -94,17 +97,76 @@
       .btn-choice.active { background: linear-gradient(90deg,#7c3aed,#ec4899,#22d3ee); color: #fff; border: none; }
 
       /* Compare area + badges */
-      #compare { position: relative; border: 1px solid var(--ba-border); border-radius: 12px; overflow: hidden; background: var(--ba-muted-bg); min-height: 220px; }
+      #compare { position: relative; border: 1px solid var(--ba-border); border-radius: 12px; overflow: hidden; background: var(--ba-muted-bg); min-height: 220px; aspect-ratio: 4 / 3; }
+      .compare.compact { aspect-ratio: 3 / 4; }
       #compare img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
       .after-wrapper { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); transition: clip-path .2s ease; }
-      .tag { position: absolute; top: 8px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 8px; background: var(--ba-muted-bg); color: var(--ba-fg); }
+      .tag { position: absolute; top: 8px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 8px; background: var(--ba-muted-bg); color: var(--ba-fg); z-index: 7; }
       .tag-before { left: 8px; }
       .tag-after { right: 8px; }
 
       /* Slider */
-      input.slider { -webkit-appearance: none; position: absolute; left: 8px; right: 8px; bottom: 8px; height: 6px; border-radius: 4px; background: var(--ba-border); outline: none; }
+      input.slider { -webkit-appearance: none; position: absolute; left: 8px; right: 8px; bottom: 8px; height: 6px; border-radius: 4px; background: var(--ba-border); outline: none; z-index: 10; }
       input.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--ba-accent); cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
       input.slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--ba-accent); border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3); cursor: pointer; }
+
+      /* Placeholder CTA */
+      .placeholder-cta {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 64px;
+        display: none;
+        justify-content: center;
+        align-items: flex-end;
+        padding: 16px;
+        z-index: 6;
+      }
+      .compare.is-placeholder .placeholder-cta {
+        display: flex;
+        animation: fadeIn .32s ease forwards;
+      }
+      .placeholder-card {
+        pointer-events: auto;
+        background: rgba(15, 23, 42, 0.82);
+        color: #fff;
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.38);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        text-align: center;
+        width: min(90%, 420px);
+      }
+      .placeholder-card img {
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(8, 13, 23, 0.35);
+      }
+      .placeholder-card p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .placeholder-card button {
+        width: 100%;
+        font-size: 14px;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (max-width: 540px) {
+        .placeholder-cta { bottom: 72px; }
+        .placeholder-card { padding: 16px; gap: 10px; }
+        .placeholder-card p { font-size: 13px; }
+      }
     </style>
   </head>
   <body class="auto widget-body card">
@@ -128,12 +190,19 @@
         </select>
         <input type="text" id="w-prompt" name="prompt" placeholder="Optional prompt" style="display:none" />
       </form>
-      <div class="compare" id="compare">
+      <div class="compare is-placeholder" id="compare">
         <span class="tag tag-before">Before</span>
         <span class="tag tag-after">After</span>
-        <img id="w-before" alt="Before" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+        <img id="w-before" alt="Before" data-placeholder="/placeholder/volvo-before.jpg" src="/placeholder/volvo-before.jpg" />
         <div class="after-wrapper">
-          <img id="w-after" alt="After" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+          <img id="w-after" alt="After" data-placeholder="/placeholder/volvo-after.jpg" src="/placeholder/volvo-after.jpg" />
+        </div>
+        <div class="placeholder-cta" id="placeholder-cta">
+          <div class="placeholder-card">
+            <img src="/placeholder/cta-banner.png" alt="Sparkling detailing results" style="display: block; opacity: 0; transition: opacity 0.3s ease;" onload="this.style.opacity='1';" onerror="this.style.display='none';" />
+            <p>Slide to compare the Volvo detail, then upload your own ride to experience the Before/After magic.</p>
+            <button type="button" class="btn-primary" id="cta-try">Test your car</button>
+          </div>
         </div>
         <input id="w-slider" class="slider" type="range" min="0" max="100" value="50" />
       </div>
@@ -153,7 +222,14 @@
         pick.addEventListener('click', ()=> input.click());
         dz.addEventListener('dragover', (e)=>{ e.preventDefault(); dz.style.borderColor = 'var(--accent)';});
         dz.addEventListener('dragleave', ()=>{ dz.style.borderColor = 'var(--border)';});
-        dz.addEventListener('drop', (e)=>{ e.preventDefault(); dz.style.borderColor = 'var(--border)'; if (e.dataTransfer.files[0]) input.files = e.dataTransfer.files;});
+        dz.addEventListener('drop', (e)=>{
+          e.preventDefault();
+          dz.style.borderColor = 'var(--border)';
+          if (e.dataTransfer.files[0]) {
+            input.files = e.dataTransfer.files;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
       })();
     </script>
     <script src="/widget.js"></script>
@@ -184,5 +260,3 @@
     </script>
   </body>
 </html>
-
-
