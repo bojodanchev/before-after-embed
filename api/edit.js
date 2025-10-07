@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, incrMonthlyUsageForClient, getClientSettings, handleCorsPreflight, setCorsHeaders, bumpCounter } from "./_shared.js";
+import { fal, verticalPromptPresets, getEmbedConfig, logUsage, deliverWebhook, getClientPlan, getMonthlyUsageForClient, getMonthlyBonusForClient, incrMonthlyUsageForClient, getClientSettings, handleCorsPreflight, setCorsHeaders, bumpCounter } from "./_shared.js";
 
 export const config = {
   api: {
@@ -96,14 +96,18 @@ export default async function handler(req, res){
     // Enforce monthly generation quota if embed belongs to a client
     let plan = null;
     let monthlyUsed = 0;
+    let monthlyBonus = 0;
     let monthlyLimit = Infinity;
     if (embedClientId){
       try{
         plan = await getClientPlan(embedClientId);
         monthlyLimit = Number(plan?.monthlyGenerations || Infinity);
         monthlyUsed = await getMonthlyUsageForClient(embedClientId);
-        if (Number.isFinite(monthlyLimit) && monthlyUsed >= monthlyLimit){
-          await logUsage('edit_quota_exceeded', embedId, { clientId: embedClientId, plan: plan?.id || 'unknown', monthlyUsed, monthlyLimit });
+        monthlyBonus = await getMonthlyBonusForClient(embedClientId);
+        const totalAvailable = monthlyLimit + monthlyBonus;
+        const remaining = totalAvailable - monthlyUsed;
+        if (remaining <= 0){
+          await logUsage('edit_quota_exceeded', embedId, { clientId: embedClientId, plan: plan?.id || 'unknown', monthlyUsed, monthlyLimit, monthlyBonus, remaining });
           return res.status(402).json({ error: 'Generation limit reached for current plan. Upgrade to continue.' });
         }
       }catch{}
