@@ -453,9 +453,6 @@ export default function BeforeAfterLanding() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-xs text-white/60">
-                {t('Source: Harvard Business Review — Forget What You Know About SEO (LLM optimization research, 2025)','Източник: Harvard Business Review — Forget What You Know About SEO (проучване за оптимизация за LLM, 2025)')}
-              </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a href="#demo"><Button size="lg" className="gap-2">
                   {t('Try the Live Demo','Опитайте демото на живо')} <ArrowRight className="h-5 w-5" />
@@ -532,48 +529,6 @@ export default function BeforeAfterLanding() {
                 </CardContent>
               </Card>
             </div>
-          </Container>
-        </section>
-
-        {/* GEO readiness */}
-        <section id="geo" className="border-t border-white/10 py-16 sm:py-24">
-          <Container>
-            <SectionTitle
-              eyebrow={t('AI search','AI търсене')}
-              title={t('Reach AI searchers with built-in GEO','Достигнете AI търсещи с вграден GEO')}
-              subtitle={t('Before/After ships with answer-first copy, structured data, and accessibility best practices so Google, Perplexity, and chat assistants surface your brand.','Before/After идва с отговори отпред, структурирани данни и достъпност, за да показват Google, Perplexity и чат асистенти вашия бранд.')}
-            />
-
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              <Card className="border-white/10 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="text-base">{t('Answer-ready sections','Секции, готови за отговори')}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-white/70">
-                  {t('Hero statements, question-based headings, and bilingual copy map to the exact prompts prospects ask human reps.','Херо твърдения, въпросни заглавия и двуезично копи отговарят на точните въпроси, които клиентите задават на консултанти.')}
-                </CardContent>
-              </Card>
-              <Card className="border-white/10 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="text-base">{t('Structured data baked in','Вградени структурирани данни')}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-white/70">
-                  {t('Organization, Product, Offer, and FAQ schema explain pricing, onboarding, and support so AI answer engines cite you correctly.','Схемите Organization, Product, Offer и FAQ обясняват цените, внедряването и поддръжката, за да цитират AI отговорите вас коректно.')}
-                </CardContent>
-              </Card>
-              <Card className="border-white/10 bg-white/5">
-                <CardHeader>
-                  <CardTitle className="text-base">{t('Accessible proof experiences','Достъпни преживявания с доказателства')}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-white/70">
-                  {t('Descriptive alt text, skip links, and semantic landmarks make the slider usable for buyers and the assistants they rely on.','Описателни alt текстове, skip линк и семантични ориентири правят плъзгача удобен както за купувачите, така и за техните асистенти.')}
-                </CardContent>
-              </Card>
-            </div>
-
-            <p className="mt-6 text-xs text-white/60">
-              {t('Powered by the ToTheWeb GEO checklist so AI summaries, chatbots, and marketplaces surface your brand consistently.','Задвижвано от GEO чеклиста на ToTheWeb, за да показват AI резюмета, чатботи и маркетплейси вашия бранд последователно.')}
-            </p>
           </Container>
         </section>
 
