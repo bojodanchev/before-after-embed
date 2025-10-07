@@ -250,7 +250,12 @@
             <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Preview transformation slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 10;">
               <div id="placeholder-thumb" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
             </div>
-            <img id="placeholder-cta-img" alt="Slide CTA" style="position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); width: min(90%, 560px); z-index: 11; pointer-events: none;">
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 11; text-align: center; pointer-events: none;">
+              <div style="background: rgba(0,0,0,0.75); color: white; padding: 12px 20px; border-radius: 999px; font-size: 14px; font-weight: 600; backdrop-filter: blur(10px); display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+                <span style="font-size: 20px;">👆</span>
+                <span>Try it out now</span>
+              </div>
+            </div>
           </div>
         </div>
         <div id="slider" class="slider" style="display: none;" role="region" aria-live="polite"></div>
@@ -269,14 +274,19 @@
     let selectedOpt = null;
     let beforeUrl = '';
     let afterUrl = '';
+    let uploadedImageAspectRatio = 75; // default 4:3
 
-    // Set placeholder image sources after DOM is ready
+    // Set placeholder image sources after DOM is ready - use direct URLs to ensure they load
     const placeholderAfterImg = root.getElementById('placeholder-after');
     const placeholderBeforeImg = root.getElementById('placeholder-before');
-    const placeholderCtaImg = root.getElementById('placeholder-cta-img');
-    if (placeholderAfterImg) placeholderAfterImg.src = placeholderAfterSrc;
-    if (placeholderBeforeImg) placeholderBeforeImg.src = placeholderBeforeSrc;
-    if (placeholderCtaImg) placeholderCtaImg.src = placeholderCtaSrc;
+    if (placeholderAfterImg) {
+      placeholderAfterImg.src = 'https://before-after-embed.vercel.app/placeholder/after.jpg';
+      placeholderAfterImg.onerror = () => console.error('[Before/After] Failed to load placeholder-after');
+    }
+    if (placeholderBeforeImg) {
+      placeholderBeforeImg.src = 'https://before-after-embed.vercel.app/placeholder/before.jpg';
+      placeholderBeforeImg.onerror = () => console.error('[Before/After] Failed to load placeholder-before');
+    }
 
     // Load embed configuration
     fetch(`https://before-after-embed.vercel.app/api/embed/${encodeURIComponent(cfg.id)}`)
@@ -520,20 +530,29 @@
         
       beforeUrl = URL.createObjectURL(processedFile);
       placeholder.style.display = 'none';
-      
-      // Show uploaded image immediately in a preview slider
-      slider.innerHTML = `
-        <div style="position: relative; width: 100%; padding-bottom: 75%; background: #000; border-radius: 8px; overflow: hidden;">
-          <img src="${beforeUrl}" alt="Your uploaded photo" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
-          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 24px; border-radius: 12px; text-align: center; pointer-events: none; backdrop-filter: blur(8px);">
-            <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">✓ Photo uploaded!</div>
-            <div style="font-size: 12px; opacity: 0.85;">Click "Generate" to see the transformation</div>
-          </div>
-        </div>`;
-      slider.style.display = 'block';
-      genBtn.disabled = false;
-      showStatus('Photo ready! Click Generate to transform it.', 'success');
-      console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`);
+
+      // Load image to get dimensions and show proper aspect ratio
+      const tempImg = new Image();
+      tempImg.onload = () => {
+        uploadedImageAspectRatio = (tempImg.naturalHeight / tempImg.naturalWidth) * 100;
+        // Show uploaded image immediately in a preview with correct aspect ratio
+        slider.innerHTML = `
+          <div style="position: relative; width: 100%; padding-bottom: ${uploadedImageAspectRatio}%; background: #000; border-radius: 14px; overflow: hidden;">
+            <img src="${beforeUrl}" alt="Your uploaded photo" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 24px; border-radius: 12px; text-align: center; pointer-events: none; backdrop-filter: blur(8px); z-index: 20;">
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">✓ Photo uploaded!</div>
+              <div style="font-size: 12px; opacity: 0.85;">Click "Generate" to see the transformation</div>
+            </div>
+          </div>`;
+        slider.style.display = 'block';
+        genBtn.disabled = false;
+        showStatus('Photo ready! Click Generate to transform it.', 'success');
+        console.log('[Before/After] Image loaded:', processedFile.name, `${(processedFile.size / 1024).toFixed(1)}KB`, `${tempImg.naturalWidth}x${tempImg.naturalHeight}`);
+      };
+      tempImg.onerror = () => {
+        showStatus('Failed to load image preview. Please try again.', 'error');
+      };
+      tempImg.src = beforeUrl;
       } catch (err) {
         showStatus('Failed to load image. Please try a different photo.', 'error');
         console.error('[Before/After] Image load error:', err);
@@ -553,11 +572,11 @@
         showStatus('Generating...', 'info');
         console.log('[Before/After] Starting generation...', { embedId: cfg.id, vertical: root.__ba_vertical, option: selectedOpt });
 
-        // Show user's image while generating
+        // Show user's static image while generating (no zooming/resizing)
         slider.innerHTML = `
-          <div style="position: relative; width: 100%; padding-bottom: 75%; background: #000; border-radius: 8px; overflow: hidden;">
+          <div style="position: relative; width: 100%; padding-bottom: ${uploadedImageAspectRatio}%; background: #000; border-radius: 14px; overflow: hidden;">
             <img src="${beforeUrl}" alt="Your photo - generating..." style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 24px; border-radius: 12px; text-align: center; pointer-events: none; backdrop-filter: blur(8px);">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 24px; border-radius: 12px; text-align: center; pointer-events: none; backdrop-filter: blur(8px); z-index: 20;">
               <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">⏳ Generating...</div>
               <div style="font-size: 12px; opacity: 0.85;">This usually takes 15-30 seconds</div>
             </div>
@@ -620,11 +639,12 @@
         try { root.__baCleanup(); } catch (_e) {}
       }
 
+      // Use the stored aspect ratio for consistent sizing
       root.innerHTML = `
-        <div style="position: relative; width: 100%; padding-bottom: 75%; background: #000; border-radius: 8px; overflow: hidden;">
+        <div style="position: relative; width: 100%; padding-bottom: ${uploadedImageAspectRatio}%; background: #000; border-radius: 14px; overflow: hidden;">
           <img src="${after}" alt="After image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;">
           <img id="b" src="${before}" alt="Before image" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; clip-path: inset(0 50% 0 0);">
-          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none;">
+          <div class="slider-control" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" tabindex="0" aria-label="Before After slider" style="position: absolute; inset: 0; cursor: ew-resize; touch-action: none; z-index: 15;">
             <div id="r" class="slider-thumb" style="left: 50%; transform: translateX(-50%); cursor: ew-resize;"></div>
           </div>
         </div>`;
