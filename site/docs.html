@@ -24,14 +24,221 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "TechArticle",
-        "headline": "Before/After Embed Documentation",
-        "description": "Step-by-step instructions to launch and customize the Before/After Embed widget.",
-        "url": "https://before-after-embed.vercel.app/app/docs.html",
-        "publisher": {
-          "@type": "Organization",
-          "name": "Before/After Embed"
-        }
+        "@graph": [
+          {
+            "@type": "TechArticle",
+            "headline": "Before/After Embed Documentation",
+            "description": "Step-by-step instructions to launch and customize the Before/After Embed widget.",
+            "url": "https://before-after-embed.vercel.app/app/docs.html",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Before/After Embed"
+            }
+          },
+          {
+            "@type": "HowTo",
+            "name": "How to Install Before/After Widget on WordPress",
+            "description": "Step-by-step guide to add the Before/After widget to your WordPress dental, barber, or detailing website in under 5 minutes.",
+            "totalTime": "PT5M",
+            "tool": [
+              {
+                "@type": "HowToTool",
+                "name": "Before/After Embed account"
+              },
+              {
+                "@type": "HowToTool",
+                "name": "WordPress website with admin access"
+              }
+            ],
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Get your embed code",
+                "text": "Log into the Before/After Client Portal at before-after-embed.vercel.app/client.html and copy your unique embed snippet from the Embeds section.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#quickstart"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Add Custom HTML block in WordPress",
+                "text": "In the WordPress block editor, add a Custom HTML block where you want the widget to appear on your page.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Paste and configure the embed code",
+                "text": "Paste the embed code into the Custom HTML block. If your theme has strict CSP settings, add data-variant='card' to the script tag.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Publish and test",
+                "text": "Save and publish your page. Test by uploading an image and generating a before/after preview to confirm the widget works.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "How to Install Before/After Widget on Shopify",
+            "description": "Quick guide to add the Before/After AI widget to your Shopify store for auto detailing, dental, or barber services.",
+            "totalTime": "PT5M",
+            "tool": [
+              {
+                "@type": "HowToTool",
+                "name": "Before/After Embed account"
+              },
+              {
+                "@type": "HowToTool",
+                "name": "Shopify store with theme editing access"
+              }
+            ],
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Get your embed snippet",
+                "text": "Sign into the Before/After Client Portal and copy your embed code with data-variant='card' for Shopify compatibility.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#quickstart"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Add Custom Liquid block",
+                "text": "In the Shopify theme editor, add a Custom liquid block to the page where you want the widget (usually product or service pages).",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Paste the code and adjust styling",
+                "text": "Paste the embed snippet. For better theme integration, add data-background='transparent' to blend the widget with your store design.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Save and test",
+                "text": "Save your theme changes and preview the page. Upload a test image to verify the before/after slider works correctly.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "How to Install Before/After Widget on Wix",
+            "description": "Simple steps to embed the Before/After widget on any Wix website for service businesses.",
+            "totalTime": "PT3M",
+            "tool": [
+              {
+                "@type": "HowToTool",
+                "name": "Before/After Embed account"
+              },
+              {
+                "@type": "HowToTool",
+                "name": "Wix website with editor access"
+              }
+            ],
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Copy your embed code",
+                "text": "Log into Before/After Client Portal and copy your embed snippet with data-variant='card' recommended for Wix.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#quickstart"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Add Embed Code widget in Wix",
+                "text": "In the Wix editor, click Add (+) and search for 'Embed Code' widget. Drag it to where you want the before/after slider.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Paste and configure",
+                "text": "Paste your embed snippet into the code box. Select 'Code' mode and ensure the widget size fits your page layout.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Publish and verify",
+                "text": "Publish your Wix site and test the widget by uploading an image and generating a transformation.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "How to Fix Widget Not Appearing Issue",
+            "description": "Troubleshooting guide when the Before/After widget doesn't show up on your website.",
+            "totalTime": "PT10M",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Check browser console for errors",
+                "text": "Open browser DevTools (F12), go to Console tab, and look for red errors. Common issues include CSP blocking or network failures.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Verify embed code is correct",
+                "text": "Ensure your data-embed-id matches the ID from your Client Portal and the script src points to https://before-after-embed.vercel.app/embed.js",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#attributes"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Switch to iframe variant for CSP issues",
+                "text": "If you see Content Security Policy errors, add data-variant='card' to your script tag to use the CSP-safe iframe version.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#cms-csp"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Clear cache and hard refresh",
+                "text": "Press Ctrl+F5 (Windows) or Cmd+Shift+R (Mac) to clear browser cache and reload the page with fresh assets.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              }
+            ]
+          },
+          {
+            "@type": "HowTo",
+            "name": "How to Fix Upload Failing Error",
+            "description": "Solutions for when image uploads fail in the Before/After widget.",
+            "totalTime": "PT5M",
+            "step": [
+              {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Check file size and format",
+                "text": "Ensure image is under 25MB and in JPG, PNG, WEBP, or HEIC format. Large iPhone photos are automatically compressed.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Verify internet connection",
+                "text": "Check Network tab in DevTools to see if upload request reaches the server. Slow connections may timeout on large files.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              },
+              {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Try a smaller test image",
+                "text": "Test with a small image under 5MB to rule out file size issues. If it works, the original image may be corrupted or too large.",
+                "url": "https://before-after-embed.vercel.app/app/docs.html#troubleshooting"
+              }
+            ]
+          }
+        ]
       }
     </script>
   </head>
